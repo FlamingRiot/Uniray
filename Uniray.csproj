@@ -11,4 +11,14 @@
     <PackageReference Include="Raylib-cs" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="RayGUI_cs">
+      <HintPath>..\raygui_cs\bin\Debug\net6.0\RayGUI_cs.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="assets\models\" />
+  </ItemGroup>
+
 </Project>
