@@ -21,4 +21,10 @@
     <Folder Include="assets\models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="data\font\Ubuntu-Regular.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -29,7 +29,9 @@ namespace Uniray
             // ===============================================================================================================================================
             // =============================================================== SET APPLICATION UI ============================================================
             // ===============================================================================================================================================
-            
+
+            Font baseFont = LoadFont("data/font/Ubuntu-Regular.ttf");
+
             float cont1X = wWindow - wWindow / 1.25f;
             float cont1Y = hWindow - hWindow / 3;
             Container fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X, hWindow - (int)cont1Y, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
@@ -38,6 +40,8 @@ namespace Uniray
             fileManager.ExtensionFile = "m3d";
 
             Container gameManager = new Container(10, 30, (int)cont1X - 20, hWindow - 10, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+
+            Textbox textbox = new Textbox("Romane", 40, 400, 50, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
 
             // Set FPS
             SetTargetFPS(60);
@@ -63,6 +67,7 @@ namespace Uniray
                 DrawRectangle(0, (int)cont1Y - 10, wWindow, hWindow - (int)cont1Y + 10, Uniray.APPLICATION_COLOR);
                 DrawContainer(ref fileManager);
                 DrawContainer(ref gameManager);
+                DrawTextbox(ref textbox, baseFont);
 
                 EndDrawing();
             }
