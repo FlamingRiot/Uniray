@@ -13,9 +13,6 @@ namespace Uniray
             // Initialize window and set mode
             InitWindow(1800, 900, "Uniray");
 
-            SetConfigFlags(ConfigFlags.ResizableWindow);
-            SetConfigFlags(ConfigFlags.MaximizedWindow);
-
             int wWindow = GetScreenWidth();
             int hWindow = GetScreenHeight();
 
@@ -42,15 +39,25 @@ namespace Uniray
 
             Container gameManager = new Container(10, 30, (int)cont1X - 20, hWindow - 10, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
 
-            Textbox textbox = new Textbox("Hello World !", 400, 900, 50, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
-            Button button = new Button(50, 20, 40, 400, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
-            button.Text = "Hello World !";
-            button.HoverColor = Uniray.FOCUS_COLOR;
+            Textbox textbox = new Textbox("Hello World !", 140, 200, 50, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            Button button = new Button("Evan", 1200, 400, 60, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            button.Type = ButtonType.PathFinder;
 
             // Set FPS
             SetTargetFPS(60);
+
+
+            /*List<int> keys = new List<int>();
+            int index = 0;
+            int key;*/
+
             while (!WindowShouldClose())
             {
+                /*key = GetKeyPressed();
+                if (key != 0)keys.Add(key);
+                if (keys.Count != 0)Console.WriteLine(keys.Last());*/
+
+
                 BeginDrawing();
 
                 ClearBackground(Color.White);
