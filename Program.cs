@@ -11,7 +11,8 @@ namespace Uniray
         static void Main(string[] args)
         {
             // Initialize window and set mode
-            InitWindow(GetMonitorWidth(0), GetMonitorHeight(0), "Uniray");
+            InitWindow(1800, 900, "Uniray");
+
             SetConfigFlags(ConfigFlags.ResizableWindow);
             SetConfigFlags(ConfigFlags.MaximizedWindow);
 
@@ -41,13 +42,15 @@ namespace Uniray
 
             Container gameManager = new Container(10, 30, (int)cont1X - 20, hWindow - 10, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
 
-            Textbox textbox = new Textbox("Romane", 40, 400, 50, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            Textbox textbox = new Textbox("Hello World !", 400, 900, 50, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            Button button = new Button(50, 20, 40, 400, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            button.Text = "Hello World !";
+            button.HoverColor = Uniray.FOCUS_COLOR;
 
             // Set FPS
             SetTargetFPS(60);
             while (!WindowShouldClose())
             {
-                UpdateCamera(ref camera, CameraMode.FirstPerson);
                 BeginDrawing();
 
                 ClearBackground(Color.White);
@@ -68,6 +71,7 @@ namespace Uniray
                 DrawContainer(ref fileManager);
                 DrawContainer(ref gameManager);
                 DrawTextbox(ref textbox, baseFont);
+                DrawButton(button, baseFont);
 
                 EndDrawing();
             }
