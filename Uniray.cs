@@ -27,7 +27,7 @@ namespace Uniray
 
         public List<Button> Buttons { get { return buttons; } }
         public Container GameManager { get { return gameManager; } set { gameManager = value; } }
-        public Container FileManager { get { return gameManager; } set { fileManager = value; } }
+        public Container FileManager { get { return fileManager; } set { fileManager = value; } }
 
         /// <summary>
         /// Construct UI
@@ -46,7 +46,7 @@ namespace Uniray
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;
             float cont1Y = hWindow - hWindow / 3;
-            fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X, hWindow - (int)cont1Y - 10, APPLICATION_COLOR, FOCUS_COLOR);
+            fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X - 10, hWindow - (int)cont1Y - 10, APPLICATION_COLOR, FOCUS_COLOR);
             fileManager.Type = ContainerType.FileDropper;
             fileManager.OutputFilePath = "assets/models/";
             fileManager.ExtensionFile = "m3d";
@@ -70,6 +70,10 @@ namespace Uniray
             animationsButton.Type = ButtonType.Custom;
             buttons.Add(animationsButton);
 
+            Button openFileButton = new Button("Open", (int)fileManager.X + fileManager.Width - 38, (int)fileManager.Y + 5, 40, 20, APPLICATION_COLOR, FOCUS_COLOR);
+            openFileButton.Type = ButtonType.PathFinder;
+            buttons.Add(openFileButton);
+
             // Textboxes
             /*Textbox textbox = new Textbox("Hello World !", 140, 200, 50, 20, APPLICATION_COLOR, FOCUS_COLOR);
             textboxes.Add(textbox);*/
@@ -80,12 +84,16 @@ namespace Uniray
 
             Label gameObjectLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + hWindow / 2, "Game Object");
             labels.Add(gameObjectLabel);
+
+            Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "File type : .m3d");
+            labels.Add(fileType);
         }
         /// <summary>
         /// Draw user interface of the application
         /// </summary>
         public void DrawUI()
         {
+            // Draw
             DrawRectangle(0, 0, (int)(wWindow - wWindow / 1.25f), hWindow, new Color(20, 20, 20, 255));
             DrawRectangle(0, hWindow - hWindow / 3 - 10, wWindow, hWindow - (hWindow - hWindow / 3) + 10, new Color(20, 20, 20, 255));
 
@@ -107,7 +115,49 @@ namespace Uniray
                 if (Hover(textbox.X, textbox.Y, textbox.Width, textbox.Height)) { focus = true; }
             }
 
-            if (!focus) { SetMouseCursor(MouseCursor.Default); } 
+            if (!focus) { SetMouseCursor(MouseCursor.Default); }
+
+            // Manage pressed buttons
+            foreach (Button section in buttons)
+            {
+                if (IsButtonPressed(section))
+                {
+                    Container c = FileManager;
+                    Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "");
+                    switch (section.Text)
+                    {
+                        case "Models":
+                            c.ExtensionFile = "m3d";
+                            c.OutputFilePath = "assets/models";
+                            fileType.Text = "File type : .m3d";
+                            labels.RemoveAt(labels.IndexOf(labels.Last()));
+                            labels.Add(fileType);
+                            break;
+                        case "Textures":
+                            c.ExtensionFile = "png";
+                            c.OutputFilePath = "assets/textures";
+                            fileType.Text = "File type : .png";
+                            labels.RemoveAt(labels.IndexOf(labels.Last()));
+                            labels.Add(fileType);
+                            break;
+                        case "Sounds":
+                            c.ExtensionFile = "wav";
+                            c.OutputFilePath = "assets/sounds";
+                            fileType.Text = "File type : .wav";
+                            labels.RemoveAt(labels.IndexOf(labels.Last()));
+                            labels.Add(fileType);
+                            break;
+                        case "Animations":
+                            c.ExtensionFile = "m3d";
+                            c.OutputFilePath = "assets/animations";
+                            fileType.Text = "File type : .m3d";
+                            labels.RemoveAt(labels.IndexOf(labels.Last()));
+                            labels.Add(fileType);
+                            break;
+                    }
+                    FileManager = c;
+                }
+            }
         }
     }
 }
