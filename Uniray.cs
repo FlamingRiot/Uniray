@@ -1,6 +1,6 @@
 ﻿using static Raylib_cs.Raylib;
 using Raylib_cs;
-using System.Numerics;
+using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
 namespace Uniray
 {
@@ -15,13 +15,19 @@ namespace Uniray
 
         private Font baseFont;
 
-        private List<Container> containers;
+        private Container fileManager;
+
+        private Container gameManager;
 
         private List<Textbox> textboxes;
 
         private List<Button> buttons;
 
         private List<Label> labels;
+
+        public List<Button> Buttons { get { return buttons; } }
+        public Container GameManager { get { return gameManager; } set { gameManager = value; } }
+        public Container FileManager { get { return gameManager; } set { fileManager = value; } }
 
         /// <summary>
         /// Construct UI
@@ -33,7 +39,6 @@ namespace Uniray
             this.baseFont = font;
 
             // Instantiate lists of components
-            containers = new List<Container>();
             textboxes = new List<Textbox>();
             buttons = new List<Button>();
             labels = new List<Label>();
@@ -41,14 +46,12 @@ namespace Uniray
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;
             float cont1Y = hWindow - hWindow / 3;
-            Container fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X, hWindow - (int)cont1Y - 10, APPLICATION_COLOR, FOCUS_COLOR);
+            fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X, hWindow - (int)cont1Y - 10, APPLICATION_COLOR, FOCUS_COLOR);
             fileManager.Type = ContainerType.FileDropper;
             fileManager.OutputFilePath = "assets/models/";
             fileManager.ExtensionFile = "m3d";
-            containers.Add(fileManager);
 
-            Container gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR);
-            containers.Add(gameManager);
+            gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR);
 
             // Buttons
             Button modelsButton = new Button("Models", (int)fileManager.X + 48, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR);
@@ -88,22 +91,20 @@ namespace Uniray
 
             bool focus = false;
 
-            for (int i = 0; i < containers.Count; i++)
-            {
-                Container container = containers[i];
-                containers[i] = RayGUI.DrawContainer(ref container);
-            }
-            foreach (Label label in labels) { RayGUI.DrawLabel(label, baseFont); }
+            DrawContainer(ref gameManager);
+            DrawContainer(ref fileManager);
+
+            foreach (Label label in labels) { DrawLabel(label, baseFont); }
             foreach (Button button in buttons)
             {
-                RayGUI.DrawButton(button, baseFont);
-                if (RayGUI.Hover(button.X, button.Y, button.Width, button.Height)) { focus = true; }
+                DrawButton(button, baseFont);
+                if (Hover(button.X, button.Y, button.Width, button.Height)) { focus = true; }
             }
             for (int i = 0; i < textboxes.Count; i++) 
             {
                 Textbox textbox = textboxes[i];
-                textboxes[i] = RayGUI.DrawTextbox(ref textbox, baseFont);
-                if (RayGUI.Hover(textbox.X, textbox.Y, textbox.Width, textbox.Height)) { focus = true; }
+                textboxes[i] = DrawTextbox(ref textbox, baseFont);
+                if (Hover(textbox.X, textbox.Y, textbox.Width, textbox.Height)) { focus = true; }
             }
 
             if (!focus) { SetMouseCursor(MouseCursor.Default); } 

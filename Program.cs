@@ -2,6 +2,7 @@
 using static RayGUI_cs.RayGUI;
 using Raylib_cs;
 using System.Numerics;
+using RayGUI_cs;
 
 namespace Uniray
 {
@@ -15,7 +16,6 @@ namespace Uniray
             SetWindowState(ConfigFlags.MaximizedWindow);
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
             
-
             // Load font
             Font font = LoadFont("data/font/Ubuntu-Regular.ttf");
 
@@ -46,6 +46,36 @@ namespace Uniray
                 /*key = GetKeyPressed();
                 if (key != 0)keys.Add(key);
                 if (keys.Count != 0)Console.WriteLine(keys.Last());*/
+
+                // Manage file manager sections
+                foreach (Button section in uniray.Buttons)
+                {
+                    if (IsButtonPressed(section))
+                    {
+                        Container c = uniray.FileManager;
+                        switch (section.Text)
+                        {
+                            case "Models":
+                                c.ExtensionFile = "m3d";
+                                c.OutputFilePath = "assets/models";
+                                break;
+                            case "Textures":
+                                c.ExtensionFile = "png";
+                                c.OutputFilePath = "assets/textures";
+                                break;
+                            case "Sounds":
+                                c.ExtensionFile = "wav";
+                                c.OutputFilePath = "assets/sounds";
+                                break;
+                            case "Animations":
+                                c.ExtensionFile = "m3d";
+                                c.OutputFilePath = "assets/animations";
+                                break;
+                        }
+                        uniray.FileManager = c;
+                    }
+                }
+
                 // Manage resize options
                 if (IsWindowResized())
                 {
