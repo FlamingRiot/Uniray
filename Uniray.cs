@@ -1,5 +1,6 @@
 ﻿using static Raylib_cs.Raylib;
 using Raylib_cs;
+using System.Numerics;
 using RayGUI_cs;
 namespace Uniray
 {
@@ -20,6 +21,8 @@ namespace Uniray
 
         private List<Button> buttons;
 
+        private List<Label> labels;
+
         /// <summary>
         /// Construct UI
         /// </summary>
@@ -33,6 +36,7 @@ namespace Uniray
             containers = new List<Container>();
             textboxes = new List<Textbox>();
             buttons = new List<Button>();
+            labels = new List<Label>();
 
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;
@@ -47,34 +51,62 @@ namespace Uniray
             containers.Add(gameManager);
 
             // Buttons
-            Button button = new Button("Evan", 1200, 400, 60, 20, APPLICATION_COLOR, FOCUS_COLOR);
-            button.Type = ButtonType.PathFinder;
-            buttons.Add(button);
+            Button modelsButton = new Button("Models", (int)fileManager.X + 48, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR);
+            modelsButton.Type = ButtonType.Custom;
+            buttons.Add(modelsButton);
+
+            Button texturesButton = new Button("Textures", (int)fileManager.X + 164, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR);
+            texturesButton.Type = ButtonType.Custom;
+            buttons.Add(texturesButton);
+
+            Button soundsButton = new Button("Sounds", (int)fileManager.X + 260, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR);
+            soundsButton.Type = ButtonType.Custom;
+            buttons.Add(soundsButton);
+
+            Button animationsButton = new Button("Animations", (int)fileManager.X + 392, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR);
+            animationsButton.Type = ButtonType.Custom;
+            buttons.Add(animationsButton);
 
             // Textboxes
-            Textbox textbox = new Textbox("Hello World !", 140, 200, 50, 20, APPLICATION_COLOR, FOCUS_COLOR);
-            textboxes.Add(textbox);
-        }
+            /*Textbox textbox = new Textbox("Hello World !", 140, 200, 50, 20, APPLICATION_COLOR, FOCUS_COLOR);
+            textboxes.Add(textbox);*/
 
+            // Labels
+            Label gameLayersLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + 10, "Game Layers");
+            labels.Add(gameLayersLabel);
+
+            Label gameObjectLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + hWindow / 2, "Game Object");
+            labels.Add(gameObjectLabel);
+        }
         /// <summary>
         /// Draw user interface of the application
         /// </summary>
         public void DrawUI()
         {
-            DrawRectangle(0, 0, (int)(wWindow - wWindow / 1.25f), hWindow, APPLICATION_COLOR);
-            DrawRectangle(0, hWindow - hWindow / 3 - 10, wWindow, hWindow - (hWindow - hWindow / 3) + 10, APPLICATION_COLOR);
+            DrawRectangle(0, 0, (int)(wWindow - wWindow / 1.25f), hWindow, new Color(20, 20, 20, 255));
+            DrawRectangle(0, hWindow - hWindow / 3 - 10, wWindow, hWindow - (hWindow - hWindow / 3) + 10, new Color(20, 20, 20, 255));
 
-            foreach (Button button in buttons) { RayGUI.DrawButton(button, baseFont); }
+            bool focus = false;
+
             for (int i = 0; i < containers.Count; i++)
             {
                 Container container = containers[i];
                 containers[i] = RayGUI.DrawContainer(ref container);
             }
+            foreach (Label label in labels) { RayGUI.DrawLabel(label, baseFont); }
+            foreach (Button button in buttons)
+            {
+                RayGUI.DrawButton(button, baseFont);
+                if (RayGUI.Hover(button.X, button.Y, button.Width, button.Height)) { focus = true; }
+            }
             for (int i = 0; i < textboxes.Count; i++) 
             {
                 Textbox textbox = textboxes[i];
-                textboxes[i] = RayGUI.DrawTextbox(ref textbox, baseFont); 
+                textboxes[i] = RayGUI.DrawTextbox(ref textbox, baseFont);
+                if (RayGUI.Hover(textbox.X, textbox.Y, textbox.Width, textbox.Height)) { focus = true; }
             }
+
+            if (!focus) { SetMouseCursor(MouseCursor.Default); } 
         }
     }
 }

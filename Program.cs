@@ -9,10 +9,12 @@ namespace Uniray
     {
         static void Main(string[] args)
         {
-            SetConfigFlags(ConfigFlags.ResizableWindow);
             // Initialize window and set mode
             InitWindow(1800, 900, "Uniray");
+            SetWindowState(ConfigFlags.ResizableWindow);
+            SetWindowState(ConfigFlags.MaximizedWindow);
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            
 
             // Load font
             Font font = LoadFont("data/font/Ubuntu-Regular.ttf");
@@ -56,17 +58,12 @@ namespace Uniray
 
                 ClearBackground(Color.White);
 
-                // ===============================================================================================================================================
-                // =============================================================== MANAGE 3D SPACE ===============================================================
-                // ===============================================================================================================================================
                 BeginMode3D(camera);
 
                 DrawGrid(10, 10);
 
                 EndMode3D();
-                // ===============================================================================================================================================
-                // ============================================================= MANAGE APPLICATION ==============================================================
-                // ===============================================================================================================================================
+
                 uniray.DrawUI();
 
                 EndDrawing();
