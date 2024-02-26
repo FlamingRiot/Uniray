@@ -23,18 +23,16 @@ namespace Uniray
         /// <summary>
         /// Construct UI
         /// </summary>
-        public Uniray(int WWindow, int HWindow)
+        public Uniray(int WWindow, int HWindow, Font font)
         {
             this.wWindow = WWindow;
             this.hWindow = HWindow;
+            this.baseFont = font;
 
             // Instantiate lists of components
             containers = new List<Container>();
             textboxes = new List<Textbox>();
             buttons = new List<Button>();
-
-            // Load font
-            this.baseFont = LoadFont("data/font/Ubuntu-Regular.ttf");
 
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;

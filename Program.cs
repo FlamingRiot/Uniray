@@ -1,7 +1,6 @@
 ﻿using static Raylib_cs.Raylib;
 using static RayGUI_cs.RayGUI;
 using Raylib_cs;
-using RayGUI_cs;
 using System.Numerics;
 
 namespace Uniray
@@ -10,14 +9,20 @@ namespace Uniray
     {
         static void Main(string[] args)
         {
+            SetConfigFlags(ConfigFlags.ResizableWindow);
             // Initialize window and set mode
             InitWindow(1800, 900, "Uniray");
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
 
+            // Load font
+            Font font = LoadFont("data/font/Ubuntu-Regular.ttf");
+
+            // Get Window size
             int wWindow = GetScreenWidth();
             int hWindow = GetScreenHeight();
 
-            Uniray uniray = new Uniray(wWindow, hWindow);
+            // Set UI
+            Uniray uniray = new Uniray(wWindow, hWindow, font);
 
             // Set 3D camera for the scene
             Camera3D camera = new Camera3D();
@@ -39,7 +44,13 @@ namespace Uniray
                 /*key = GetKeyPressed();
                 if (key != 0)keys.Add(key);
                 if (keys.Count != 0)Console.WriteLine(keys.Last());*/
-
+                // Manage resize options
+                if (IsWindowResized())
+                {
+                    hWindow = GetScreenHeight();
+                    wWindow = GetScreenWidth();
+                    uniray = new Uniray(wWindow, hWindow, font);
+                }
 
                 BeginDrawing();
 
