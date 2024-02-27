@@ -25,6 +25,8 @@ namespace Uniray
 
         private List<Label> labels;
 
+        private Scene currentScene;
+
         public List<Button> Buttons { get { return buttons; } }
         public Container GameManager { get { return gameManager; } set { gameManager = value; } }
         public Container FileManager { get { return fileManager; } set { fileManager = value; } }
@@ -37,6 +39,7 @@ namespace Uniray
             this.wWindow = WWindow;
             this.hWindow = HWindow;
             this.baseFont = font;
+            this.currentScene = new Scene();
 
             // Instantiate lists of components
             textboxes = new List<Textbox>();
