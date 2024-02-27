@@ -6,34 +6,50 @@ namespace Uniray
     public class GameObject
     {
         /// <summary>
-        /// Transform of the object
+        /// Position of the object
         /// </summary>
-        private Transform transform;
+        private Vector3 position;
+
+        /// <summary>
+        /// Rotation of the object
+        /// </summary>
+        private Vector3 rotation;
+
+        /// <summary>
+        /// Scale of the object
+        /// </summary>
+        private Vector3 scale;
 
         /// <summary>
         /// Model of the object
         /// </summary>
         private Model model;
 
-        public float X { get { return transform.Translation.X; } set { transform.Translation.X = value; } }
-        public float Y { get { return transform.Translation.Y; } set { transform.Translation.Y = value; } }
-        public float Z { get { return transform.Translation.Z; } set { transform.Translation.Z = value; } }
-        public float Rx { get { return transform.Rotation.X; } set { transform.Rotation.X = value; } }
-        public float Ry { get { return transform.Rotation.Y; } set { transform.Rotation.Y = value; } }
-        public float Rz { get { return transform.Rotation.Z; } set { transform.Rotation.Z = value; } }
-        public float Sx { get { return transform.Scale.X; } set { transform.Scale.X = value; } }
-        public float Sy { get { return transform.Scale.Y; } set { transform.Scale.Y = value; } }
-        public float Sz { get { return transform.Scale.Z; } set { transform.Scale.Z = value; } }
+        public float X { get { return position.X; } set { position.X = value; } }
+        public float Y { get { return position.Y; } set { position.Y = value; } }
+        public float Z { get { return position.Z; } set { position.Z = value; } }
+        public float Rx { get { return rotation.X; } set { rotation.X = value; } }
+        public float Ry { get { return rotation.Y; } set { rotation.Y = value; } }
+        public float Rz { get { return rotation.Z; } set { rotation.Z = value; } }
+        public float Sx { get { return scale.X; } set { scale.X = value; } }
+        public float Sy { get { return scale.Y; } set { scale.Y = value; } }
+        public float Sz { get { return scale.Z; } set { scale.Z = value; } }
 
         public Model Model { get { return model; } set { model = value; } }
+        public Vector3 Position { get { return position; } set { position = value; } }
+        public Vector3 Rotation { get { return rotation; } set { rotation = value; } }
+        public Vector3 Scale { get { return scale; } set { scale = value; } }
+
 
         /// <summary>
         /// Constructor 1
         /// </summary>
         /// <param name="transform">Transform of the object</param>
-        public GameObject(Transform transform)
+        public GameObject(Vector3 position, Vector3 rotation, Vector3 scale)
         {
-            this.transform = transform;
+            this.position = position;
+            this.rotation = rotation;
+            this.scale = scale;
             this.model = new Model();
         }
 
@@ -42,10 +58,17 @@ namespace Uniray
         /// </summary>
         /// <param name="transform">Transform of the object</param>
         /// <param name="model">Model of the object</param>
-        public GameObject(Transform transform, Model model)
+        public GameObject(Vector3 position, Vector3 rotation, Vector3 scale, Model model)
         {
-            this.transform = transform;
+            this.position = position;
+            this.rotation = rotation;
+            this.scale = scale;
             this.model = model;
+        }
+
+        public override string ToString()
+        {
+            return "X : " + X.ToString() + "\n\nY : " + Y.ToString() + "\n\nZ : " + Z.ToString();
         }
     }
 }
