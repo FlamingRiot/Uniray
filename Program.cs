@@ -51,24 +51,33 @@ namespace Uniray
                 if (key != 0)keys.Add(key);
                 if (keys.Count != 0)Console.WriteLine(keys.Last());*/
 
-                // Manage camera
+                // =========================================================================================================================================================
+                // ============================================================= MANAGE 3D ENVIRONMENT =====================================================================
+                // =========================================================================================================================================================
+
                 if (Hover((int)uniray.GameManager.X + uniray.GameManager.Width + 10, 0, wWindow - uniray.GameManager.Width - 20, hWindow - uniray.FileManager.Height - 20))
                 {
                     if (IsMouseButtonReleased(MouseButton.Middle))
                     {
-                        // La position où la souris est lorsque l'utilisateur relâche la souris
                         mousePos = fakePos;
-                        // La position où la souris lorsque l'utilisateur appuie à nouveau sur la souris
                         mouseMovementOrigin = Vector2.Zero;
                     }
                     if (IsMouseButtonDown(MouseButton.Middle))
                     {
-                        if (mouseMovementOrigin == Vector2.Zero) { mouseMovementOrigin = GetMousePosition(); }
-                        fakePos = MoveCamera(camDistance, ref camera, camera.Target, camYOffset, false, mousePos, mouseMovementOrigin);
+
+                        if (IsKeyDown(KeyboardKey.LeftShift))
+                        {
+                            GetMouseDelta().X 
+                        }
+                        else
+                        {
+                            if (mouseMovementOrigin == Vector2.Zero) { mouseMovementOrigin = GetMousePosition(); }
+                            fakePos = MoveCamera(camDistance, ref camera, camera.Target, camYOffset, false, mousePos, mouseMovementOrigin);
+                        }
                     }
                     else
                     {
-                        camDistance -= GetMouseWheelMove();
+                        camDistance -= GetMouseWheelMove() * 2f;
                         MoveCamera(camDistance, ref camera, camera.Target, camYOffset, true, mousePos, mouseMovementOrigin);
                     }
                 }
@@ -80,6 +89,11 @@ namespace Uniray
                     wWindow = GetScreenWidth();
                     uniray = new Uniray(wWindow, hWindow, font);
                 }
+
+
+                // =========================================================================================================================================================
+                // ============================================================= MANAGE OVERALL DRAWING ====================================================================
+                // =========================================================================================================================================================
 
                 BeginDrawing();
 
@@ -98,6 +112,17 @@ namespace Uniray
             CloseWindow();
         }
 
+        /// <summary>
+        /// Move the conceptor's camera
+        /// </summary>
+        /// <param name="distance">Distance from the target</param>
+        /// <param name="camera">3D camera (conceptor's)</param>
+        /// <param name="targetPosition">Target of the camera</param>
+        /// <param name="yOffset">Well I don't even remember what this is</param>
+        /// <param name="zoom">Is zoom possible ?</param>
+        /// <param name="mousePos">Last position of the mouse</param>
+        /// <param name="mouseOrigin">First position of the mouse when interacting with movement</param>
+        /// <returns></returns>
         static Vector2 MoveCamera(float distance, ref Camera3D camera, Vector3 targetPosition, float yOffset, bool zoom, Vector2 mousePos, Vector2 mouseOrigin)
         {
             float alpha = 0;
@@ -111,6 +136,16 @@ namespace Uniray
             return mousePos - (mouseOrigin - GetMousePosition());
         }
 
+        /// <summary>
+        /// Calculate the vertical position of the conceptor's camera
+        /// </summary>
+        /// <param name="distance">Distance from the target</param>
+        /// <param name="targetPosition">Target of the camera</param>
+        /// <param name="alpha">Alpha angle</param>
+        /// <param name="zoom">Is zoom possible ?</param>
+        /// <param name="m">Last position of the mouse</param>
+        /// <param name="mO">First position of the mouse when interacting with movement</param>
+        /// <returns></returns>
         static Vector2 CalculateVerticalPosition(float distance, Vector3 targetPosition, ref float alpha, bool zoom, Vector2 m, Vector2 mO)
         {
             if (!zoom) alpha = (m.Y - (mO.Y - GetMousePosition().Y)) * 0.005f;
@@ -122,6 +157,16 @@ namespace Uniray
             return new Vector2(posZ, posY);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="distance">Distance from the target</param>
+        /// <param name="targetPosition">Target of the camera</param>
+        /// <param name="beta">Beta angle</param>
+        /// <param name="zoom">Is zoom possible ?</param>
+        /// <param name="m">Last position of the mouse</param>
+        /// <param name="mO">First position of the mouse when interacting with movement</param>
+        /// <returns></returns>
         static Vector2 CalculateHorizontalPosition(float distance, Vector3 targetPosition, ref float beta, bool zoom, Vector2 m, Vector2 mO)
         {
             if (!zoom) beta = (m.X - (mO.X - GetMousePosition().X)) * 0.005f;
