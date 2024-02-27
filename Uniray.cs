@@ -137,6 +137,12 @@ namespace Uniray
                 if (Hover(textbox.X, textbox.Y, textbox.Width, textbox.Height)) { focus = true; }
             }
 
+            // Draw game layers infos
+            foreach (GameObject go in CurrentScene.GameObjects)
+            {
+                DrawLabel(new Label((int)gameManager.X + 30, (int)gameManager.Y + 30 + CurrentScene.GameObjects.IndexOf(go) * 20, go.Name), baseFont);
+            }
+
             if (!focus) { SetMouseCursor(MouseCursor.Default); }
 
             // =========================================================================================================================================================
@@ -183,7 +189,7 @@ namespace Uniray
                             Vector3 position = new Vector3(2f, 0f, 5f);
                             Vector3 rotation = Vector3.Zero;
                             Vector3 scale = Vector3.One;
-                            currentScene.AddGameObject(new GameObject(position, rotation, scale, model));
+                            currentScene.AddGameObject(new GameObject(position, rotation, scale, "MonCube", model));
                             TraceLog(TraceLogLevel.Info, "Game object added");
                             break;
                     }
