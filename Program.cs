@@ -2,7 +2,6 @@
 using static RayGUI_cs.RayGUI;
 using Raylib_cs;
 using System.Numerics;
-using RayGUI_cs;
 
 namespace Uniray
 {
@@ -29,10 +28,15 @@ namespace Uniray
             // Set 3D camera for the scene
             Camera3D camera = new Camera3D();
             camera.Projection = CameraProjection.Perspective;
-            camera.Position = Vector3.UnitY * 5;
-            camera.Target = Vector3.UnitX;
+            camera.Position = new Vector3(5, 5, 0);
+            camera.Target = Vector3.Zero;
             camera.Up = Vector3.UnitY;
             camera.FovY = 90;
+            float camYOffset = 0f;
+            float camDistance = 6f;
+            Vector2 mousePos = new Vector2(wWindow / 2, hWindow / 2);
+            Vector2 mouseMovementOrigin = Vector2.Zero;
+            Vector2 fakePos = Vector2.Zero;
 
             // Set FPS
             SetTargetFPS(60);
@@ -47,6 +51,27 @@ namespace Uniray
                 if (key != 0)keys.Add(key);
                 if (keys.Count != 0)Console.WriteLine(keys.Last());*/
 
+                // Manage camera
+                if (Hover((int)uniray.GameManager.X + uniray.GameManager.Width + 10, 0, wWindow - uniray.GameManager.Width - 20, hWindow - uniray.FileManager.Height - 20))
+                {
+                    if (IsMouseButtonReleased(MouseButton.Middle))
+                    {
+                        // La position où la souris est lorsque l'utilisateur relâche la souris
+                        mousePos = fakePos;
+                        // La position où la souris lorsque l'utilisateur appuie à nouveau sur la souris
+                        mouseMovementOrigin = Vector2.Zero;
+                    }
+                    if (IsMouseButtonDown(MouseButton.Middle))
+                    {
+                        if (mouseMovementOrigin == Vector2.Zero) { mouseMovementOrigin = GetMousePosition(); }
+                        fakePos = MoveCamera(camDistance, ref camera, camera.Target, camYOffset, false, mousePos, mouseMovementOrigin);
+                    }
+                    else
+                    {
+                        camDistance -= GetMouseWheelMove();
+                        MoveCamera(camDistance, ref camera, camera.Target, camYOffset, true, mousePos, mouseMovementOrigin);
+                    }
+                }
 
                 // Manage resize options
                 if (IsWindowResized())
@@ -71,6 +96,41 @@ namespace Uniray
                 EndDrawing();
             }
             CloseWindow();
+        }
+
+        static Vector2 MoveCamera(float distance, ref Camera3D camera, Vector3 targetPosition, float yOffset, bool zoom, Vector2 mousePos, Vector2 mouseOrigin)
+        {
+            float alpha = 0;
+            float beta = 0;
+            Vector2 verticalPosition = CalculateVerticalPosition(distance, targetPosition, ref alpha, zoom, mousePos, mouseOrigin);
+            Vector2 HorizontalPosition = CalculateHorizontalPosition(distance, targetPosition, ref beta, zoom, mousePos, mouseOrigin);
+            camera.Position.Y = verticalPosition.Y + yOffset;
+            camera.Position.X = HorizontalPosition.X;
+            camera.Position.Z = HorizontalPosition.Y;
+
+            return mousePos - (mouseOrigin - GetMousePosition());
+        }
+
+        static Vector2 CalculateVerticalPosition(float distance, Vector3 targetPosition, ref float alpha, bool zoom, Vector2 m, Vector2 mO)
+        {
+            if (!zoom) alpha = (m.Y - (mO.Y - GetMousePosition().Y)) * 0.005f;
+            else alpha = m.Y * 0.005f;
+            float offsetZ = (float)(distance * Math.Cos(alpha));
+            float offsetY = (float)(distance * Math.Sin(alpha));
+            float posY = targetPosition.Y + offsetY;
+            float posZ = targetPosition.Z + offsetZ;
+            return new Vector2(posZ, posY);
+        }
+
+        static Vector2 CalculateHorizontalPosition(float distance, Vector3 targetPosition, ref float beta, bool zoom, Vector2 m, Vector2 mO)
+        {
+            if (!zoom) beta = (m.X - (mO.X - GetMousePosition().X)) * 0.005f;
+            else beta = m.X * 0.005f;
+            float offsetX = (float)(distance * Math.Cos(beta));
+            float offsetZ = (float)(distance * Math.Sin(beta));
+            float posX = targetPosition.X + offsetX;
+            float posZ = targetPosition.Z + offsetZ;
+            return new Vector2(posX, posZ); 
         }
     }
 }

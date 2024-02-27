@@ -159,5 +159,14 @@ namespace Uniray
                 }
             }
         }
+
+        /// <summary>
+        /// String definition of the uniray class
+        /// </summary>
+        /// <returns>Message</returns>
+        public override string ToString()
+        {
+            return "Uniray is a game engine developped by Evan Comtesse";
+        }
     }
 }
