@@ -33,7 +33,7 @@ namespace Uniray
             camera.Up = Vector3.UnitY;
             camera.FovY = 90;
             float camYOffset = 0f;
-            float camDistance = 6f;
+            float camDistance = 50f;
             Vector2 mousePos = new Vector2(wWindow / 2, hWindow / 2);
             Vector2 mouseMovementOrigin = Vector2.Zero;
             Vector2 fakePos = Vector2.Zero;
@@ -67,7 +67,14 @@ namespace Uniray
 
                         if (IsKeyDown(KeyboardKey.LeftShift))
                         {
-                            GetMouseDelta().X 
+                            Vector3 movX = GetCameraRight(ref camera) * GetMouseDelta().X * (camDistance / 200);
+                            Vector3 movY = GetCameraUp(ref camera) * GetMouseDelta().Y * (camDistance / 200);
+
+                            camera.Position -= movX;
+                            camera.Target -= movX;
+
+                            camera.Position += movY;
+                            camera.Target += movY;
                         }
                         else
                         {
