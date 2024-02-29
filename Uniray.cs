@@ -12,6 +12,7 @@ namespace Uniray
         public static readonly Color APPLICATION_COLOR = new Color(30, 30, 30, 255);
         public static readonly Color FOCUS_COLOR = new Color(60, 60, 60, 255);
         public static readonly Texture2D fileTex = LoadTexture("data/file.png");
+        public static readonly Model arrow = LoadModel("data/arrow.m3d");
 
         // 2D related attributes
         private int hWindow;
@@ -44,6 +45,8 @@ namespace Uniray
 
         private List<string> scriptPathList;
 
+        private GameObject? selectedElement;
+
         public List<Button> Buttons { get { return buttons; } }
         public Container GameManager { get { return gameManager; } set { gameManager = value; } }
         public Container FileManager { get { return fileManager; } set { fileManager = value; } }
@@ -55,21 +58,21 @@ namespace Uniray
         /// </summary>
         public Uniray(int WWindow, int HWindow, Font font, Scene scene)
         {
-            this.wWindow = WWindow;
-            this.hWindow = HWindow;
-            this.baseFont = font;
-            this.currentScene = scene;
+            wWindow = WWindow;
+            hWindow = HWindow;
+            baseFont = font;
+            currentScene = scene;
 
             // Instantiate lists of components
-            textboxes = new List<Textbox>();
-            buttons = new List<Button>();
-            labels = new List<Label>();
+            textboxes = [];
+            buttons = [];
+            labels = [];
 
-            modelsPathList = new List<string>();
-            texturesPathList = new List<string>();
-            soundsPathList = new List<string>();
-            animationsPathList = new List<string>();
-            scriptPathList = new List<string>();
+            modelsPathList = [];
+            texturesPathList = [];
+            soundsPathList = [];
+            animationsPathList = [];
+            scriptPathList = [];
 
             // Load data paths from directories
             byte[] modelPath = Encoding.UTF8.GetBytes("assets/models");
@@ -142,35 +145,27 @@ namespace Uniray
 
             // Buttons
             Button modelsButton = new Button("Models", (int)fileManager.X + 48, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "modelsSection");
-            modelsButton.Type = ButtonType.Custom;
             buttons.Add(modelsButton);
 
             Button texturesButton = new Button("Textures", (int)fileManager.X + 164, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "texturesSection");
-            texturesButton.Type = ButtonType.Custom;
             buttons.Add(texturesButton);
 
             Button soundsButton = new Button("Sounds", (int)fileManager.X + 260, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "soundsSection");
-            soundsButton.Type = ButtonType.Custom;
             buttons.Add(soundsButton);
 
             Button animationsButton = new Button("Animations", (int)fileManager.X + 392, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "animationsSections");
-            animationsButton.Type = ButtonType.Custom;
             buttons.Add(animationsButton);
 
             Button scriptsButton = new Button("Scripts", (int)fileManager.X + 492, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "scriptsSections");
-            scriptsButton.Type = ButtonType.Custom;
             buttons.Add(scriptsButton);
 
-            Button openFileButton = new Button("Open", (int)fileManager.X + fileManager.Width - 38, (int)fileManager.Y + 5, 40, 20, APPLICATION_COLOR, FOCUS_COLOR, "openExplorer");
-            openFileButton.Type = ButtonType.PathFinder;
+            Button openFileButton = new Button("Open", (int)fileManager.X + fileManager.Width - 38, (int)fileManager.Y + 5, 40, 20, APPLICATION_COLOR, FOCUS_COLOR, "openExplorer") { Type = ButtonType.PathFinder };
             buttons.Add(openFileButton);
 
             Button addGameObject = new Button("+", (int)gameManager.X + gameManager.Width - 20, (int)gameManager.Y + 10, 10, 15, APPLICATION_COLOR, FOCUS_COLOR, "addGameObject");
             buttons.Add(addGameObject);
 
             // Textboxes
-            /*Textbox textbox = new Textbox("Hello World !", 140, 200, 50, 20, APPLICATION_COLOR, FOCUS_COLOR);
-            textboxes.Add(textbox);*/
 
             // Labels
             Label gameLayersLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + 10, "Game Layers");
@@ -191,6 +186,11 @@ namespace Uniray
             foreach (GameObject go in currentScene.GameObjects)
             {
                 DrawModelEx(go.Model, go.Position, go.Rotation, 0, go.Scale, Color.Red);
+            }
+
+            if (selectedElement != null)
+            {
+                DrawModel(arrow, selectedElement.Position, 5, Color.Green);
             }
         }
         /// <summary>
@@ -308,6 +308,7 @@ namespace Uniray
                                 Vector3 rotation = Vector3.Zero;
                                 Vector3 scale = Vector3.One;
                                 currentScene.AddGameObject(new GameObject(position, rotation, scale, "MonCube", model));
+                                selectedElement = currentScene.GameObjects.Last();
                                 TraceLog(TraceLogLevel.Info, "Game object added");
                                 break;
                         }
