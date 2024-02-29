@@ -3,6 +3,7 @@ using Raylib_cs;
 using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
 using System.Numerics;
+using System.Text;
 namespace Uniray
 {
     public partial struct Uniray
@@ -10,6 +11,8 @@ namespace Uniray
         public static readonly Color APPLICATION_COLOR = new Color(30, 30, 30, 255);
         public static readonly Color FOCUS_COLOR = new Color(60, 60, 60, 255);
 
+
+        // 2D related attributes
         private int hWindow;
 
         private int wWindow;
@@ -27,6 +30,18 @@ namespace Uniray
         private List<Label> labels;
 
         private Scene currentScene;
+
+        // 3D related attributes
+
+        private List<string> modelsPathList;
+
+        private List<string> texturesPathList;
+
+        private List<string> soundsPathList;
+
+        private List<string> animationsPathList;
+
+        private List<string> scriptPathList;
 
         public List<Button> Buttons { get { return buttons; } }
         public Container GameManager { get { return gameManager; } set { gameManager = value; } }
@@ -48,6 +63,71 @@ namespace Uniray
             textboxes = new List<Textbox>();
             buttons = new List<Button>();
             labels = new List<Label>();
+
+            modelsPathList = new List<string>();
+            texturesPathList = new List<string>();
+            soundsPathList = new List<string>();
+            animationsPathList = new List<string>();
+            scriptPathList = new List<string>();
+
+            // Load data paths from directories
+            byte[] modelPath = Encoding.UTF8.GetBytes("assets/models");
+            byte[] texturePath = Encoding.UTF8.GetBytes("assets/textures");
+            byte[] soundPath = Encoding.UTF8.GetBytes("assets/sounds");
+            byte[] animationPath = Encoding.UTF8.GetBytes("assets/animations");
+            byte[] scriptPath = Encoding.UTF8.GetBytes("assets/scripts");
+            int maxFiles = 30;
+            unsafe
+            {
+                sbyte*[] paths = new sbyte*[5];
+                fixed (byte* p = modelPath)
+                {
+                    sbyte* sp = (sbyte*)p;
+                    paths[0] = sp;
+                }
+                fixed (byte* p = texturePath)
+                {
+                    sbyte* sp = (sbyte*)p;
+                    paths[1] = sp;
+                }
+                fixed (byte* p = soundPath)
+                {
+                    sbyte* sp = (sbyte*)p;
+                    paths[2] = sp;
+                }
+                fixed (byte* p = animationPath)
+                {
+                    sbyte* sp = (sbyte*)p;
+                    paths[3] = sp;
+                }
+                fixed (byte* p = scriptPath)
+                {
+                    sbyte* sp = (sbyte*)p;
+                    paths[4] = sp;
+                }
+                for (int i = 0; i < paths.Length; i++)
+                {
+                    FilePathList pathList = LoadDirectoryFiles(paths[i], (int*)maxFiles);
+                    for (int j = 0; j < pathList.Count; j++)
+                    {
+                        string path = new string((sbyte*)pathList.Paths[j]);
+                        switch (i)
+                        {
+                            case 0:
+                                modelsPathList.Add(path); break;
+                            case 1:
+                                texturesPathList.Add(path); break;
+                            case 2:
+                                soundsPathList.Add(path); break;
+                            case 3:
+                                animationsPathList.Add(path); break;
+                            case 4:
+                                scriptPathList.Add(path); break;
+                        }
+                    }
+                }
+                Console.WriteLine(texturesPathList[0]);
+            }
 
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;

@@ -26,6 +26,16 @@ namespace Uniray
         private Model model;
 
         /// <summary>
+        /// Texture of the model
+        /// </summary>
+        private Texture2D texture;
+
+        /// <summary>
+        /// Behaviour
+        /// </summary>
+        private Behaviour behaviour;
+
+        /// <summary>
         /// Name of the object
         /// </summary>
         private string name;
@@ -58,6 +68,9 @@ namespace Uniray
             this.scale = scale;
             this.name = name;
             this.model = new Model();
+            this.texture = new Texture2D();
+
+            behaviour = new Behaviour();
         }
 
         /// <summary>
@@ -72,6 +85,10 @@ namespace Uniray
             this.scale = scale;
             this.name = name;
             this.model = model;
+            this.texture = new Texture2D();
+
+            behaviour = new Behaviour();
+
         }
 
         public override string ToString()
