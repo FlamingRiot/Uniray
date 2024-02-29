@@ -218,19 +218,19 @@ namespace Uniray
             switch (fileManager.Tag)
             {
                 case "models":
-                    DrawManagerFiles(modelsPathList);
+                    DrawManagerFiles(ref modelsPathList);
                     break;
                 case "textures":
-                    DrawManagerFiles(texturesPathList);
+                    DrawManagerFiles(ref texturesPathList);
                     break;
                 case "sounds":
-                    DrawManagerFiles(soundsPathList);
+                    DrawManagerFiles(ref soundsPathList);
                     break;
                 case "animations":
-                    DrawManagerFiles(animationsPathList);
+                    DrawManagerFiles(ref animationsPathList);
                     break;
                 case "scripts":
-                    DrawManagerFiles(scriptPathList);
+                    DrawManagerFiles(ref scriptPathList);
                     break;
             }
 
@@ -318,8 +318,21 @@ namespace Uniray
             }
         }
 
-        public void DrawManagerFiles(List<string> files)
+        public void DrawManagerFiles(ref List<string> files)
         {
+            string directory = fileManager.Files.Last().Split("\\")[0];
+            string aimedDirectory = files[0].Split("\\")[0];
+            string name = fileManager.Files.Last().Split("\\").Last();
+
+            // Check if there needs to be a recheck for the files
+            if (directory == aimedDirectory)
+            {
+                if (!files.Exists(e => e.EndsWith(name))) 
+                {
+                    files.Add(fileManager.Files.Last());
+                }
+            }
+
             for (int i = 0; i < files.Count; i++)
             {
                 int positionX = (i + 8) % 8;
