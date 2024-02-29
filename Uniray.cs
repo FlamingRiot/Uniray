@@ -4,13 +4,14 @@ using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
 using System.Numerics;
 using System.Text;
+using System.IO;
 namespace Uniray
 {
     public partial struct Uniray
     {
         public static readonly Color APPLICATION_COLOR = new Color(30, 30, 30, 255);
         public static readonly Color FOCUS_COLOR = new Color(60, 60, 60, 255);
-
+        public static readonly Texture2D fileTex = LoadTexture("data/file.png");
 
         // 2D related attributes
         private int hWindow;
@@ -132,12 +133,12 @@ namespace Uniray
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;
             float cont1Y = hWindow - hWindow / 3;
-            fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X - 10, hWindow - (int)cont1Y - 10, APPLICATION_COLOR, FOCUS_COLOR);
+            fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X - 10, hWindow - (int)cont1Y - 10, APPLICATION_COLOR, FOCUS_COLOR, "models");
             fileManager.Type = ContainerType.FileDropper;
             fileManager.OutputFilePath = "assets/models/";
             fileManager.ExtensionFile = "m3d";
 
-            gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR);
+            gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR, "gameManager");
 
             // Buttons
             Button modelsButton = new Button("Models", (int)fileManager.X + 48, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "modelsSection");
@@ -155,6 +156,10 @@ namespace Uniray
             Button animationsButton = new Button("Animations", (int)fileManager.X + 392, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "animationsSections");
             animationsButton.Type = ButtonType.Custom;
             buttons.Add(animationsButton);
+
+            Button scriptsButton = new Button("Scripts", (int)fileManager.X + 492, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "scriptsSections");
+            scriptsButton.Type = ButtonType.Custom;
+            buttons.Add(scriptsButton);
 
             Button openFileButton = new Button("Open", (int)fileManager.X + fileManager.Width - 38, (int)fileManager.Y + 5, 40, 20, APPLICATION_COLOR, FOCUS_COLOR, "openExplorer");
             openFileButton.Type = ButtonType.PathFinder;
@@ -210,6 +215,25 @@ namespace Uniray
                 DrawButton(button, baseFont);
                 if (Hover(button.X, button.Y, button.Width, button.Height)) { focus = true; }
             }
+            switch (fileManager.Tag)
+            {
+                case "models":
+                    DrawManagerFiles(modelsPathList);
+                    break;
+                case "textures":
+                    DrawManagerFiles(texturesPathList);
+                    break;
+                case "sounds":
+                    DrawManagerFiles(soundsPathList);
+                    break;
+                case "animations":
+                    DrawManagerFiles(animationsPathList);
+                    break;
+                case "scripts":
+                    DrawManagerFiles(scriptPathList);
+                    break;
+            }
+
             for (int i = 0; i < textboxes.Count; i++) 
             {
                 Textbox textbox = textboxes[i];
@@ -230,51 +254,81 @@ namespace Uniray
             // =========================================================================================================================================================
             foreach (Button section in buttons)
             {
-                if (IsButtonPressed(section))
+                if (section.Type == ButtonType.Custom)
                 {
-                    Container c = FileManager;
-                    Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "");
-                    switch (section.Tag)
+                    if (IsButtonPressed(section))
                     {
-                        case "modelsSection":
-                            c.ExtensionFile = "m3d";
-                            c.OutputFilePath = "assets/models";
-                            fileType.Text = "File type : .m3d";
-                            labels.RemoveAt(labels.IndexOf(labels.Last()));
-                            labels.Add(fileType);
-                            break;
-                        case "texturesSection":
-                            c.ExtensionFile = "png";
-                            c.OutputFilePath = "assets/textures";
-                            fileType.Text = "File type : .png";
-                            labels.RemoveAt(labels.IndexOf(labels.Last()));
-                            labels.Add(fileType);
-                            break;
-                        case "soundsSection":
-                            c.ExtensionFile = "wav";
-                            c.OutputFilePath = "assets/sounds";
-                            fileType.Text = "File type : .wav";
-                            labels.RemoveAt(labels.IndexOf(labels.Last()));
-                            labels.Add(fileType);
-                            break;
-                        case "animationsSections":
-                            c.ExtensionFile = "m3d";
-                            c.OutputFilePath = "assets/animations";
-                            fileType.Text = "File type : .m3d";
-                            labels.RemoveAt(labels.IndexOf(labels.Last()));
-                            labels.Add(fileType);
-                            break;
-                        case "addGameObject":
-                            Model model = LoadModelFromMesh(GenMeshCube(1f, 1f, 1f));
-                            Vector3 position = new Vector3(2f, 0f, 5f);
-                            Vector3 rotation = Vector3.Zero;
-                            Vector3 scale = Vector3.One;
-                            currentScene.AddGameObject(new GameObject(position, rotation, scale, "MonCube", model));
-                            TraceLog(TraceLogLevel.Info, "Game object added");
-                            break;
+                        Container c = FileManager;
+                        Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "");
+                        switch (section.Tag)
+                        {
+                            case "modelsSection":
+                                c.ExtensionFile = "m3d";
+                                c.Tag = "models";
+                                c.OutputFilePath = "assets/models";
+                                fileType.Text = "File type : .m3d";
+                                labels.RemoveAt(labels.IndexOf(labels.Last()));
+                                labels.Add(fileType);
+                                break;
+                            case "texturesSection":
+                                c.ExtensionFile = "png";
+                                c.Tag = "textures";
+                                c.OutputFilePath = "assets/textures";
+                                fileType.Text = "File type : .png";
+                                labels.RemoveAt(labels.IndexOf(labels.Last()));
+                                labels.Add(fileType);
+                                break;
+                            case "soundsSection":
+                                c.ExtensionFile = "wav";
+                                c.Tag = "sounds";
+                                c.OutputFilePath = "assets/sounds";
+                                fileType.Text = "File type : .wav";
+                                labels.RemoveAt(labels.IndexOf(labels.Last()));
+                                labels.Add(fileType);
+                                break;
+                            case "animationsSections":
+                                c.ExtensionFile = "m3d";
+                                c.Tag = "animations";
+                                c.OutputFilePath = "assets/animations";
+                                fileType.Text = "File type : .m3d";
+                                labels.RemoveAt(labels.IndexOf(labels.Last()));
+                                labels.Add(fileType);
+                                break;
+                            case "scriptsSections":
+                                c.ExtensionFile = "cs";
+                                c.Tag = "scripts";
+                                c.OutputFilePath = "assets/scripts";
+                                fileType.Text = "File type : .cs";
+                                labels.RemoveAt(labels.IndexOf(labels.Last()));
+                                labels.Add(fileType);
+                                break;
+                            case "addGameObject":
+                                Model model = LoadModelFromMesh(GenMeshCube(1f, 1f, 1f));
+                                Vector3 position = new Vector3(2f, 0f, 5f);
+                                Vector3 rotation = Vector3.Zero;
+                                Vector3 scale = Vector3.One;
+                                currentScene.AddGameObject(new GameObject(position, rotation, scale, "MonCube", model));
+                                TraceLog(TraceLogLevel.Info, "Game object added");
+                                break;
+                        }
+                        FileManager = c;
                     }
-                    FileManager = c;
                 }
+                
+            }
+        }
+
+        public void DrawManagerFiles(List<string> files)
+        {
+            for (int i = 0; i < files.Count; i++)
+            {
+                int positionX = (i + 8) % 8;
+                if (positionX == 0) _ = 8;
+                int xPos = (int)fileManager.X + 150 * (i + 1) - 100;
+                int yPos = (int)fileManager.Y + 60;
+                DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
+                string[] pathArryBySlash = files[i].Split('\\');
+                DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), baseFont);
             }
         }
 
