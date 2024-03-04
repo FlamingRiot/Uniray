@@ -13,6 +13,7 @@ namespace Uniray
             InitWindow(1800, 900, "Uniray");
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
+            SetWindowState(ConfigFlags.TransparentWindow);
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
             
             // Load font
@@ -48,6 +49,12 @@ namespace Uniray
 
             while (!WindowShouldClose())
             {
+                /*
+                 function sum(int a)...
+                 function sum(int b)..
+                    
+                    sum(b:12)
+                 */
                 /*key = GetKeyPressed();
                 if (key != 0)keys.Add(key);
                 if (keys.Count != 0)Console.WriteLine(keys.Last());*/

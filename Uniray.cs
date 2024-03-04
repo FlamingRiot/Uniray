@@ -4,7 +4,6 @@ using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
 using System.Numerics;
 using System.Text;
-using System.IO;
 namespace Uniray
 {
     public partial struct Uniray
@@ -47,6 +46,8 @@ namespace Uniray
 
         private GameObject? selectedElement;
 
+        private string? selectedFile;
+
         public List<Button> Buttons { get { return buttons; } }
         public Container GameManager { get { return gameManager; } set { gameManager = value; } }
         public Container FileManager { get { return fileManager; } set { fileManager = value; } }
@@ -62,7 +63,9 @@ namespace Uniray
             hWindow = HWindow;
             baseFont = font;
             currentScene = scene;
+
             selectedElement = null;
+            selectedFile = null;
 
             // Instantiate lists of components
             textboxes = new List<Textbox>();
@@ -247,7 +250,6 @@ namespace Uniray
             {
                 DrawLabel(new Label((int)gameManager.X + 30, (int)gameManager.Y + 30 + CurrentScene.GameObjects.IndexOf(go) * 20, go.Name), baseFont);
             }
-
             if (!focus) { SetMouseCursor(MouseCursor.Default); }
 
             // =========================================================================================================================================================
@@ -319,6 +321,7 @@ namespace Uniray
                 
             }
         }
+        
 
         public void DrawManagerFiles(ref List<string> files)
         {
@@ -344,6 +347,26 @@ namespace Uniray
                 DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
                 string[] pathArryBySlash = files[i].Split('\\');
                 DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), baseFont);
+
+                Vector2 mouse = GetMousePosition();
+                if (mouse.X < xPos + fileTex.Width && mouse.X > xPos && mouse.Y < yPos + fileTex.Height && mouse.Y > yPos)
+                {
+                    if (IsMouseButtonDown(MouseButton.Left))
+                    {
+                        selectedFile = files[i];
+                    }
+                }
+                if (selectedFile is not null)
+                {
+                    if (IsMouseButtonReleased(MouseButton.Left))
+                    {
+                        if (mouse.X > gameManager.X + gameManager.Width + 10 && mouse.Y < fileManager.Y - 10)
+                        {
+                            currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(5, 5, 5), "[New model]", LoadModel(selectedFile)));
+                        }
+                        else selectedFile = null;
+                    }
+                }
             }
         }
 
