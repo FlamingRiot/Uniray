@@ -7,7 +7,7 @@ namespace Uniray
 {
     public class Program
     {
-        static void Main(string[] args)
+        static unsafe void Main(string[] args)
         {
             // Initialize window and set mode
             InitWindow(1800, 900, "Uniray");
@@ -125,8 +125,6 @@ namespace Uniray
                 EndMode3D();
 
                 uniray.DrawUI();
-
-                DrawText(GetFPS().ToString(), 20, 100, 30, Color.Red);
 
                 EndDrawing();
             }

@@ -250,7 +250,7 @@ namespace Uniray
             {
                 DrawLabel(new Label((int)gameManager.X + 30, (int)gameManager.Y + 30 + CurrentScene.GameObjects.IndexOf(go) * 20, go.Name), baseFont);
             }
-            if (!focus) { SetMouseCursor(MouseCursor.Default); }
+            if (!focus && selectedFile is null) { SetMouseCursor(MouseCursor.Default); }
 
             // =========================================================================================================================================================
             // ============================================================= MANAGE CUSTOM BUTTONS =====================================================================
@@ -354,6 +354,7 @@ namespace Uniray
                     if (IsMouseButtonDown(MouseButton.Left))
                     {
                         selectedFile = files[i];
+                        SetMouseCursor(MouseCursor.PointingHand);
                     }
                 }
                 if (selectedFile is not null)
