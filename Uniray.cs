@@ -6,7 +6,7 @@ using System.Numerics;
 using System.Text;
 namespace Uniray
 {
-    public partial struct Uniray
+    public unsafe partial struct Uniray
     {
         public static readonly Color APPLICATION_COLOR = new Color(30, 30, 30, 255);
         public static readonly Color FOCUS_COLOR = new Color(60, 60, 60, 255);
@@ -364,7 +364,7 @@ namespace Uniray
                         {
                             currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(5, 5, 5), "[New model]", LoadModel(selectedFile)));
                         }
-                        else selectedFile = null;
+                        selectedFile = null;
                     }
                 }
             }

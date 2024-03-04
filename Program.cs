@@ -126,6 +126,8 @@ namespace Uniray
 
                 uniray.DrawUI();
 
+                DrawText(GetFPS().ToString(), 20, 100, 30, Color.Red);
+
                 EndDrawing();
             }
             CloseWindow();
