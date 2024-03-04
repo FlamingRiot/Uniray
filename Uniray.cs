@@ -62,17 +62,18 @@ namespace Uniray
             hWindow = HWindow;
             baseFont = font;
             currentScene = scene;
+            selectedElement = null;
 
             // Instantiate lists of components
-            textboxes = [];
-            buttons = [];
-            labels = [];
+            textboxes = new List<Textbox>();
+            buttons = new List<Button>();
+            labels = new List<Label>();
 
-            modelsPathList = [];
-            texturesPathList = [];
-            soundsPathList = [];
-            animationsPathList = [];
-            scriptPathList = [];
+            modelsPathList = new List<string>();
+            texturesPathList = new List<string>();
+            soundsPathList = new List<string>();
+            animationsPathList = new List<string>();
+            scriptPathList = new List<string>();
 
             // Load data paths from directories
             byte[] modelPath = Encoding.UTF8.GetBytes("assets/models");
