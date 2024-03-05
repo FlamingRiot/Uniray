@@ -334,7 +334,11 @@ namespace Uniray
             {
                 if (!files.Exists(e => e.EndsWith(name))) 
                 {
-                    files.Add(fileManager.Files.Last());
+                    string extension = fileManager.Files.Last().Split('.').Last();
+                    if (extension == fileManager.ExtensionFile)
+                    {
+                        files.Add(fileManager.Files.Last());
+                    }
                 }
             }
 
