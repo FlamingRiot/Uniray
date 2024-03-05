@@ -189,7 +189,7 @@ namespace Uniray
 
             foreach (GameObject go in currentScene.GameObjects)
             {
-                DrawModelEx(go.Model, go.Position, go.Rotation, 0, go.Scale, Color.Red);
+                DrawModelEx(go.Model, go.Position, go.Rotation, 0, go.Scale, Color.White);
             }
 
             if (selectedElement != null)
@@ -363,7 +363,11 @@ namespace Uniray
                     {
                         if (mouse.X > gameManager.X + gameManager.Width + 10 && mouse.Y < fileManager.Y - 10)
                         {
-                            currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(5, 5, 5), "[New model]", LoadModel(selectedFile)));
+                            Model m = LoadModel(selectedFile);
+                            for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                                m.Meshes[0].Colors[j] = 255;
+                            UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+                            currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(5, 5, 5), "[New model]", m));
                         }
                         selectedFile = null;
                     }

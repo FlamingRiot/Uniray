@@ -2,18 +2,18 @@
 using static RayGUI_cs.RayGUI;
 using Raylib_cs;
 using System.Numerics;
+using System.Reflection;
 
 namespace Uniray
 {
     public class Program
     {
-        static unsafe void Main(string[] args)
+        unsafe static void Main(string[] args)
         {
             // Initialize window and set mode
             InitWindow(1800, 900, "Uniray");
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
-            SetWindowState(ConfigFlags.TransparentWindow);
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
             
             // Load font
@@ -107,7 +107,6 @@ namespace Uniray
                     wWindow = GetScreenWidth();
                     uniray = new Uniray(wWindow, hWindow, font, uniray.CurrentScene);
                 }
-
                 // =========================================================================================================================================================
                 // ============================================================= MANAGE OVERALL DRAWING ====================================================================
                 // =========================================================================================================================================================
@@ -121,6 +120,7 @@ namespace Uniray
                 DrawGrid(10, 10);
 
                 uniray.DrawScene();
+                //DrawModel(m, Vector3.Zero, 5, Color.White);
 
                 EndMode3D();
 
