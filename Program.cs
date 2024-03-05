@@ -32,7 +32,7 @@ namespace Uniray
             cam.Up = Vector3.UnitY;
             cam.FovY = 90f;
             float camYOffset = 0f;
-            float camDistance = 10f;
+            float camDistance = 2f;
             Vector2 mousePos = new Vector2(wWindow / 2, hWindow / 2);
             Vector2 mouseMovementOrigin = Vector2.Zero;
             Vector2 fakePos = Vector2.Zero;

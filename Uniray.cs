@@ -11,7 +11,6 @@ namespace Uniray
         public static readonly Color APPLICATION_COLOR = new Color(30, 30, 30, 255);
         public static readonly Color FOCUS_COLOR = new Color(60, 60, 60, 255);
         public static readonly Texture2D fileTex = LoadTexture("data/file.png");
-        public static readonly Model arrow = LoadModel("data/arrow.m3d");
 
         // 2D related attributes
         private int hWindow;
@@ -191,11 +190,6 @@ namespace Uniray
             {
                 DrawModelEx(go.Model, go.Position, go.Rotation, 0, go.Scale, Color.White);
             }
-
-            if (selectedElement != null)
-            {
-                DrawModel(arrow, selectedElement.Position, 5, Color.Green);
-            }
         }
         /// <summary>
         /// Draw user interface of the application
@@ -371,7 +365,8 @@ namespace Uniray
                             for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
                                 m.Meshes[0].Colors[j] = 255;
                             UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-                            currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(5, 5, 5), "[New model]", m));
+                            currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(1, 1, 1), "[New model]", m));
+                            selectedElement = currentScene.GameObjects.Last();
                         }
                         selectedFile = null;
                     }
