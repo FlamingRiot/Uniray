@@ -185,7 +185,7 @@ namespace Uniray
             buttons.Add(addGameObject);
 
             // Textboxes
-            Textbox goTexture = new Textbox("", (int)GameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 300, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+            Textbox goTexture = new Textbox("", (int)GameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 290, 250, 40, APPLICATION_COLOR, FOCUS_COLOR);
             textboxes.Add(goTexture);
 
             // Labels
