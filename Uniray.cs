@@ -10,7 +10,11 @@ namespace Uniray
     {
         public static readonly Color APPLICATION_COLOR = new Color(30, 30, 30, 255);
         public static readonly Color FOCUS_COLOR = new Color(60, 60, 60, 255);
-        public static readonly Texture2D fileTex = LoadTexture("data/file.png");
+        public Texture2D fileTex = LoadTexture("data/file.png");
+        public Model arrow = LoadModelFromMesh(GenMeshCylinder(0.05f, 0.7f, 20));
+        public BoundingBox yArrowBox = new BoundingBox(new Vector3(-0.1f, 0f, -0.1f), new Vector3(0.1f, 1.4f, 0.1f));
+        public BoundingBox xArrowBox = new BoundingBox(new Vector3(-0.1f, -0.1f, -1.4f), new Vector3(0.1f, 0.1f, 0f));
+        public BoundingBox zArrowBox = new BoundingBox(new Vector3(0f, -0.1f, -0.1f), new Vector3(1.4f, 0.1f, 0.1f));
 
         // 2D related attributes
         private int hWindow;
@@ -47,6 +51,14 @@ namespace Uniray
 
         private string? selectedFile;
 
+        private Ray mouseRay;
+
+        private RayCollision xCollision;
+
+        private RayCollision yCollision;
+
+        private RayCollision zCollision;
+
         public List<Button> Buttons { get { return buttons; } }
         public Container GameManager { get { return gameManager; } set { gameManager = value; } }
         public Container FileManager { get { return fileManager; } set { fileManager = value; } }
@@ -65,6 +77,10 @@ namespace Uniray
 
             selectedElement = null;
             selectedFile = null;
+            mouseRay = new Ray();
+            xCollision = new RayCollision();
+            yCollision = new RayCollision();
+            zCollision = new RayCollision();
 
             // Instantiate lists of components
             textboxes = new List<Textbox>();
@@ -191,9 +207,31 @@ namespace Uniray
             // ================================================================ MANAGE 3D DRAWING ======================================================================
             // =========================================================================================================================================================
 
+            if (selectedElement != null) { selectedElement = currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)); }
+
             foreach (GameObject go in currentScene.GameObjects)
             {
                 DrawModelEx(go.Model, go.Position, go.Rotation, 0, go.Scale, Color.White);
+            }
+
+            // Draw directional arrows
+            if (selectedElement != null) 
+            {
+                if (IsMouseButtonDown(MouseButton.Left))
+                {
+                    mouseRay = GetMouseRay(GetMousePosition(), CurrentCamera);
+                    xCollision = GetRayCollisionBox(mouseRay, new BoundingBox(xArrowBox.Min + selectedElement.Position, xArrowBox.Max + selectedElement.Position));
+                    yCollision = GetRayCollisionBox(mouseRay, new BoundingBox(yArrowBox.Min + selectedElement.Position, yArrowBox.Max + selectedElement.Position));
+                    zCollision = GetRayCollisionBox(mouseRay, new BoundingBox(zArrowBox.Min + selectedElement.Position, zArrowBox.Max + selectedElement.Position));
+
+                    if (xCollision.Hit) { currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)).Z -= GetMouseDelta().X / 100; }
+                    if (yCollision.Hit) { currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)).Y -= GetMouseDelta().Y / 100; }
+                    if (zCollision.Hit) { currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)).X -= GetMouseDelta().X / 100; }
+                }
+
+                DrawModelEx(arrow, selectedElement.Position, Vector3.UnitZ, 270, new Vector3(2), Color.Green);
+                DrawModelEx(arrow, selectedElement.Position, Vector3.UnitY, 0, new Vector3(2), Color.Red);
+                DrawModelEx(arrow, selectedElement.Position, Vector3.UnitX, 270, new Vector3(2), Color.Blue);
             }
         }
         /// <summary>
