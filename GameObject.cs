@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace Uniray
 {
-    public class GameObject
+    public unsafe class GameObject
     {
         /// <summary>
         /// Position of the object
@@ -51,6 +51,7 @@ namespace Uniray
         public float Sz { get { return scale.Z; } set { scale.Z = value; } }
 
         public Model Model { get { return model; } set { model = value; } }
+        public Texture2D Texture { get { return texture; } set { texture = value; } }
         public Vector3 Position { get { return position; } set { position = value; } }
         public Vector3 Rotation { get { return rotation; } set { rotation = value; } }
         public Vector3 Scale { get { return scale; } set { scale = value; } }
@@ -89,6 +90,12 @@ namespace Uniray
 
             behaviour = new Behaviour();
 
+        }
+
+        public void SetTexture(Texture2D tex)
+        {
+            texture = tex;
+            Raylib.SetMaterialTexture(&model.Materials[0], MaterialMapIndex.Diffuse, texture);
         }
 
         public override string ToString()

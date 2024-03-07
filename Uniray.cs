@@ -169,10 +169,15 @@ namespace Uniray
             buttons.Add(addGameObject);
 
             // Textboxes
+            Textbox goTexture = new Textbox("", (int)GameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 300, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+            textboxes.Add(goTexture);
 
             // Labels
             Label gameLayersLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + 10, "Game Layers");
             labels.Add(gameLayersLabel);
+
+            Label goTextureLabel = new Label((int)GameManager.X + 20, (int)gameManager.Y + gameManager.Height / 2 + 300, "Texture");
+            labels.Add(goTextureLabel);
 
             Label gameObjectLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + hWindow / 2, "Game Object");
             labels.Add(gameObjectLabel);
@@ -359,7 +364,8 @@ namespace Uniray
                 {
                     if (IsMouseButtonReleased(MouseButton.Left))
                     {
-                        if (mouse.X > gameManager.X + gameManager.Width + 10 && mouse.Y < fileManager.Y - 10)
+                        // Import model into the scene
+                        if (mouse.X > gameManager.X + gameManager.Width + 10 && mouse.Y < fileManager.Y - 10 && selectedFile.Split('.').Last() == "m3d")
                         {
                             Model m = LoadModel(selectedFile);
                             for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
@@ -367,6 +373,20 @@ namespace Uniray
                             UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
                             currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(1, 1, 1), "[New model]", m));
                             selectedElement = currentScene.GameObjects.Last();
+                        }
+                        // Import texture in game object attributes
+                        else if (mouse.X > gameManager.X + 100 && mouse.X < gameManager.X + 350 && mouse.Y > gameManager.Y + gameManager.Height / 2 + 300 && mouse.Y < gameManager.Y + gameManager.Height / 2 + 320 && selectedFile.Split('.').Last() == "png")
+                        {
+                            if (selectedElement != null)
+                            {
+                                foreach (GameObject go in currentScene.GameObjects)
+                                {
+                                    if (go == selectedElement)
+                                    {
+                                        go.SetTexture(LoadTexture(selectedFile));
+                                    }
+                                }
+                            }
                         }
                         selectedFile = null;
                     }
