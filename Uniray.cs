@@ -397,6 +397,12 @@ namespace Uniray
                         selectedFile = files[i];
                         SetMouseCursor(MouseCursor.PointingHand);
                     }
+                    if (IsMouseButtonPressed(MouseButton.Middle))
+                    {
+                        File.Delete(files[i]);
+                        File.Delete("..\\..\\..\\" + files[i]);
+                        files.Remove(files[i]);
+                    }
                 }
                 if (selectedFile is not null)
                 {
