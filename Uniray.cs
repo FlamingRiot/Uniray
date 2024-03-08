@@ -203,6 +203,12 @@ namespace Uniray
             Button openFileButton = new Button("Open", (int)fileManager.X + fileManager.Width - 38, (int)fileManager.Y + 5, 40, 20, APPLICATION_COLOR, FOCUS_COLOR, "openExplorer") { Type = ButtonType.PathFinder };
             buttons.Add(openFileButton);
 
+            Button openProjectButton = new Button("Open project", (int)fileManager.X + fileManager.Width - 175, (int)fileManager.Y + 5, 125, 20, APPLICATION_COLOR, FOCUS_COLOR, "openProject");
+            buttons.Add(openProjectButton);
+
+            Button newProjectButton = new Button("New project", (int)fileManager.X + fileManager.Width - 303, (int)fileManager.Y + 5, 50, 20, APPLICATION_COLOR, FOCUS_COLOR, "newProject");
+            buttons.Add(newProjectButton);
+
             Button addGameObject = new Button("+", (int)gameManager.X + gameManager.Width - 20, (int)gameManager.Y + 10, 10, 15, APPLICATION_COLOR, FOCUS_COLOR, "addGameObject");
             buttons.Add(addGameObject);
 
@@ -231,28 +237,24 @@ namespace Uniray
 
             if (selectedElement != null) { selectedElement = currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)); }
 
-            mouseRay = GetMouseRay(GetMousePosition(), CurrentCamera);
-
             Vector2 mousePos = GetMousePosition();
-            int index = -1;
+            mouseRay = GetMouseRay(mousePos, CurrentCamera);
 
+            int index = -1;
             foreach (GameObject go in currentScene.GameObjects)
             {
                 DrawModelEx(go.Model, go.Position, go.Rotation, 0, go.Scale, Color.White);
 
-                BoundingBox box = GetModelBoundingBox(go.Model);
-                box.Min += go.Position;
-                box.Max += go.Position;
-
-                if (mousePos.X > gameManager.X + gameManager.Width && mousePos.Y < fileManager.Y - 10)
+                if (mousePos.X > gameManager.X + gameManager.Width && mousePos.Y < fileManager.Y - 10 && IsMouseButtonPressed(MouseButton.Left))
                 {
-                    if (IsMouseButtonPressed(MouseButton.Left))
+                    BoundingBox box = GetModelBoundingBox(go.Model);
+                    box.Min += go.Position;
+                    box.Max += go.Position;
+
+                    goCollision = GetRayCollisionBox(mouseRay, box);
+                    if (goCollision.Hit)
                     {
-                        goCollision = GetRayCollisionBox(mouseRay, box);
-                        if (goCollision.Hit)
-                        {
-                            index = currentScene.GameObjects.IndexOf(go);
-                        }
+                        index = currentScene.GameObjects.IndexOf(go);
                     }
                 }
             }
@@ -401,11 +403,13 @@ namespace Uniray
                         FileManager = c;
                     }
                 }
-                
             }
         }
-        
 
+        /// <summary>
+        /// Draw and manage the files in the bottom container
+        /// </summary>
+        /// <param name="files">All the files in the asset directory</param>
         public void DrawManagerFiles(ref List<string> files)
         {
             string directory = fileManager.Files.Last().Split("\\")[0];
