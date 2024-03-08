@@ -15,8 +15,8 @@ namespace Uniray
             InitWindow(1800, 900, "Uniray");
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
-            InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
             SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
+            InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
             
             // Load font
             Font font = LoadFont("data/font/Ubuntu-Regular.ttf");
@@ -126,6 +126,8 @@ namespace Uniray
                 EndMode3D();
 
                 uniray.DrawUI();
+
+                DrawFPS(40, 200);
 
                 EndDrawing();
             }

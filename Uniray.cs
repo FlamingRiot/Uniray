@@ -11,9 +11,26 @@ namespace Uniray
         public static readonly Color APPLICATION_COLOR = new Color(30, 30, 30, 255);
         public static readonly Color FOCUS_COLOR = new Color(60, 60, 60, 255);
         public Texture2D fileTex = LoadTexture("data/file.png");
+
+        // =========================================================================================================================================================
+        // ================================================================= SEMI-CONSTANTS ========================================================================
+        // =========================================================================================================================================================
+
+        /// <summary>
+        /// Directionnal arrows model loading
+        /// </summary>
         public Model arrow = LoadModelFromMesh(GenMeshCylinder(0.05f, 0.7f, 20));
+        /// <summary>
+        /// Y arrow box
+        /// </summary>
         public BoundingBox yArrowBox = new BoundingBox(new Vector3(-0.1f, 0f, -0.1f), new Vector3(0.1f, 1.4f, 0.1f));
+        /// <summary>
+        /// X arrow box
+        /// </summary>
         public BoundingBox xArrowBox = new BoundingBox(new Vector3(-0.1f, -0.1f, -1.4f), new Vector3(0.1f, 0.1f, 0f));
+        /// <summary>
+        /// Z arrow box
+        /// </summary>
         public BoundingBox zArrowBox = new BoundingBox(new Vector3(0f, -0.1f, -0.1f), new Vector3(1.4f, 0.1f, 0.1f));
 
         // 2D related attributes
@@ -51,6 +68,8 @@ namespace Uniray
 
         private string? selectedFile;
 
+        // Collision related variables
+
         private Ray mouseRay;
 
         private RayCollision xCollision;
@@ -58,6 +77,8 @@ namespace Uniray
         private RayCollision yCollision;
 
         private RayCollision zCollision;
+
+        private RayCollision goCollision;
 
         public List<Button> Buttons { get { return buttons; } }
         public Container GameManager { get { return gameManager; } set { gameManager = value; } }
@@ -81,6 +102,7 @@ namespace Uniray
             xCollision = new RayCollision();
             yCollision = new RayCollision();
             zCollision = new RayCollision();
+            goCollision = new RayCollision();
 
             // Instantiate lists of components
             textboxes = new List<Textbox>();
@@ -209,9 +231,34 @@ namespace Uniray
 
             if (selectedElement != null) { selectedElement = currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)); }
 
+            mouseRay = GetMouseRay(GetMousePosition(), CurrentCamera);
+
+            Vector2 mousePos = GetMousePosition();
+            int index = -1;
+
             foreach (GameObject go in currentScene.GameObjects)
             {
                 DrawModelEx(go.Model, go.Position, go.Rotation, 0, go.Scale, Color.White);
+
+                BoundingBox box = GetModelBoundingBox(go.Model);
+                box.Min += go.Position;
+                box.Max += go.Position;
+
+                if (mousePos.X > gameManager.X + gameManager.Width && mousePos.Y < fileManager.Y - 10)
+                {
+                    if (IsMouseButtonPressed(MouseButton.Left))
+                    {
+                        goCollision = GetRayCollisionBox(mouseRay, box);
+                        if (goCollision.Hit)
+                        {
+                            index = currentScene.GameObjects.IndexOf(go);
+                        }
+                    }
+                }
+            }
+            if (index != -1)
+            {
+                selectedElement = currentScene.GetGameObject(index);
             }
 
             // Draw directional arrows
@@ -219,7 +266,6 @@ namespace Uniray
             {
                 if (IsMouseButtonDown(MouseButton.Left))
                 {
-                    mouseRay = GetMouseRay(GetMousePosition(), CurrentCamera);
                     xCollision = GetRayCollisionBox(mouseRay, new BoundingBox(xArrowBox.Min + selectedElement.Position, xArrowBox.Max + selectedElement.Position));
                     yCollision = GetRayCollisionBox(mouseRay, new BoundingBox(yArrowBox.Min + selectedElement.Position, yArrowBox.Max + selectedElement.Position));
                     zCollision = GetRayCollisionBox(mouseRay, new BoundingBox(zArrowBox.Min + selectedElement.Position, zArrowBox.Max + selectedElement.Position));
