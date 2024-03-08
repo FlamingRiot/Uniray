@@ -4,6 +4,8 @@ using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
 using System.Numerics;
 using System.Text;
+using System.Diagnostics;
+
 namespace Uniray
 {
     public unsafe partial struct Uniray
@@ -68,6 +70,8 @@ namespace Uniray
 
         private string? selectedFile;
 
+        private string? projectPath;
+
         // Collision related variables
 
         private Ray mouseRay;
@@ -98,6 +102,7 @@ namespace Uniray
 
             selectedElement = null;
             selectedFile = null;
+            projectPath = null; 
             mouseRay = new Ray();
             xCollision = new RayCollision();
             yCollision = new RayCollision();
@@ -407,6 +412,14 @@ namespace Uniray
                                 currentScene.AddGameObject(new GameObject(position, rotation, scale, "MonCube", model));
                                 selectedElement = currentScene.GameObjects.Last();
                                 TraceLog(TraceLogLevel.Info, "Game object added");
+                                break;
+                            case "play":
+                                var p = new Process();
+                                p.StartInfo = new ProcessStartInfo(@"C:\Users\ComtesseE1\Desktop\Crossy Road\bin\Debug\net7.0\crossy_road.exe");
+                                p.Start();
+                                break;
+                            case "openProject":
+                                
                                 break;
                         }
                         FileManager = c;
