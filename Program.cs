@@ -114,7 +114,7 @@ namespace Uniray
 
                 BeginDrawing();
 
-                ClearBackground(Color.White);
+                ClearBackground(new Color(70, 70, 70, 255));
 
                 BeginMode3D(uniray.CurrentCamera);
 

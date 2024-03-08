@@ -209,6 +209,9 @@ namespace Uniray
             Button newProjectButton = new Button("New project", (int)fileManager.X + fileManager.Width - 303, (int)fileManager.Y + 5, 50, 20, APPLICATION_COLOR, FOCUS_COLOR, "newProject");
             buttons.Add(newProjectButton);
 
+            Button playButton = new Button("Play", (GetScreenWidth() - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, APPLICATION_COLOR, FOCUS_COLOR, "play");
+            buttons.Add(playButton);
+
             Button addGameObject = new Button("+", (int)gameManager.X + gameManager.Width - 20, (int)gameManager.Y + 10, 10, 15, APPLICATION_COLOR, FOCUS_COLOR, "addGameObject");
             buttons.Add(addGameObject);
 
@@ -280,6 +283,12 @@ namespace Uniray
                 DrawModelEx(arrow, selectedElement.Position, Vector3.UnitZ, 270, new Vector3(2), Color.Green);
                 DrawModelEx(arrow, selectedElement.Position, Vector3.UnitY, 0, new Vector3(2), Color.Red);
                 DrawModelEx(arrow, selectedElement.Position, Vector3.UnitX, 270, new Vector3(2), Color.Blue);
+
+                if (IsKeyPressed(KeyboardKey.Delete))
+                {
+                    currentScene.GameObjects.Remove(selectedElement);
+                    selectedElement = null;
+                }
             }
         }
         /// <summary>
