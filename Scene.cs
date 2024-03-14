@@ -14,8 +14,14 @@ namespace Uniray
         /// </summary>
         private Camera3D camera;
 
+        /// <summary>
+        /// Camera property
+        /// </summary>
         public Camera3D Camera { get { return camera; } set { camera = value; } }
 
+        /// <summary>
+        /// Game objects list property
+        /// </summary>
         public List<GameObject> GameObjects { get { return gameObjects; } }    
 
         /// <summary>
@@ -46,12 +52,20 @@ namespace Uniray
             gameObjects[index] = go;
         }
 
+        /// <summary>
+        /// Construct new Scene
+        /// </summary>
+        /// <param name="camera"></param>
         public Scene(Camera3D camera)
         {
             gameObjects = new List<GameObject>();
             this.camera = camera;
         }
 
+        /// <summary>
+        /// Scene to string
+        /// </summary>
+        /// <returns>String</returns>
         public override string ToString()
         {
             return "This scene contains : " + gameObjects.Count;

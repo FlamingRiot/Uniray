@@ -40,6 +40,7 @@ namespace Uniray
         /// </summary>
         private string name;
 
+        // Properties
         public float X { get { return position.X; } set { position.X = value; } }
         public float Y { get { return position.Y; } set { position.Y = value; } }
         public float Z { get { return position.Z; } set { position.Z = value; } }
@@ -92,12 +93,20 @@ namespace Uniray
 
         }
 
+        /// <summary>
+        /// Set game object textures
+        /// </summary>
+        /// <param name="tex">Texture to apply</param>
         public void SetTexture(Texture2D tex)
         {
             texture = tex;
             Raylib.SetMaterialTexture(&model.Materials[0], MaterialMapIndex.Diffuse, texture);
         }
 
+        /// <summary>
+        /// Game object to string
+        /// </summary>
+        /// <returns>String</returns>
         public override string ToString()
         {
             return "X : " + X.ToString() + "\n\nY : " + Y.ToString() + "\n\nZ : " + Z.ToString();
