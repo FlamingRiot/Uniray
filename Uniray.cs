@@ -40,11 +40,23 @@ namespace Uniray
 
         private int wWindow;
 
+        private bool openModal;
+
+        private string? currentProject;
+
         private Font baseFont;
 
         private Container fileManager;
 
         private Container gameManager;
+
+        private Container modal;
+
+        private Textbox openProjTxb;
+
+        private Button closeModal;
+
+        private Button okModal;
 
         private List<Textbox> textboxes;
 
@@ -102,7 +114,9 @@ namespace Uniray
 
             selectedElement = null;
             selectedFile = null;
-            projectPath = null; 
+            projectPath = null;
+            openModal = false;
+            currentProject = null;
             mouseRay = new Ray();
             xCollision = new RayCollision();
             yCollision = new RayCollision();
@@ -189,6 +203,8 @@ namespace Uniray
 
             gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR, "gameManager");
 
+            modal = new Container(WWindow / 2 - WWindow / 6, HWindow / 2 - HWindow / 6, WWindow / 3, HWindow / 3, APPLICATION_COLOR, FOCUS_COLOR, "modal");
+
             // Buttons
             Button modelsButton = new Button("Models", (int)fileManager.X + 48, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "modelsSection");
             buttons.Add(modelsButton);
@@ -220,15 +236,21 @@ namespace Uniray
             Button addGameObject = new Button("+", (int)gameManager.X + gameManager.Width - 20, (int)gameManager.Y + 10, 10, 15, APPLICATION_COLOR, FOCUS_COLOR, "addGameObject");
             buttons.Add(addGameObject);
 
+            closeModal = new Button("x", (int)modal.X + modal.Width - 30, (int)modal.Y + 10, 20, 20, Color.Red, FOCUS_COLOR, "closeModal");
+            
+            okModal = new Button("Proceed", (int)modal.X + modal.Width - 70, (int)modal.Y + modal.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModal");
+
             // Textboxes
-            Textbox goTexture = new Textbox("", (int)GameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 290, 250, 40, APPLICATION_COLOR, FOCUS_COLOR);
+            Textbox goTexture = new Textbox("",  (int)gameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 290, gameManager.Width - 120, 40, APPLICATION_COLOR, FOCUS_COLOR);
             textboxes.Add(goTexture);
+
+            openProjTxb = new Textbox("", (int)modal.X + 20, (int)modal.Y + 70, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
 
             // Labels
             Label gameLayersLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + 10, "Game Layers");
             labels.Add(gameLayersLabel);
 
-            Label goTextureLabel = new Label((int)GameManager.X + 20, (int)gameManager.Y + gameManager.Height / 2 + 300, "Texture");
+            Label goTextureLabel = new Label((int)gameManager.X + 20, (int)gameManager.Y + gameManager.Height / 2 + 300, "Texture");
             labels.Add(goTextureLabel);
 
             Label gameObjectLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + hWindow / 2, "Game Object");
@@ -351,6 +373,26 @@ namespace Uniray
             }
             if (!focus && selectedFile is null) { SetMouseCursor(MouseCursor.Default); }
 
+            if (openModal)
+            {
+                DrawRectanglePro(new Rectangle(0, 0, wWindow, hWindow), Vector2.Zero, 0, new Color(0, 0, 0, 75));
+                DrawContainer(ref modal);
+                DrawLabel(new Label((int)modal.X + 20, (int)modal.Y + 50, "Copy .uproj file link"), baseFont);
+                DrawTextbox(ref openProjTxb, baseFont);
+                DrawButton(closeModal, baseFont);
+                DrawButton(okModal, baseFont);
+
+                if (IsButtonPressed(closeModal)) 
+                {
+                    openModal = false;
+                }
+                else if (IsButtonPressed(okModal))
+                {
+                    openModal = false;
+                    currentProject = openProjTxb.Text.Split('\\').Last().Split('.')[0];
+                }
+            }
+
             // =========================================================================================================================================================
             // ============================================================= MANAGE CUSTOM BUTTONS =====================================================================
             // =========================================================================================================================================================
@@ -414,12 +456,12 @@ namespace Uniray
                                 TraceLog(TraceLogLevel.Info, "Game object added");
                                 break;
                             case "play":
-                                var p = new Process();
+                                /*var p = new Process();
                                 p.StartInfo = new ProcessStartInfo(@"C:\Users\ComtesseE1\Desktop\Crossy Road\bin\Debug\net7.0\crossy_road.exe");
-                                p.Start();
+                                p.Start();*/
                                 break;
                             case "openProject":
-                                
+                                openModal = true;
                                 break;
                         }
                         FileManager = c;
