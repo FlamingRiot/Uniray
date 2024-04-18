@@ -4,8 +4,6 @@ using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
 using System.Numerics;
 using System.Text;
-using System.Diagnostics;
-using System.Security;
 
 namespace Uniray
 {
@@ -626,6 +624,24 @@ namespace Uniray
         {
             try
             {
+                // Create directories (assets, locs, etc.)
+                Directory.CreateDirectory(path + "\\assets");
+
+                Directory.CreateDirectory(path + "\\assets\\animations");
+                Directory.CreateDirectory(path + "\\assets\\models");
+                Directory.CreateDirectory(path + "\\assets\\scripts");
+                Directory.CreateDirectory(path + "\\assets\\sounds");
+                Directory.CreateDirectory(path + "\\assets\\textures");
+
+                Directory.CreateDirectory(path + "\\scenes\\new_scene\\");
+                StreamWriter default_locs = new StreamWriter(path + "\\scenes\\new_scene\\locs.json");
+                default_locs.WriteLine("[");
+                default_locs.WriteLine("    {");
+                default_locs.WriteLine("    }");
+                default_locs.WriteLine("]");
+                default_locs.Close();
+
+                // Create .uproj file
                 StreamReader read = new StreamReader("data\\project_template.txt");
                 string content = "";
                 while (!read.EndOfStream) 
