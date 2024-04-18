@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <Reference Include="RayGUI_cs">
-      <HintPath>..\..\Documents\Free Time\Prog\Libraries\RayGUI\RayGUI_cs.dll</HintPath>
+      <HintPath>\\s2.rpn.ch\Home\CPNE\Eleves-TI\ComtesseE1\Programmation C#\Libraries\RayGUI_cs\RayGUI_cs.dll</HintPath>
     </Reference>
   </ItemGroup>
 

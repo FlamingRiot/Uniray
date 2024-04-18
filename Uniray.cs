@@ -5,6 +5,7 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using System.Diagnostics;
+using System.Security;
 
 namespace Uniray
 {
@@ -40,7 +41,9 @@ namespace Uniray
 
         private int wWindow;
 
-        private bool openModal;
+        private bool openModalOpenProject;
+
+        private bool openModalNewProject;
 
         private string? currentProject;
 
@@ -50,13 +53,21 @@ namespace Uniray
 
         private Container gameManager;
 
-        private Container modal;
+        private Container modalOpenProject;
+
+        private Container modalNewProject;
 
         private Textbox openProjTxb;
 
+        private Textbox newProjTxb;
+
+        private Textbox newProjNameTxb;
+
         private Button closeModal;
 
-        private Button okModal;
+        private Button okModalOpen;
+
+        private Button okModalNew;
 
         private List<Textbox> textboxes;
 
@@ -115,7 +126,8 @@ namespace Uniray
             selectedElement = null;
             selectedFile = null;
             projectPath = null;
-            openModal = false;
+            openModalOpenProject = false;
+            openModalNewProject = false;
             currentProject = null;
             mouseRay = new Ray();
             xCollision = new RayCollision();
@@ -203,7 +215,11 @@ namespace Uniray
 
             gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR, "gameManager");
 
-            modal = new Container(WWindow / 2 - WWindow / 6, HWindow / 2 - HWindow / 6, WWindow / 3, HWindow / 3, APPLICATION_COLOR, FOCUS_COLOR, "modal");
+            Container modal_template = new Container(WWindow / 2 - WWindow / 6, HWindow / 2 - HWindow / 6, WWindow / 3, HWindow / 3, APPLICATION_COLOR, FOCUS_COLOR, "modal");
+
+            modalOpenProject = modal_template;
+
+            modalNewProject = modal_template;
 
             // Buttons
             Button modelsButton = new Button("Models", (int)fileManager.X + 48, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "modelsSection");
@@ -236,15 +252,21 @@ namespace Uniray
             Button addGameObject = new Button("+", (int)gameManager.X + gameManager.Width - 20, (int)gameManager.Y + 10, 10, 15, APPLICATION_COLOR, FOCUS_COLOR, "addGameObject");
             buttons.Add(addGameObject);
 
-            closeModal = new Button("x", (int)modal.X + modal.Width - 30, (int)modal.Y + 10, 20, 20, Color.Red, FOCUS_COLOR, "closeModal");
+            closeModal = new Button("x", (int)modal_template.X + modal_template.Width - 30, (int)modal_template.Y + 10, 20, 20, Color.Red, FOCUS_COLOR, "closeModal");
             
-            okModal = new Button("Proceed", (int)modal.X + modal.Width - 70, (int)modal.Y + modal.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModal");
+            okModalOpen = new Button("Proceed", (int)modal_template.X + modal_template.Width - 70, (int)modal_template.Y + modal_template.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalOpen");
+
+            okModalNew = new Button("Proceed", (int)modal_template.X + modal_template.Width - 70, (int)modal_template.Y + modal_template.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalNew");
 
             // Textboxes
             Textbox goTexture = new Textbox("",  (int)gameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 290, gameManager.Width - 120, 40, APPLICATION_COLOR, FOCUS_COLOR);
             textboxes.Add(goTexture);
 
-            openProjTxb = new Textbox("", (int)modal.X + 20, (int)modal.Y + 70, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+            openProjTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+
+            newProjTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+
+            newProjNameTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 120, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
 
             // Labels
             Label gameLayersLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + 10, "Game Layers");
@@ -373,23 +395,47 @@ namespace Uniray
             }
             if (!focus && selectedFile is null) { SetMouseCursor(MouseCursor.Default); }
 
-            if (openModal)
+            if (openModalOpenProject)
             {
                 DrawRectanglePro(new Rectangle(0, 0, wWindow, hWindow), Vector2.Zero, 0, new Color(0, 0, 0, 75));
-                DrawContainer(ref modal);
-                DrawLabel(new Label((int)modal.X + 20, (int)modal.Y + 50, "Copy .uproj file link"), baseFont);
+                DrawContainer(ref modalOpenProject);
+                DrawLabel(new Label((int)modalOpenProject.X + 20, (int)modalOpenProject.Y + 50, "Copy .uproj file link"), baseFont);
                 DrawTextbox(ref openProjTxb, baseFont);
                 DrawButton(closeModal, baseFont);
-                DrawButton(okModal, baseFont);
+                DrawButton(okModalOpen, baseFont);
 
                 if (IsButtonPressed(closeModal)) 
                 {
-                    openModal = false;
+                    openModalOpenProject = false;
                 }
-                else if (IsButtonPressed(okModal))
+                else if (IsButtonPressed(okModalOpen))
                 {
-                    openModal = false;
+                    openModalOpenProject = false;
                     currentProject = openProjTxb.Text.Split('\\').Last().Split('.')[0];
+                }
+            }
+
+            if (openModalNewProject)
+            {
+                DrawRectanglePro(new Rectangle(0, 0, wWindow, hWindow), Vector2.Zero, 0, new Color(0, 0, 0, 75));
+                DrawContainer(ref modalNewProject);
+                DrawLabel(new Label((int)modalNewProject.X + 20, (int)modalNewProject.Y + 50, "Copy target directory path"), baseFont);
+                DrawLabel(new Label((int)modalNewProject.X + 20, (int)modalNewProject.Y + 100, "Create your project name"), baseFont);
+                DrawTextbox(ref newProjTxb, baseFont);
+                DrawTextbox(ref newProjNameTxb, baseFont);
+                DrawButton(closeModal, baseFont);
+                DrawButton(okModalNew, baseFont);
+
+                if (IsButtonPressed(closeModal))
+                {
+                    openModalNewProject = false;
+                }
+                else if (IsButtonPressed(okModalNew))
+                {
+                    openModalNewProject = false;
+                    string project_path = newProjTxb.Text;
+                    string project_name = newProjNameTxb.Text;
+                    CreateProject(project_path, project_name);
                 }
             }
 
@@ -461,7 +507,10 @@ namespace Uniray
                                 p.Start();*/
                                 break;
                             case "openProject":
-                                openModal = true;
+                                openModalOpenProject = true;
+                                break;
+                            case "newProject":
+                                openModalNewProject = true;
                                 break;
                         }
                         FileManager = c;
@@ -549,6 +598,55 @@ namespace Uniray
                         selectedFile = null;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Load project from .uproj file
+        /// </summary>
+        /// <param name="path">path to the .uproj file</param>
+        public void LoadProject(string path)
+        {
+            try
+            {
+                StreamReader stream = new StreamReader(path);
+                
+            }
+            catch
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// Create project (.uproj file)
+        /// </summary>
+        /// <param name="path">path to the target directory</param>
+        public void CreateProject(string path, string name)
+        {
+            try
+            {
+                StreamReader read = new StreamReader("data\\project_template.txt");
+                string content = "";
+                while (!read.EndOfStream) 
+                {
+                    content += read.ReadLine() + '$';
+                }
+                read.Close();
+                // Replace specific elements
+                content = content.Replace("{ASSETS_PATH}", path + "\\assets");
+                content = content.Replace("{JSON_PATH}", path + "\\scenes\\new_scene\\locs.json");
+                string[] file = content.Split('$');
+                StreamWriter write = new StreamWriter(path + "\\" + name + ".uproj");
+                for (int i = 0; i < file.Length; i++)
+                {
+                    write.WriteLine(file[i]);
+                }
+                write.Close();
+            }
+            catch
+            {
+
             }
         }
 
