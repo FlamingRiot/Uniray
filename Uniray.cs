@@ -4,6 +4,7 @@ using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
 using System.Numerics;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace Uniray
 {
@@ -409,7 +410,6 @@ namespace Uniray
                 else if (IsButtonPressed(okModalOpen))
                 {
                     openModalOpenProject = false;
-                    currentProject = openProjTxb.Text.Split('\\').Last().Split('.')[0];
                     LoadProject(openProjTxb.Text);
                 }
             }
@@ -615,6 +615,8 @@ namespace Uniray
                     project_name = stream.ReadLine().Split('>')[1].Split('<')[0];
                 }
                 stream.Close();
+                string? directory = Path.GetDirectoryName(path);
+                currentProject = directory;
                 SetWindowTitle("Uniray - " + project_name);
             }
             catch
@@ -672,8 +674,7 @@ namespace Uniray
                 write.Close();
 
                 SetWindowTitle("Uniray - " + name);
-                currentProject = name;
-
+                currentProject = path;
                 Console.WriteLine("Le projet " + name + " a bien été créé !");
             }
             catch
