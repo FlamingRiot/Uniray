@@ -692,6 +692,7 @@ namespace Uniray
                 scenes.Add(defaultScene);
                 currentProject = new Project(name, path, scenes);
                 currentScene = currentProject.GetScene(0);
+                selectedElement = null;
 
                 Console.WriteLine("Le projet " + name + " a bien été créé !");
             }
