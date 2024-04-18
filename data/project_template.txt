@@ -1,6 +1,5 @@
 <Project>
 	<name>{PROJECT_NAME}</name>
-	<assets>{ASSETS_PATH}</assets>
 	<Scene>
 		<name>new_scene</name>
 		<GameObjects>{JSON_PATH}</GameObjects>

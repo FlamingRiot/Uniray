@@ -5,6 +5,7 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace Uniray
 {
@@ -44,7 +45,7 @@ namespace Uniray
 
         private bool openModalNewProject;
 
-        private string? currentProject;
+        private Project currentProject;
 
         private Font baseFont;
 
@@ -615,8 +616,12 @@ namespace Uniray
                     project_name = stream.ReadLine().Split('>')[1].Split('<')[0];
                 }
                 stream.Close();
+
+                // Set Project info in application
                 string? directory = Path.GetDirectoryName(path);
-                currentProject = directory;
+
+                // To be continued...
+
                 SetWindowTitle("Uniray - " + project_name);
             }
             catch
@@ -674,7 +679,20 @@ namespace Uniray
                 write.Close();
 
                 SetWindowTitle("Uniray - " + name);
-                currentProject = path;
+
+                Camera3D camera = new Camera3D();
+                camera.Position = Vector3.Zero;
+                camera.Target = Vector3.Zero;
+                camera.Up = Vector3.UnitY;
+                camera.Projection = CameraProjection.Perspective;
+                camera.FovY = 150;
+
+                Scene defaultScene = new Scene(camera);
+                List<Scene> scenes = new List<Scene>();
+                scenes.Add(defaultScene);
+                currentProject = new Project(name, path, scenes);
+                currentScene = currentProject.GetScene(0);
+
                 Console.WriteLine("Le projet " + name + " a bien été créé !");
             }
             catch
