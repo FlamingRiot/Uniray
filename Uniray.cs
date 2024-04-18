@@ -663,6 +663,8 @@ namespace Uniray
                 }
                 write.Close();
 
+                SetWindowTitle("Uniray - " + name);
+
                 Console.WriteLine("Le projet " + name + " a bien été créé !");
             }
             catch

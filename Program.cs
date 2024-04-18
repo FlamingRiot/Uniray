@@ -11,7 +11,7 @@ namespace Uniray
         unsafe static void Main(string[] args)
         {
             // Initialize window and set mode
-            InitWindow(1800, 900, "Uniray");
+            InitWindow(1800, 900, "Uniray - New Project");
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
             SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
