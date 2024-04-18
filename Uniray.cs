@@ -641,6 +641,9 @@ namespace Uniray
                 default_locs.WriteLine("]");
                 default_locs.Close();
 
+                // Unzip default Visual Studio project from internal data
+                System.IO.Compression.ZipFile.ExtractToDirectory("data/default_VS_Project.zip", path);
+
                 // Create .uproj file
                 StreamReader read = new StreamReader("data\\project_template.txt");
                 string content = "";
@@ -659,10 +662,12 @@ namespace Uniray
                     write.WriteLine(file[i]);
                 }
                 write.Close();
+
+                Console.WriteLine("Le projet " + name + " a bien été créé !");
             }
             catch
             {
-
+                Console.WriteLine("Le projet " + name + " a échoué lors de sa création...");
             }
         }
 
