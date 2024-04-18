@@ -410,6 +410,7 @@ namespace Uniray
                 {
                     openModalOpenProject = false;
                     currentProject = openProjTxb.Text.Split('\\').Last().Split('.')[0];
+                    LoadProject(openProjTxb.Text);
                 }
             }
 
@@ -607,8 +608,14 @@ namespace Uniray
         {
             try
             {
+                string project_name = "";
                 StreamReader stream = new StreamReader(path);
-                
+                if (stream.ReadLine() == "<Project>")
+                {
+                    project_name = stream.ReadLine().Split('>')[1].Split('<')[0];
+                }
+                stream.Close();
+                SetWindowTitle("Uniray - " + project_name);
             }
             catch
             {
@@ -655,6 +662,7 @@ namespace Uniray
                 // Replace specific elements
                 content = content.Replace("{ASSETS_PATH}", path + "\\assets");
                 content = content.Replace("{JSON_PATH}", path + "\\scenes\\new_scene\\locs.json");
+                content = content.Replace("{PROJECT_NAME}", name);
                 string[] file = content.Split('$');
                 StreamWriter write = new StreamWriter(path + "\\" + name + ".uproj");
                 for (int i = 0; i < file.Length; i++)
@@ -664,6 +672,7 @@ namespace Uniray
                 write.Close();
 
                 SetWindowTitle("Uniray - " + name);
+                currentProject = name;
 
                 Console.WriteLine("Le projet " + name + " a bien été créé !");
             }
