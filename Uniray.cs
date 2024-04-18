@@ -110,7 +110,7 @@ namespace Uniray
         public List<Button> Buttons { get { return buttons; } }
         public Container GameManager { get { return gameManager; } set { gameManager = value; } }
         public Container FileManager { get { return fileManager; } set { fileManager = value; } }
-        public Camera3D CurrentCamera { get { return currentScene.Camera; } set { currentScene.Camera = value; } }
+        public Camera3D EnvCamera { get; set; } = new Camera3D();
         public Scene CurrentScene { get { return currentScene; } }
 
         /// <summary>
@@ -290,7 +290,7 @@ namespace Uniray
             if (selectedElement != null) { selectedElement = currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)); }
 
             Vector2 mousePos = GetMousePosition();
-            mouseRay = GetMouseRay(mousePos, CurrentCamera);
+            mouseRay = GetMouseRay(mousePos, EnvCamera);
 
             int index = -1;
             foreach (GameObject go in currentScene.GameObjects)
@@ -685,7 +685,7 @@ namespace Uniray
                 camera.Target = Vector3.Zero;
                 camera.Up = Vector3.UnitY;
                 camera.Projection = CameraProjection.Perspective;
-                camera.FovY = 150;
+                camera.FovY = 90;
 
                 Scene defaultScene = new Scene(camera);
                 List<Scene> scenes = new List<Scene>();

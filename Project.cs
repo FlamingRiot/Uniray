@@ -1,6 +1,4 @@
-﻿using Raylib_cs;
-
-namespace Uniray
+﻿namespace Uniray
 {
     public class Project
     {

@@ -25,12 +25,12 @@ namespace Uniray
             int hWindow = GetScreenHeight();
 
             // Set 3D camera for the default scene
-            Camera3D cam = new Camera3D();
-            cam.Projection = CameraProjection.Perspective;
-            cam.Position = new Vector3(5, 5, 0);
-            cam.Target = Vector3.Zero;
-            cam.Up = Vector3.UnitY;
-            cam.FovY = 90f;
+            Camera3D camera = new Camera3D();
+            camera.Projection = CameraProjection.Perspective;
+            camera.Position = new Vector3(5, 5, 0);
+            camera.Target = Vector3.Zero;
+            camera.Up = Vector3.UnitY;
+            camera.FovY = 90f;
             float camYOffset = 0f;
             float camDistance = 2f;
             Vector2 mousePos = new Vector2(wWindow / 2, hWindow / 2);
@@ -38,7 +38,7 @@ namespace Uniray
             Vector2 fakePos = Vector2.Zero;
 
             // Set UI and application default
-            Scene scene = new Scene(cam);
+            Scene scene = new Scene(camera);
             Uniray uniray = new Uniray(wWindow, hWindow, font, scene);
 
             // Set FPS
@@ -66,7 +66,6 @@ namespace Uniray
                 
                 if (Hover((int)uniray.GameManager.X + uniray.GameManager.Width + 10, 0, wWindow - uniray.GameManager.Width - 20, hWindow - uniray.FileManager.Height - 20))
                 {
-                    Camera3D camera = uniray.CurrentCamera;
                     if (IsMouseButtonReleased(MouseButton.Middle))
                     {
                         mousePos = fakePos;
@@ -97,7 +96,7 @@ namespace Uniray
                         camDistance -= GetMouseWheelMove() * 2f;
                         MoveCamera(camDistance, ref camera, camera.Target, camYOffset, true, mousePos, mouseMovementOrigin);
                     }
-                    uniray.CurrentCamera = camera;
+                    uniray.EnvCamera = camera;
                 }
                 // =========================================================================================================================================================
 
@@ -116,7 +115,7 @@ namespace Uniray
 
                 ClearBackground(new Color(70, 70, 70, 255));
 
-                BeginMode3D(uniray.CurrentCamera);
+                BeginMode3D(camera);
 
                 DrawGrid(10, 10);
 
