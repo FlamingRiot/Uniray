@@ -42,7 +42,7 @@ namespace Uniray
             Uniray uniray = new Uniray(wWindow, hWindow, font, scene);
 
             // Set FPS
-            SetTargetFPS(60);
+            //SetTargetFPS(60);
 
             /*List<int> keys = new List<int>();
             int index = 0;

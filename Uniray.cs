@@ -347,8 +347,24 @@ namespace Uniray
                 if (IsKeyDown(KeyboardKey.G))
                 {
                     Vector3 newPos = selectedElement.Position;
-                    newPos += GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
-                    newPos -= GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
+                    if (IsKeyDown(KeyboardKey.X))
+                    {
+                        newPos.X += (GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).X;
+                    }
+                    else if (IsKeyDown(KeyboardKey.Y))
+                    {
+                        newPos.Z += (GetCameraForward(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).X;
+                    }
+                    else if (IsKeyDown(KeyboardKey.Z))
+                    {
+                        newPos.Y -= (GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).Y;
+                    }
+                    else
+                    {
+                        newPos += GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
+                        newPos -= GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
+                    }
+
                     currentScene.SetGameObjectPosition(currentScene.GameObjects.IndexOf(selectedElement), newPos);
 
                     HideCursor();
@@ -405,6 +421,9 @@ namespace Uniray
                 Textbox textbox = textboxes[i];
                 textboxes[i] = DrawTextbox(ref textbox, baseFont);
                 if (Hover(textbox.X, textbox.Y, textbox.Width, textbox.Height)) { focus = true; }
+                if (Hover(newProjTxb.X, newProjTxb.Y, newProjTxb.Width, newProjTxb.Height)) { focus = true; }
+                if (Hover(openProjTxb.X, openProjTxb.Y, openProjTxb.Width, openProjTxb.Height)) { focus = true; }
+                if (Hover(newProjNameTxb.X, newProjNameTxb.Y, newProjNameTxb.Width, newProjNameTxb.Height)) { focus = true; }
             }
 
             // Draw game layers infos
