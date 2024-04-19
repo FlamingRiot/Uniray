@@ -1,4 +1,5 @@
 ﻿using static Raylib_cs.Raylib;
+using static Raylib_cs.Raymath;
 using Raylib_cs;
 using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
@@ -95,6 +96,8 @@ namespace Uniray
 
         private string? projectPath;
 
+        private Camera3D envCamera;
+
         // Collision related variables
 
         private Ray mouseRay;
@@ -110,7 +113,7 @@ namespace Uniray
         public List<Button> Buttons { get { return buttons; } }
         public Container GameManager { get { return gameManager; } set { gameManager = value; } }
         public Container FileManager { get { return fileManager; } set { fileManager = value; } }
-        public Camera3D EnvCamera { get; set; } = new Camera3D();
+        public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
         public Scene CurrentScene { get { return currentScene; } }
 
         /// <summary>
@@ -122,6 +125,7 @@ namespace Uniray
             hWindow = HWindow;
             baseFont = font;
             currentScene = scene;
+            envCamera = new Camera3D();
 
             selectedElement = null;
             selectedFile = null;
@@ -338,7 +342,22 @@ namespace Uniray
                     currentScene.GameObjects.Remove(selectedElement);
                     selectedElement = null;
                 }
+
+                // Move selected object
+                if (IsKeyDown(KeyboardKey.G))
+                {
+                    Vector3 newPos = selectedElement.Position;
+                    newPos += GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
+                    newPos -= GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
+                    currentScene.SetGameObjectPosition(currentScene.GameObjects.IndexOf(selectedElement), newPos);
+
+                    HideCursor();
+                }
+                else ShowCursor();
             }
+
+            // Display the current scene's camera
+            DrawCube(CurrentScene.Camera.Position, 1, 1, 1, Color.Red);
         }
         /// <summary>
         /// Draw user interface of the application

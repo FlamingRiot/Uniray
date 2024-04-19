@@ -1,4 +1,5 @@
 ﻿using Raylib_cs;
+using System.Numerics;
 
 namespace Uniray
 {
@@ -50,6 +51,18 @@ namespace Uniray
         public void SetGameObject(int index, GameObject go)
         {
             gameObjects[index] = go;
+        }
+
+        /// <summary>
+        /// Set game object position
+        /// </summary>
+        /// <param name="index">Index of the object</param>
+        /// <param name="position">Game object position</param>
+        public void SetGameObjectPosition(int index, Vector3 position)
+        {
+            GameObject go = gameObjects[index];
+            go.Position = position;
+            SetGameObject(index, go);
         }
 
         /// <summary>
