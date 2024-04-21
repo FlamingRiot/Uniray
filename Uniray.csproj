@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +29,7 @@
 
   <ItemGroup>
     <Reference Include="RayGUI_cs">
-      <HintPath>\\s2.rpn.ch\Home\CPNE\Eleves-TI\ComtesseE1\Programmation C#\Libraries\RayGUI_cs\RayGUI_cs.dll</HintPath>
+      <HintPath>..\raygui_cs\bin\Debug\net6.0\RayGUI_cs.dll</HintPath>
     </Reference>
   </ItemGroup>
 

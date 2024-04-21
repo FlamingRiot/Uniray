@@ -94,8 +94,6 @@ namespace Uniray
 
         private string? selectedFile;
 
-        private string? projectPath;
-
         private Camera3D envCamera;
 
         // Collision related variables
@@ -129,7 +127,6 @@ namespace Uniray
 
             selectedElement = null;
             selectedFile = null;
-            projectPath = null;
             openModalOpenProject = false;
             openModalNewProject = false;
             currentProject = null;
