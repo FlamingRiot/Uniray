@@ -30,6 +30,8 @@
             this.scenes = scenes;
         }
 
+        public string Path { get { return path; } set { path = value; } }
+
         /// <summary>
         /// Get scene according to an index
         /// </summary>

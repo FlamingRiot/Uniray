@@ -26,9 +26,19 @@ namespace Uniray
         private Model model;
 
         /// <summary>
+        /// File path for the go's model
+        /// </summary>
+        private string modelPath;
+
+        /// <summary>
         /// Texture of the model
         /// </summary>
         private Texture2D texture;
+
+        /// <summary>
+        /// Dictionary key of the go's texture
+        /// </summary>
+        private string textureID;
 
         /// <summary>
         /// Behaviour
@@ -52,7 +62,9 @@ namespace Uniray
         public float Sz { get { return scale.Z; } set { scale.Z = value; } }
 
         public Model Model { get { return model; } set { model = value; } }
+        public string ModelPath { get { return modelPath; } }
         public Texture2D Texture { get { return texture; } set { texture = value; } }
+        public string TextureID { get { return textureID; } }
         public Vector3 Position { get { return position; } set { position = value; } }
         public Vector3 Rotation { get { return rotation; } set { rotation = value; } }
         public Vector3 Scale { get { return scale; } set { scale = value; } }
@@ -70,7 +82,9 @@ namespace Uniray
             this.scale = scale;
             this.name = name;
             this.model = new Model();
+            this.modelPath = "";
             this.texture = new Texture2D();
+            this.textureID = "null";
 
             behaviour = new Behaviour();
         }
@@ -80,26 +94,28 @@ namespace Uniray
         /// </summary>
         /// <param name="transform">Transform of the object</param>
         /// <param name="model">Model of the object</param>
-        public GameObject(Vector3 position, Vector3 rotation, Vector3 scale, string name,Model model)
+        public GameObject(Vector3 position, Vector3 rotation, Vector3 scale, string name, Model model, string modelPath)
         {
             this.position = position;
             this.rotation = rotation;
             this.scale = scale;
             this.name = name;
             this.model = model;
+            this.modelPath = modelPath;
             this.texture = new Texture2D();
+            this.textureID = "";
 
             behaviour = new Behaviour();
-
         }
 
         /// <summary>
         /// Set game object textures
         /// </summary>
         /// <param name="tex">Texture to apply</param>
-        public void SetTexture(Texture2D tex)
+        public void SetTexture(Texture2D tex, string id)
         {
             texture = tex;
+            this.textureID = id;
             Raylib.SetMaterialTexture(&model.Materials[0], MaterialMapIndex.Diffuse, texture);
         }
 

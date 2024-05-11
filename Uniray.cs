@@ -532,15 +532,6 @@ namespace Uniray
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
                                 break;
-                            case "addGameObject":
-                                Model model = LoadModelFromMesh(GenMeshCube(1f, 1f, 1f));
-                                Vector3 position = new Vector3(2f, 0f, 5f);
-                                Vector3 rotation = Vector3.Zero;
-                                Vector3 scale = Vector3.One;
-                                currentScene.AddGameObject(new GameObject(position, rotation, scale, "MonCube", model));
-                                selectedElement = currentScene.GameObjects.Last();
-                                TraceLog(TraceLogLevel.Info, "Game object added");
-                                break;
                             case "play":
                                 /*var p = new Process();
                                 p.StartInfo = new ProcessStartInfo(@"C:\Users\ComtesseE1\Desktop\Crossy Road\bin\Debug\net7.0\crossy_road.exe");
@@ -618,7 +609,7 @@ namespace Uniray
                             for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
                                 m.Meshes[0].Colors[j] = 255;
                             UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-                            currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(1, 1, 1), "[New model]", m));
+                            currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(1, 1, 1), "[New model]", m, selectedFile));
                             selectedElement = currentScene.GameObjects.Last();
                         }
                         // Import texture in game object attributes
@@ -630,7 +621,8 @@ namespace Uniray
                                 {
                                     if (go == selectedElement)
                                     {
-                                        go.SetTexture(Ressource.GetTexture(selectedFile.Split('\\').Last().Split('.')[0]));
+                                        string dictionaryKey = selectedFile.Split('\\').Last().Split('.')[0];
+                                        go.SetTexture(Ressource.GetTexture(dictionaryKey), dictionaryKey);
                                     }
                                 }
                             }
@@ -663,6 +655,8 @@ namespace Uniray
                 // To be continued...
 
                 SetWindowTitle("Uniray - " + project_name);
+
+                currentProject = new Project(project_name, path, new List<Scene>());
             }
             catch
             {
@@ -675,7 +669,20 @@ namespace Uniray
         /// </summary>
         public void SaveProject()
         {
-            JsonfyGos(currentScene.GameObjects);
+            if (currentProject != null)
+            {
+                string json = JsonfyGos(currentScene.GameObjects);
+                string[] pathArray = currentProject.Path.Split('\\');
+                string[] newPathArray = pathArray.Take(pathArray.Length - 1).ToArray();
+                string path = string.Join("\\", newPathArray);
+                StreamWriter stream = new StreamWriter(path + "/scenes/new_scene/locs.json");
+                stream.Write(json);
+                stream.Close();
+            }
+            else
+            {
+                openModalNewProject = true;
+            }
         }
 
         /// <summary>
@@ -766,7 +773,17 @@ namespace Uniray
         /// <returns></returns>
         public string JsonfyGos(List<GameObject> gos)
         {
-            return "";
+            string json = "[";
+            foreach(GameObject go in gos)
+            {
+                json += "{" + "X: " + go.X + ",Y: " + go.Y + ",Z: " + go.Z + ",Rx: " + go.Rx +
+                    ",Ry: " + go.Ry + ",Rz: " + go.Rz + ",Sx: " + go.Sx + ",Sy: " + go.Sy + ",Sz: " + 
+                    go.Sz + ",Model: \"" + go.ModelPath + "\",TextureID: \"" + go.TextureID;
+                if (gos.IndexOf(go) == gos.Count - 1) json += "\"}";
+                else json += "\"},";
+            }
+            json += "]";
+            return json;
         }
     }
 }
