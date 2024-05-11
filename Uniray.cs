@@ -671,6 +671,14 @@ namespace Uniray
         }
 
         /// <summary>
+        /// Save current game objects and scenes
+        /// </summary>
+        public void SaveProject()
+        {
+            JsonfyGos(currentScene.GameObjects);
+        }
+
+        /// <summary>
         /// Create project (.uproj file)
         /// </summary>
         /// <param name="path">path to the target directory</param>
@@ -749,6 +757,16 @@ namespace Uniray
         public override string ToString()
         {
             return "Uniray is a game engine developped by Evan Comtesse";
+        }
+
+        /// <summary>
+        /// Convert game objects list to json according to the ressource dictionaries
+        /// </summary>
+        /// <param name="gos">Game objects list</param>
+        /// <returns></returns>
+        public string JsonfyGos(List<GameObject> gos)
+        {
+            return "";
         }
     }
 }
