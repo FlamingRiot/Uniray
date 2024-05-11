@@ -20,6 +20,8 @@ namespace Uniray
         // ================================================================= SEMI-CONSTANTS ========================================================================
         // =========================================================================================================================================================
 
+        public Ressource Ressource;
+
         /// <summary>
         /// Directionnal arrows model loading
         /// </summary>
@@ -203,7 +205,10 @@ namespace Uniray
                         }
                     }
                 }
-                Console.WriteLine(texturesPathList[0]);
+                Ressource = new Ressource(
+                    texturesPathList,
+                    soundsPathList
+                    );
             }
 
             // Containers
@@ -625,7 +630,7 @@ namespace Uniray
                                 {
                                     if (go == selectedElement)
                                     {
-                                        go.SetTexture(LoadTexture(selectedFile));
+                                        go.SetTexture(Ressource.GetTexture(selectedFile.Split('\\').Last().Split('.')[0]));
                                     }
                                 }
                             }

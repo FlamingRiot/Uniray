@@ -2,12 +2,14 @@
 using static RayGUI_cs.RayGUI;
 using Raylib_cs;
 using System.Numerics;
+using System.Text;
 
 namespace Uniray
 {
     public class Program
     {
         public float CameraDistance;
+
         unsafe static void Main(string[] args)
         {
             // Initialize window and set mode
@@ -40,6 +42,7 @@ namespace Uniray
             // Set UI and application default
             Scene scene = new Scene(camera);
             Uniray uniray = new Uniray(wWindow, hWindow, font, scene);
+
 
             // Set FPS
             //SetTargetFPS(60);
