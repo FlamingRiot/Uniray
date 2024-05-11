@@ -660,7 +660,7 @@ namespace Uniray
             }
             catch
             {
-
+                TraceLog(TraceLogLevel.Warning, "Project could not be loaded !");
             }
         }
 
