@@ -674,7 +674,16 @@ namespace Uniray
             if (currentProject != null)
             {
                 string json = JsonfyGos(currentScene.GameObjects);
-                string? path = Path.GetDirectoryName(currentProject.Path);
+                string? path;
+                if (currentProject.Path.Contains('.'))
+                {
+                    path = Path.GetDirectoryName(currentProject.Path);
+                }
+                else
+                {
+                    path = currentProject.Path;
+                }
+                
                 StreamWriter stream = new StreamWriter(path + "/scenes/new_scene/locs.json", false);
                 stream.Write(json);
                 stream.Close();
