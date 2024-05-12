@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
 using System.IO;
+using System.Globalization;
 
 namespace Uniray
 {
@@ -20,7 +21,7 @@ namespace Uniray
         // ================================================================= SEMI-CONSTANTS ========================================================================
         // =========================================================================================================================================================
 
-        public Ressource Ressource;
+        public static Ressource Ressource;
 
         /// <summary>
         /// Directionnal arrows model loading
@@ -190,6 +191,7 @@ namespace Uniray
                     for (int j = 0; j < pathList.Count; j++)
                     {
                         string path = new string((sbyte*)pathList.Paths[j]);
+                        path = path.Replace("\\", "/");
                         switch (i)
                         {
                             case 0:
@@ -373,9 +375,6 @@ namespace Uniray
                 }
                 else ShowCursor();
             }
-
-            // Display the current scene's camera
-            DrawCube(CurrentScene.Camera.Position, 1, 1, 1, Color.Red);
         }
         /// <summary>
         /// Draw user interface of the application
@@ -580,7 +579,7 @@ namespace Uniray
                 int xPos = (int)fileManager.X + 150 * (i) - 100;
                 int yPos = (int)fileManager.Y + 60;
                 DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
-                string[] pathArryBySlash = files[i].Split('\\');
+                string[] pathArryBySlash = files[i].Split('/');
                 DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), baseFont);
 
                 Vector2 mouse = GetMousePosition();
@@ -621,8 +620,8 @@ namespace Uniray
                                 {
                                     if (go == selectedElement)
                                     {
-                                        string dictionaryKey = selectedFile.Split('\\').Last().Split('.')[0];
-                                        go.SetTexture(Ressource.GetTexture(dictionaryKey), dictionaryKey);
+                                        string dictionaryKey = selectedFile.Split('/').Last().Split('.')[0];
+                                        go.SetTexture(dictionaryKey);
                                     }
                                 }
                             }
@@ -656,7 +655,8 @@ namespace Uniray
 
                 SetWindowTitle("Uniray - " + project_name);
 
-                currentProject = new Project(project_name, path, new List<Scene>());
+                currentProject = new Project(project_name, path, LoadScenes(directory));
+                currentScene = currentProject.GetScene(0);
             }
             catch
             {
@@ -672,12 +672,12 @@ namespace Uniray
             if (currentProject != null)
             {
                 string json = JsonfyGos(currentScene.GameObjects);
-                string[] pathArray = currentProject.Path.Split('\\');
-                string[] newPathArray = pathArray.Take(pathArray.Length - 1).ToArray();
-                string path = string.Join("\\", newPathArray);
-                StreamWriter stream = new StreamWriter(path + "/scenes/new_scene/locs.json");
+                string? path = Path.GetDirectoryName(currentProject.Path);
+                StreamWriter stream = new StreamWriter(path + "/scenes/new_scene/locs.json", false);
                 stream.Write(json);
                 stream.Close();
+
+                TraceLog(TraceLogLevel.Info, "Project was saved successfully !");
             }
             else
             {
@@ -778,12 +778,51 @@ namespace Uniray
             {
                 json += "{" + "X: " + go.X + ",Y: " + go.Y + ",Z: " + go.Z + ",Rx: " + go.Rx +
                     ",Ry: " + go.Ry + ",Rz: " + go.Rz + ",Sx: " + go.Sx + ",Sy: " + go.Sy + ",Sz: " + 
-                    go.Sz + ",Model: \"" + go.ModelPath + "\",TextureID: \"" + go.TextureID;
+                    go.Sz + ",ModelPath: \"" + go.ModelPath + "\",TextureID: \"" + go.TextureID;
                 if (gos.IndexOf(go) == gos.Count - 1) json += "\"}";
                 else json += "\"},";
             }
             json += "]";
             return json;
+        }
+
+        /// <summary>
+        /// Load all the scenes from a project directory
+        /// </summary>
+        /// <returns></returns>
+        public List<Scene> LoadScenes(string directory)
+        {
+            string[] scenesPath = Directory.GetDirectories(directory + "\\scenes");
+            List<Scene> scenes = new List<Scene>();
+            for (int i = 0; i < scenesPath.Length; i++)
+            {
+                Camera3D camera = new Camera3D()
+                {
+                    Position = new Vector3(1, 1, 0),
+                    Target = Vector3.Zero,
+                    Up = Vector3.UnitY,
+                    FovY = 45f,
+                    Projection = CameraProjection.Perspective
+                };
+
+                StreamReader r = new StreamReader(scenesPath[i] + "\\locs.json");
+                string json = r.ReadToEnd();
+                List<GameObject> items = JsonConvert.DeserializeObject<List<GameObject>>(json);
+                r.Close();
+
+                foreach (GameObject go in items)
+                {
+                    Model m = LoadModel(go.ModelPath);
+                    for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                        m.Meshes[0].Colors[j] = 255;
+                    UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+                    go.Model = m;
+                    go.SetTexture(go.TextureID);
+                }
+                
+                scenes.Add(new Scene(camera,items));
+            }
+            return scenes;
         }
     }
 }

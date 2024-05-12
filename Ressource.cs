@@ -22,11 +22,11 @@ namespace Uniray
             // Load textures
             for (int i = 0; i < _textures.Count; i++)
             {
-                this._textures.Add(_textures[i].Split('\\').Last().Split('.')[0] ,Raylib.LoadTexture(_textures[i]));
+                this._textures.Add(_textures[i].Split('/').Last().Split('.')[0] ,Raylib.LoadTexture(_textures[i]));
             }
             for (int i = 0; i < _sounds.Count; i++)
             {
-                this._sounds.Add(_sounds[i].Split('\\').Last().Split('.')[0], Raylib.LoadSound(_sounds[i]));
+                this._sounds.Add(_sounds[i].Split('/').Last().Split('.')[0], Raylib.LoadSound(_sounds[i]));
             }
         }
 

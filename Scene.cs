@@ -75,6 +75,12 @@ namespace Uniray
             this.camera = camera;
         }
 
+        public Scene(Camera3D camera, List<GameObject> gameObjects)
+        {
+            this.camera = camera;
+            this.gameObjects = gameObjects;
+        }
+
         /// <summary>
         /// Scene to string
         /// </summary>

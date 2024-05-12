@@ -3,6 +3,7 @@ using static RayGUI_cs.RayGUI;
 using Raylib_cs;
 using System.Numerics;
 using System.Text;
+using System.Globalization;
 
 namespace Uniray
 {
@@ -18,6 +19,12 @@ namespace Uniray
             SetWindowState(ConfigFlags.MaximizedWindow);
             SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+
+            // Change culture info to enabled parsing float values in json
+            var clone = Thread.CurrentThread.CurrentCulture.Clone() as CultureInfo;
+            clone.NumberFormat.NumberDecimalSeparator = ".";
+            Thread.CurrentThread.CurrentCulture = clone;
+            Thread.CurrentThread.CurrentUICulture = clone;
             
             // Load font
             Font font = LoadFont("data/font/Ubuntu-Regular.ttf");
