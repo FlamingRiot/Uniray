@@ -65,10 +65,10 @@ namespace Uniray
         public Vector3 Scale { get { return scale; } set { scale = value; } }
         public string Name  { get { return name; } set { name = value; } }
 
-        public GameObject()
-        {
-
-        }
+        /// <summary>
+        /// Default constructor for the json parsing 
+        /// </summary>
+        public GameObject() { }
 
         /// <summary>
         /// Constructor 1

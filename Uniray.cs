@@ -288,6 +288,8 @@ namespace Uniray
 
             Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "File type : .m3d");
             labels.Add(fileType);
+
+            Console.WriteLine(Ressource.ToString());
         }
         public void DrawScene()
         {

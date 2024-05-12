@@ -34,10 +34,21 @@ namespace Uniray
         {
             return this._textures[index];
         }
-
         public Sound GetSound(string index)
         {
             return this._sounds[index];
+        }
+        public int GetTextureCount()
+        {
+            return this._textures.Count;    
+        }
+        public int GetSoundCount()
+        {
+            return this._sounds.Count;
+        }
+        public override string ToString()
+        {
+            return "Les ressources contiennent :\n" + GetTextureCount() + " textures\n" + GetSoundCount() + " sons";
         }
     }
 }
