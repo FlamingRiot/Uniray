@@ -679,6 +679,10 @@ namespace Uniray
                 stream.Write(json);
                 stream.Close();
 
+                StreamWriter camStream = new StreamWriter(path + "/scenes/new_scene/camera.json", false);
+                camStream.Write(JsonConvert.SerializeObject(currentScene.Camera));
+                camStream.Close();
+
                 TraceLog(TraceLogLevel.Info, "Project was saved successfully !");
             }
             else
@@ -814,14 +818,17 @@ namespace Uniray
 
                 foreach (GameObject go in items)
                 {
-                    Model m = LoadModel(go.ModelPath);
-                    for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                        m.Meshes[0].Colors[j] = 255;
-                    UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-                    go.Model = m;
-                    go.SetTexture(go.TextureID);
+                    if (go.ModelPath is not null)
+                    {
+                        Model m = LoadModel(go.ModelPath);
+                        for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                            m.Meshes[0].Colors[j] = 255;
+                        UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+                        go.Model = m;
+                        go.SetTexture(go.TextureID);
+                    }
                 }
-                
+                                
                 scenes.Add(new Scene(camera,items));
             }
             return scenes;
