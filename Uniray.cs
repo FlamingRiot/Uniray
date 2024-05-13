@@ -8,6 +8,7 @@ using System.Text;
 using Newtonsoft.Json;
 using System.IO;
 using System.Globalization;
+using Microsoft.VisualBasic.FileIO;
 
 namespace Uniray
 {
@@ -155,7 +156,6 @@ namespace Uniray
             float cont1Y = hWindow - hWindow / 3;
             fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X - 10, hWindow - (int)cont1Y - 10, APPLICATION_COLOR, FOCUS_COLOR, "models");
             fileManager.Type = ContainerType.FileDropper;
-            fileManager.OutputFilePath = "assets/models/";
             fileManager.ExtensionFile = "m3d";
 
             gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR, "gameManager");
@@ -431,7 +431,7 @@ namespace Uniray
                             case "modelsSection":
                                 c.ExtensionFile = "m3d";
                                 c.Tag = "models";
-                                c.OutputFilePath = "assets/models";
+                                c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/models";
                                 fileType.Text = "File type : .m3d";
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
@@ -439,7 +439,7 @@ namespace Uniray
                             case "texturesSection":
                                 c.ExtensionFile = "png";
                                 c.Tag = "textures";
-                                c.OutputFilePath = "assets/textures";
+                                c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/textures";
                                 fileType.Text = "File type : .png";
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
@@ -447,7 +447,7 @@ namespace Uniray
                             case "soundsSection":
                                 c.ExtensionFile = "wav";
                                 c.Tag = "sounds";
-                                c.OutputFilePath = "assets/sounds";
+                                c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/sounds";
                                 fileType.Text = "File type : .wav";
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
@@ -455,7 +455,7 @@ namespace Uniray
                             case "animationsSections":
                                 c.ExtensionFile = "m3d";
                                 c.Tag = "animations";
-                                c.OutputFilePath = "assets/animations";
+                                c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/animations";
                                 fileType.Text = "File type : .m3d";
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
@@ -463,7 +463,7 @@ namespace Uniray
                             case "scriptsSections":
                                 c.ExtensionFile = "cs";
                                 c.Tag = "scripts";
-                                c.OutputFilePath = "assets/scripts";
+                                c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/scripts";
                                 fileType.Text = "File type : .cs";
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
@@ -593,6 +593,15 @@ namespace Uniray
 
                 // Load assets from the given project's assets folder
                 LoadAssets(directory);
+
+                // Change to default assets page of the manager container
+                Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "");
+                fileManager.ExtensionFile = "m3d";
+                fileManager.Tag = "models";
+                fileManager.OutputFilePath = directory + "assets/models";
+                fileType.Text = "File type : .m3d";
+                labels.RemoveAt(labels.IndexOf(labels.Last()));
+                labels.Add(fileType);
 
                 // Load scenes along with their game objects
                 currentProject = new Project(project_name, path, LoadScenes(directory));
