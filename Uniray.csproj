@@ -29,7 +29,7 @@
 
   <ItemGroup>
     <Reference Include="RayGUI_cs">
-      <HintPath>..\raygui_cs\bin\Debug\net6.0\RayGUI_cs.dll</HintPath>
+      <HintPath>data\libraries\RayGUI_cs\RayGUI_cs.dll</HintPath>
     </Reference>
   </ItemGroup>
 
