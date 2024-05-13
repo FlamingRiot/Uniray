@@ -150,69 +150,6 @@ namespace Uniray
             animationsPathList = new List<string>();
             scriptPathList = new List<string>();
 
-            // Load data paths from directories
-            byte[] modelPath = Encoding.UTF8.GetBytes("assets/models");
-            byte[] texturePath = Encoding.UTF8.GetBytes("assets/textures");
-            byte[] soundPath = Encoding.UTF8.GetBytes("assets/sounds");
-            byte[] animationPath = Encoding.UTF8.GetBytes("assets/animations");
-            byte[] scriptPath = Encoding.UTF8.GetBytes("assets/scripts");
-            int maxFiles = 30;
-            unsafe
-            {
-                sbyte*[] paths = new sbyte*[5];
-                fixed (byte* p = modelPath)
-                {
-                    sbyte* sp = (sbyte*)p;
-                    paths[0] = sp;
-                }
-                fixed (byte* p = texturePath)
-                {
-                    sbyte* sp = (sbyte*)p;
-                    paths[1] = sp;
-                }
-                fixed (byte* p = soundPath)
-                {
-                    sbyte* sp = (sbyte*)p;
-                    paths[2] = sp;
-                }
-                fixed (byte* p = animationPath)
-                {
-                    sbyte* sp = (sbyte*)p;
-                    paths[3] = sp;
-                }
-                fixed (byte* p = scriptPath)
-                {
-                    sbyte* sp = (sbyte*)p;
-                    paths[4] = sp;
-                }
-                for (int i = 0; i < paths.Length; i++)
-                {
-                    FilePathList pathList = LoadDirectoryFiles(paths[i], (int*)maxFiles);
-                    for (int j = 0; j < pathList.Count; j++)
-                    {
-                        string path = new string((sbyte*)pathList.Paths[j]);
-                        path = path.Replace("\\", "/");
-                        switch (i)
-                        {
-                            case 0:
-                                modelsPathList.Add(path); break;
-                            case 1:
-                                texturesPathList.Add(path); break;
-                            case 2:
-                                soundsPathList.Add(path); break;
-                            case 3:
-                                animationsPathList.Add(path); break;
-                            case 4:
-                                scriptPathList.Add(path); break;
-                        }
-                    }
-                }
-                Ressource = new Ressource(
-                    texturesPathList,
-                    soundsPathList
-                    );
-            }
-
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;
             float cont1Y = hWindow - hWindow / 3;
@@ -288,8 +225,6 @@ namespace Uniray
 
             Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "File type : .m3d");
             labels.Add(fileType);
-
-            Console.WriteLine(Ressource.ToString());
         }
         public void DrawScene()
         {
@@ -557,78 +492,81 @@ namespace Uniray
         /// <param name="files">All the files in the asset directory</param>
         public void DrawManagerFiles(ref List<string> files)
         {
-            string directory = fileManager.Files.Last().Split("\\")[0];
-            string aimedDirectory = files[0].Split("\\")[0];
-            string name = fileManager.Files.Last().Split("\\").Last();
-
-            // Check if there needs to be a recheck for the files
-            if (directory == aimedDirectory)
+            if (files.Count != 0)
             {
-                if (!files.Exists(e => e.EndsWith(name))) 
-                {
-                    string extension = fileManager.Files.Last().Split('.').Last();
-                    if (extension == fileManager.ExtensionFile)
-                    {
-                        files.Add(fileManager.Files.Last());
-                    }
-                }
-            }
+                string directory = fileManager.Files.Last().Split("\\")[0];
+                string aimedDirectory = files[0].Split("\\")[0];
+                string name = fileManager.Files.Last().Split("\\").Last();
 
-            for (int i = 1; i < files.Count; i++)
-            {
-                int positionX = (i + 8) % 8;
-                if (positionX == 0) _ = 8;
-                int xPos = (int)fileManager.X + 150 * (i) - 100;
-                int yPos = (int)fileManager.Y + 60;
-                DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
-                string[] pathArryBySlash = files[i].Split('/');
-                DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), baseFont);
-
-                Vector2 mouse = GetMousePosition();
-                if (mouse.X < xPos + fileTex.Width && mouse.X > xPos && mouse.Y < yPos + fileTex.Height && mouse.Y > yPos)
+                // Check if there needs to be a recheck for the files
+                if (directory == aimedDirectory)
                 {
-                    if (IsMouseButtonDown(MouseButton.Left))
+                    if (!files.Exists(e => e.EndsWith(name)))
                     {
-                        selectedFile = files[i];
-                        SetMouseCursor(MouseCursor.PointingHand);
-                    }
-                    if (IsMouseButtonPressed(MouseButton.Middle))
-                    {
-                        File.Delete(files[i]);
-                        File.Delete("..\\..\\..\\" + files[i]);
-                        files.Remove(files[i]);
-                    }
-                }
-                if (selectedFile is not null)
-                {
-                    if (IsMouseButtonReleased(MouseButton.Left))
-                    {
-                        // Import model into the scene
-                        if (mouse.X > gameManager.X + gameManager.Width + 10 && mouse.Y < fileManager.Y - 10 && selectedFile.Split('.').Last() == "m3d")
+                        string extension = fileManager.Files.Last().Split('.').Last();
+                        if (extension == fileManager.ExtensionFile)
                         {
-                            Model m = LoadModel(selectedFile);
-                            for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                                m.Meshes[0].Colors[j] = 255;
-                            UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-                            currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(1, 1, 1), "[New model]", m, selectedFile));
-                            selectedElement = currentScene.GameObjects.Last();
+                            files.Add(fileManager.Files.Last());
                         }
-                        // Import texture in game object attributes
-                        else if (mouse.X > gameManager.X + 100 && mouse.X < gameManager.X + 350 && mouse.Y > gameManager.Y + gameManager.Height / 2 + 300 && mouse.Y < gameManager.Y + gameManager.Height / 2 + 320 && selectedFile.Split('.').Last() == "png")
+                    }
+                }
+
+                for (int i = 1; i < files.Count; i++)
+                {
+                    int positionX = (i + 8) % 8;
+                    if (positionX == 0) _ = 8;
+                    int xPos = (int)fileManager.X + 150 * (i) - 100;
+                    int yPos = (int)fileManager.Y + 60;
+                    DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
+                    string[] pathArryBySlash = files[i].Split('/');
+                    DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), baseFont);
+
+                    Vector2 mouse = GetMousePosition();
+                    if (mouse.X < xPos + fileTex.Width && mouse.X > xPos && mouse.Y < yPos + fileTex.Height && mouse.Y > yPos)
+                    {
+                        if (IsMouseButtonDown(MouseButton.Left))
                         {
-                            if (selectedElement != null)
+                            selectedFile = files[i];
+                            SetMouseCursor(MouseCursor.PointingHand);
+                        }
+                        if (IsMouseButtonPressed(MouseButton.Middle))
+                        {
+                            File.Delete(files[i]);
+                            File.Delete("..\\..\\..\\" + files[i]);
+                            files.Remove(files[i]);
+                        }
+                    }
+                    if (selectedFile is not null)
+                    {
+                        if (IsMouseButtonReleased(MouseButton.Left))
+                        {
+                            // Import model into the scene
+                            if (mouse.X > gameManager.X + gameManager.Width + 10 && mouse.Y < fileManager.Y - 10 && selectedFile.Split('.').Last() == "m3d")
                             {
-                                foreach (GameObject go in currentScene.GameObjects)
+                                Model m = LoadModel(selectedFile);
+                                for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                                    m.Meshes[0].Colors[j] = 255;
+                                UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+                                currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(1, 1, 1), "[New model]", m, selectedFile));
+                                selectedElement = currentScene.GameObjects.Last();
+                            }
+                            // Import texture in game object attributes
+                            else if (mouse.X > gameManager.X + 100 && mouse.X < gameManager.X + 350 && mouse.Y > gameManager.Y + gameManager.Height / 2 + 300 && mouse.Y < gameManager.Y + gameManager.Height / 2 + 320 && selectedFile.Split('.').Last() == "png")
+                            {
+                                if (selectedElement != null)
                                 {
-                                    if (go == selectedElement)
+                                    foreach (GameObject go in currentScene.GameObjects)
                                     {
-                                        string dictionaryKey = selectedFile.Split('/').Last().Split('.')[0];
-                                        go.SetTexture(dictionaryKey);
+                                        if (go == selectedElement)
+                                        {
+                                            string dictionaryKey = selectedFile.Split('/').Last().Split('.')[0];
+                                            go.SetTexture(dictionaryKey);
+                                        }
                                     }
                                 }
                             }
+                            selectedFile = null;
                         }
-                        selectedFile = null;
                     }
                 }
             }
@@ -653,12 +591,13 @@ namespace Uniray
                 // Set Project info in application
                 string? directory = Path.GetDirectoryName(path);
 
-                // To be continued...
+                // Load assets from the given project's assets folder
+                LoadAssets(directory);
 
-                SetWindowTitle("Uniray - " + project_name);
-
+                // Load scenes along with their game objects
                 currentProject = new Project(project_name, path, LoadScenes(directory));
                 currentScene = currentProject.GetScene(0);
+                SetWindowTitle("Uniray - " + project_name);
             }
             catch
             {
@@ -841,6 +780,76 @@ namespace Uniray
                 scenes.Add(new Scene(camera,items));
             }
             return scenes;
+        }
+        /// <summary>
+        /// Load assets from given project file path
+        /// </summary>
+        /// <param name="projectPath">File path to the project</param>
+        public void LoadAssets(string projectPath)
+        {
+            // Load data paths from directories
+            byte[] modelPath = Encoding.UTF8.GetBytes(projectPath + "/assets/models");
+            byte[] texturePath = Encoding.UTF8.GetBytes(projectPath + "/assets/textures");
+            byte[] soundPath = Encoding.UTF8.GetBytes(projectPath + "/assets/sounds");
+            byte[] animationPath = Encoding.UTF8.GetBytes(projectPath + "/assets/animations");
+            byte[] scriptPath = Encoding.UTF8.GetBytes(projectPath + "/assets/scripts");
+            int maxFiles = 30;
+            unsafe
+            {
+                sbyte*[] paths = new sbyte*[5];
+                fixed (byte* p = modelPath)
+                {
+                    sbyte* sp = (sbyte*)p;
+                    paths[0] = sp;
+                }
+                fixed (byte* p = texturePath)
+                {
+                    sbyte* sp = (sbyte*)p;
+                    paths[1] = sp;
+                }
+                fixed (byte* p = soundPath)
+                {
+                    sbyte* sp = (sbyte*)p;
+                    paths[2] = sp;
+                }
+                fixed (byte* p = animationPath)
+                {
+                    sbyte* sp = (sbyte*)p;
+                    paths[3] = sp;
+                }
+                fixed (byte* p = scriptPath)
+                {
+                    sbyte* sp = (sbyte*)p;
+                    paths[4] = sp;
+                }
+                for (int i = 0; i < paths.Length; i++)
+                {
+                    FilePathList pathList = LoadDirectoryFiles(paths[i], (int*)maxFiles);
+                    for (int j = 0; j < pathList.Count; j++)
+                    {
+                        string path = new string((sbyte*)pathList.Paths[j]);
+                        path = path.Replace("\\", "/");
+                        switch (i)
+                        {
+                            case 0:
+                                modelsPathList.Add(path); break;
+                            case 1:
+                                texturesPathList.Add(path); break;
+                            case 2:
+                                soundsPathList.Add(path); break;
+                            case 3:
+                                animationsPathList.Add(path); break;
+                            case 4:
+                                scriptPathList.Add(path); break;
+                        }
+                    }
+                }
+                Ressource = new Ressource(
+                    texturesPathList,
+                    soundsPathList
+                    );
+            }
+            Console.WriteLine(Ressource.ToString());
         }
     }
 }
