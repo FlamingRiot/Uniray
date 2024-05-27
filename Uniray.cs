@@ -334,8 +334,7 @@ namespace Uniray
             {
                 DrawButton(button, baseFont);
                 if (Hover(button.X, button.Y, button.Width, button.Height)) { focus = true; }
-            }
-            switch (fileManager.Tag)
+            }switch (fileManager.Tag)
             {
                 case "models":
                     DrawManagerFiles(ref modelsPathList);
@@ -791,7 +790,7 @@ namespace Uniray
             return scenes;
         }
         /// <summary>
-        /// Load assets from given project file path
+        /// Load assets from given project file path (Textures and sounds to the ressource dictionary, and the models as a string path list)
         /// </summary>
         /// <param name="projectPath">File path to the project</param>
         public void LoadAssets(string projectPath)
