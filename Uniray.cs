@@ -688,7 +688,7 @@ namespace Uniray
                 content = content.Replace("{JSON_PATH}", path + "\\scenes\\new_scene\\locs.json");
                 content = content.Replace("{PROJECT_NAME}", name);
                 string[] file = content.Split('$');
-                StreamWriter write = new StreamWriter(path + "\\" + name + ".uproj");
+                StreamWriter write = new (path + "\\" + name + ".uproj");
                 for (int i = 0; i < file.Length; i++)
                 {
                     write.WriteLine(file[i]);
@@ -697,16 +697,18 @@ namespace Uniray
 
                 SetWindowTitle("Uniray - " + name);
 
-                Camera3D camera = new Camera3D();
-                camera.Position = Vector3.Zero;
-                camera.Target = Vector3.Zero;
-                camera.Up = Vector3.UnitY;
-                camera.Projection = CameraProjection.Perspective;
-                camera.FovY = 90;
+                Camera3D camera = new()
+                {
+                    Position = Vector3.Zero,
+                    Target = Vector3.Zero,
+                    Up = Vector3.UnitY,
+                    Projection = CameraProjection.Perspective,
+                    FovY = 90
+                };
+                
 
-                Scene defaultScene = new Scene(camera);
-                List<Scene> scenes = new List<Scene>();
-                scenes.Add(defaultScene);
+                Scene defaultScene = new(camera);
+                List<Scene> scenes = new() { defaultScene };
                 currentProject = new Project(name, path, scenes);
                 currentScene = currentProject.GetScene(0);
                 selectedElement = null;
@@ -755,10 +757,10 @@ namespace Uniray
         public List<Scene> LoadScenes(string directory)
         {
             string[] scenesPath = Directory.GetDirectories(directory + "\\scenes");
-            List<Scene> scenes = new List<Scene>();
+            List<Scene> scenes = new();
             for (int i = 0; i < scenesPath.Length; i++)
             {
-                Camera3D camera = new Camera3D()
+                Camera3D camera = new()
                 {
                     Position = new Vector3(1, 1, 0),
                     Target = Vector3.Zero,
@@ -767,25 +769,35 @@ namespace Uniray
                     Projection = CameraProjection.Perspective
                 };
 
-                StreamReader r = new StreamReader(scenesPath[i] + "\\locs.json");
+                StreamReader r = new(scenesPath[i] + "\\locs.json");
                 string json = r.ReadToEnd();
-                List<GameObject> items = JsonConvert.DeserializeObject<List<GameObject>>(json);
+                List<GameObject>? items = JsonConvert.DeserializeObject<List<GameObject>>(json);
                 r.Close();
 
-                foreach (GameObject go in items)
+                if (items is not null)
                 {
-                    if (go.ModelPath is not null)
+                    foreach (GameObject go in items)
                     {
-                        Model m = LoadModel(go.ModelPath);
-                        for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                            m.Meshes[0].Colors[j] = 255;
-                        UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-                        go.Model = m;
-                        go.SetTexture(go.TextureID);
+                        if (go.ModelPath is not null)
+                        {
+                            Model m = LoadModel(go.ModelPath);
+                            for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                                m.Meshes[0].Colors[j] = 255;
+                            UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+                            go.Model = m;
+                            go.SetTexture(go.TextureID);
+                        }
                     }
                 }
-                                
-                scenes.Add(new Scene(camera,items));
+                            
+                if (items is not null)
+                {
+                    scenes.Add(new Scene(camera, items));
+                }
+                else
+                {
+                    scenes.Add(new Scene(camera));
+                }
             }
             return scenes;
         }
@@ -835,7 +847,7 @@ namespace Uniray
                     FilePathList pathList = LoadDirectoryFiles(paths[i], (int*)maxFiles);
                     for (int j = 0; j < pathList.Count; j++)
                     {
-                        string path = new string((sbyte*)pathList.Paths[j]);
+                        string path = new((sbyte*)pathList.Paths[j]);
                         path = path.Replace("\\", "/");
                         switch (i)
                         {
