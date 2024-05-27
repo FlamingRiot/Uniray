@@ -431,7 +431,7 @@ namespace Uniray
                             case "modelsSection":
                                 c.ExtensionFile = "m3d";
                                 c.Tag = "models";
-                                c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/models";
+                                if (currentProject is not null) c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/models";
                                 fileType.Text = "File type : .m3d";
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
@@ -439,7 +439,7 @@ namespace Uniray
                             case "texturesSection":
                                 c.ExtensionFile = "png";
                                 c.Tag = "textures";
-                                c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/textures";
+                                if (currentProject is not null) c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/textures";
                                 fileType.Text = "File type : .png";
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
@@ -447,7 +447,7 @@ namespace Uniray
                             case "soundsSection":
                                 c.ExtensionFile = "wav";
                                 c.Tag = "sounds";
-                                c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/sounds";
+                                if (currentProject is not null) c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/sounds";
                                 fileType.Text = "File type : .wav";
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
@@ -455,7 +455,7 @@ namespace Uniray
                             case "animationsSections":
                                 c.ExtensionFile = "m3d";
                                 c.Tag = "animations";
-                                c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/animations";
+                                if (currentProject is not null) c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/animations";
                                 fileType.Text = "File type : .m3d";
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
@@ -463,7 +463,7 @@ namespace Uniray
                             case "scriptsSections":
                                 c.ExtensionFile = "cs";
                                 c.Tag = "scripts";
-                                c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/scripts";
+                                if (currentProject is not null) c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/scripts";
                                 fileType.Text = "File type : .cs";
                                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                                 labels.Add(fileType);
