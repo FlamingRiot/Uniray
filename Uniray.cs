@@ -510,11 +510,11 @@ namespace Uniray
                     }
                 }
 
-                for (int i = 1; i < files.Count; i++)
+                for (int i = 0; i < files.Count; i++)
                 {
-                    int positionX = (i + 8) % 8;
+                    int positionX = (i + 9) % 8;
                     if (positionX == 0) _ = 8;
-                    int xPos = (int)fileManager.X + 150 * (i) - 100;
+                    int xPos = (int)fileManager.X + 150 * (i + 1) - 100;
                     int yPos = (int)fileManager.Y + 60;
                     DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
                     string[] pathArryBySlash = files[i].Split('/');
