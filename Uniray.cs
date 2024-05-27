@@ -50,7 +50,7 @@ namespace Uniray
 
         private bool openModalNewProject;
 
-        private Project currentProject;
+        private Project? currentProject;
 
         private Font baseFont;
 
@@ -285,7 +285,7 @@ namespace Uniray
                 }
 
                 // Move selected object
-                if (IsKeyDown(KeyboardKey.G))
+                if (IsKeyDown(KeyboardKey.G) && selectedElement is not null)
                 {
                     Vector3 newPos = selectedElement.Position;
                     if (IsKeyDown(KeyboardKey.X))
@@ -424,7 +424,7 @@ namespace Uniray
                     if (IsButtonPressed(section))
                     {
                         Container c = FileManager;
-                        Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "");
+                        Label fileType = new ((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "");
                         switch (section.Tag)
                         {
                             case "modelsSection":
@@ -583,7 +583,9 @@ namespace Uniray
                 StreamReader stream = new StreamReader(path);
                 if (stream.ReadLine() == "<Project>")
                 {
-                    project_name = stream.ReadLine().Split('>')[1].Split('<')[0];
+                    string? line = stream.ReadLine();
+                    if (line is not null) project_name = line.Split('>')[1].Split('<')[0];
+                    else throw new Exception("The given project file was empty, or contained wrong information");
                 }
                 stream.Close();
 
@@ -591,7 +593,8 @@ namespace Uniray
                 string? directory = Path.GetDirectoryName(path);
 
                 // Load assets from the given project's assets folder
-                LoadAssets(directory);
+                if (directory is not null) LoadAssets(directory);
+                else throw new Exception($"Could not load the assets of project {path}");
 
                 // Change to default assets page of the manager container
                 Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "");
@@ -631,11 +634,11 @@ namespace Uniray
                     path = currentProject.Path;
                 }
                 
-                StreamWriter stream = new StreamWriter(path + "/scenes/new_scene/locs.json", false);
+                StreamWriter stream = new (path + "/scenes/new_scene/locs.json", false);
                 stream.Write(json);
                 stream.Close();
 
-                StreamWriter camStream = new StreamWriter(path + "/scenes/new_scene/camera.json", false);
+                StreamWriter camStream = new (path + "/scenes/new_scene/camera.json", false);
                 camStream.Write(JsonConvert.SerializeObject(currentScene.Camera));
                 camStream.Close();
 
@@ -665,7 +668,7 @@ namespace Uniray
                 Directory.CreateDirectory(path + "\\assets\\textures");
 
                 Directory.CreateDirectory(path + "\\scenes\\new_scene\\");
-                StreamWriter default_locs = new StreamWriter(path + "\\scenes\\new_scene\\locs.json");
+                StreamWriter default_locs = new (path + "\\scenes\\new_scene\\locs.json");
                 default_locs.WriteLine("[");
                 default_locs.WriteLine("    {");
                 default_locs.WriteLine("    }");
@@ -676,7 +679,7 @@ namespace Uniray
                 System.IO.Compression.ZipFile.ExtractToDirectory("data/default_VS_Project.zip", path);
 
                 // Create .uproj file
-                StreamReader read = new StreamReader("data\\project_template.txt");
+                StreamReader read = new ("data\\project_template.txt");
                 string content = "";
                 while (!read.EndOfStream) 
                 {
