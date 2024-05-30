@@ -577,8 +577,8 @@ namespace Uniray
         /// <param name="path">path to the .uproj file</param>
         public void LoadProject(string path)
         {
-            try
-            {
+            //try
+            //{
                 string project_name = "";
                 StreamReader stream = new StreamReader(path);
                 if (stream.ReadLine() == "<Project>")
@@ -609,11 +609,11 @@ namespace Uniray
                 currentProject = new Project(project_name, path, LoadScenes(directory));
                 currentScene = currentProject.GetScene(0);
                 SetWindowTitle("Uniray - " + project_name);
-            }
-            catch
-            {
+            //}
+            //catch
+            //{
                 TraceLog(TraceLogLevel.Warning, "Project could not be loaded !");
-            }
+            //}
         }
 
         /// <summary>
@@ -781,7 +781,7 @@ namespace Uniray
                 {
                     foreach (GameObject go in items)
                     {
-                        if (go.ModelPath is not null)
+                        if (go.ModelPath != "")
                         {
                             Model m = LoadModel(go.ModelPath);
                             for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
