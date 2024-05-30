@@ -64,6 +64,17 @@ namespace Uniray
             go.Position = position;
             SetGameObject(index, go);
         }
+        /// <summary>
+        /// Set game object rotation
+        /// </summary>
+        /// <param name="index">Index of the object</param>
+        /// <param name="rotation">Game object position</param>
+        public void SetGameObjectRotation(int index, Vector3 rotation)
+        {
+            GameObject go = gameObjects[index];
+            go.Rotation = rotation;
+            SetGameObject(index, go);
+        }
 
         /// <summary>
         /// Construct new Scene

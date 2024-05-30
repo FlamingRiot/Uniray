@@ -240,7 +240,7 @@ namespace Uniray
             int index = -1;
             foreach (GameObject go in currentScene.GameObjects)
             {
-                DrawModelEx(go.Model, go.Position, go.Rotation, 0, go.Scale, Color.White);
+                DrawModelEx(go.Model, go.Position, go.Rotation, 1, go.Scale, Color.White);
 
                 if (mousePos.X > gameManager.X + gameManager.Width && mousePos.Y < fileManager.Y - 10 && IsMouseButtonPressed(MouseButton.Left))
                 {
@@ -283,34 +283,67 @@ namespace Uniray
                     currentScene.GameObjects.Remove(selectedElement);
                     selectedElement = null;
                 }
-
-                // Move selected object
-                if (IsKeyDown(KeyboardKey.G) && selectedElement is not null)
+                if (IsKeyPressed(KeyboardKey.Escape))
                 {
-                    Vector3 newPos = selectedElement.Position;
-                    if (IsKeyDown(KeyboardKey.X))
-                    {
-                        newPos.X += (GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).X;
-                    }
-                    else if (IsKeyDown(KeyboardKey.Y))
-                    {
-                        newPos.Z += (GetCameraForward(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).X;
-                    }
-                    else if (IsKeyDown(KeyboardKey.Z))
-                    {
-                        newPos.Y -= (GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).Y;
-                    }
-                    else
-                    {
-                        newPos += GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
-                        newPos -= GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
-                    }
-
-                    currentScene.SetGameObjectPosition(currentScene.GameObjects.IndexOf(selectedElement), newPos);
-
-                    HideCursor();
+                    selectedElement = null;
                 }
-                else ShowCursor();
+
+                // Manage GameObjects transformations effects
+
+                // Translation
+                if (selectedElement is not null)
+                {
+                    if (IsKeyDown(KeyboardKey.G))
+                    {
+                        Vector3 newPos = selectedElement.Position;
+                        if (IsKeyDown(KeyboardKey.X))
+                        {
+                            newPos.X += (GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).X;
+                        }
+                        else if (IsKeyDown(KeyboardKey.Y))
+                        {
+                            newPos.Z += (GetCameraForward(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).X;
+                        }
+                        else if (IsKeyDown(KeyboardKey.Z))
+                        {
+                            newPos.Y -= (GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).Y;
+                        }
+                        else
+                        {
+                            newPos += GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
+                            newPos -= GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
+                        }
+
+                        currentScene.SetGameObjectPosition(currentScene.GameObjects.IndexOf(selectedElement), newPos);
+
+                        HideCursor();
+                    }
+                    else if (IsKeyDown(KeyboardKey.R))
+                    {
+                        Vector3 newRot = selectedElement.Rotation;
+                        if (IsKeyDown(KeyboardKey.X))
+                        {
+                            newRot.X += GetMouseDelta().X;
+                        }
+                        else if (IsKeyDown(KeyboardKey.Y))
+                        {
+                            newRot.Z += GetMouseDelta().X;
+                        }
+                        else if (IsKeyDown(KeyboardKey.Z))
+                        {
+                            newRot.Y += GetMouseDelta().Y;    
+                        }
+                        else
+                        {
+                            newRot += new Vector3(GetMouseDelta().X, GetMouseDelta().Y, GetMouseDelta().X);
+                        }
+                        currentScene.SetGameObjectRotation(currentScene.GameObjects.IndexOf(selectedElement), newRot);
+
+                        HideCursor();
+                    }
+
+                    else ShowCursor();
+                }
             }
         }
         /// <summary>
