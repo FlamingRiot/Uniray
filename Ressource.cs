@@ -46,6 +46,10 @@ namespace Uniray
         {
             return this._sounds.Count;
         }
+        public void AddTexture(Texture2D texture, string key)
+        {
+            _textures.Add(key, texture);
+        }
         public override string ToString()
         {
             return "Les ressources contiennent :\n" + GetTextureCount() + " textures\n" + GetSoundCount() + " sons";

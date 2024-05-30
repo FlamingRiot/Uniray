@@ -333,7 +333,23 @@ namespace Uniray
             if (new_File != "" && modelsPathList.Last() != new_File.Replace('\\', '/'))
             {
                 new_File = new_File.Replace('\\', '/');
-                modelsPathList.Add(new_File);
+                switch (new_File.Split('.').Last())
+                {
+                    case "m3d":
+                        modelsPathList.Add(new_File);
+                        break;
+                    case "png":
+                        if (texturesPathList.Last() != new_File)
+                        {
+                            texturesPathList.Add(new_File);
+                            Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
+                        }
+                        break;
+                    case "wav":
+                        break;
+                    case "cs":
+                        break;
+                }
             }
 
             foreach (Label label in labels) { DrawLabel(label, baseFont); }
