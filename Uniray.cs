@@ -600,7 +600,7 @@ namespace Uniray
                 Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "");
                 fileManager.ExtensionFile = "m3d";
                 fileManager.Tag = "models";
-                fileManager.OutputFilePath = directory + "assets/models";
+                fileManager.OutputFilePath = directory + "/assets/models";
                 fileType.Text = "File type : .m3d";
                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                 labels.Add(fileType);
