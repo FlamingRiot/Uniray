@@ -327,7 +327,14 @@ namespace Uniray
             bool focus = false;
 
             DrawContainer(ref gameManager);
-            DrawContainer(ref fileManager);
+
+            string new_File = "";            
+            new_File = DrawContainer(ref fileManager);
+            if (new_File != "" && modelsPathList.Last() != new_File.Replace('\\', '/'))
+            {
+                new_File = new_File.Replace('\\', '/');
+                modelsPathList.Add(new_File);
+            }
 
             foreach (Label label in labels) { DrawLabel(label, baseFont); }
             foreach (Button button in buttons)
@@ -788,7 +795,7 @@ namespace Uniray
                                 m.Meshes[0].Colors[j] = 255;
                             UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
                             go.Model = m;
-                            go.SetTexture(go.TextureID);
+                            if (go.TextureID != "") go.SetTexture(go.TextureID);
                         }
                     }
                 }
