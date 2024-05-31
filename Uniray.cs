@@ -614,7 +614,7 @@ namespace Uniray
                                 for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
                                     m.Meshes[0].Colors[j] = 255;
                                 UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-                                currentScene.AddGameObject(new GameObject(Vector3.Zero, Vector3.Zero, new Vector3(1, 1, 1), "[New model]", m, selectedFile));
+                                currentScene.AddGameObject(new GameObject(envCamera.Position + GetCameraForward(ref envCamera) * 10, Vector3.Zero, Vector3.One, "[New model]", m, selectedFile));
                                 selectedElement = currentScene.GameObjects.Last();
                             }
                             // Import texture in game object attributes
