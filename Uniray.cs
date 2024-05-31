@@ -551,6 +551,7 @@ namespace Uniray
                     }
                 }
             }
+            DrawText(fileManager.OutputFilePath, 10, 100, 20, Color.Green);
         }
 
         /// <summary>
@@ -767,6 +768,7 @@ namespace Uniray
                     write.WriteLine(file[i]);
                 }
                 write.Close();
+                fileManager.OutputFilePath = path + "\\assets\\models\\";
 
                 SetWindowTitle("Uniray - " + name);
 
