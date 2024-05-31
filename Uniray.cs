@@ -363,16 +363,28 @@ namespace Uniray
 
             string new_File = "";            
             new_File = DrawContainer(ref fileManager);
-            if (new_File != "" && modelsPathList.Last() != new_File.Replace('\\', '/'))
+            new_File = new_File.Replace('\\', '/');
+            if (new_File != "")
             {
-                new_File = new_File.Replace('\\', '/');
                 switch (new_File.Split('.').Last())
                 {
                     case "m3d":
-                        modelsPathList.Add(new_File);
+                        if (modelsPathList.Count == 0)
+                        {
+                            modelsPathList.Add(new_File);
+                        }
+                        else if (modelsPathList.Last() != new_File)
+                        {
+                            modelsPathList.Add(new_File);
+                        }
                         break;
                     case "png":
-                        if (texturesPathList.Last() != new_File)
+                        if (texturesPathList.Count == 0)
+                        {
+                            texturesPathList.Add(new_File);
+                            Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
+                        }
+                        else if (texturesPathList.Last() != new_File)
                         {
                             texturesPathList.Add(new_File);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
@@ -633,8 +645,8 @@ namespace Uniray
         /// <param name="path">path to the .uproj file</param>
         public void LoadProject(string path)
         {
-            //try
-            //{
+            try
+            {
                 string project_name = "";
                 StreamReader stream = new StreamReader(path);
                 if (stream.ReadLine() == "<Project>")
@@ -665,11 +677,13 @@ namespace Uniray
                 currentProject = new Project(project_name, path, LoadScenes(directory));
                 currentScene = currentProject.GetScene(0);
                 SetWindowTitle("Uniray - " + project_name);
-            //}
-            //catch
-            //{
+
+                TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
+            }
+            catch
+            {
                 TraceLog(TraceLogLevel.Warning, "Project could not be loaded !");
-            //}
+            }
         }
 
         /// <summary>
@@ -772,11 +786,11 @@ namespace Uniray
                 currentScene = currentProject.GetScene(0);
                 selectedElement = null;
 
-                Console.WriteLine("Le projet " + name + " a bien été créé !");
+                TraceLog(TraceLogLevel.Warning, "Project \"" + name + "\" has been created");
             }
             catch
             {
-                Console.WriteLine("Le projet " + name + " a échoué lors de sa création...");
+                TraceLog(TraceLogLevel.Warning, "Project " + name + " could not be created");
             }
         }
 
@@ -837,7 +851,7 @@ namespace Uniray
                 {
                     foreach (GameObject go in items)
                     {
-                        if (go.ModelPath != "")
+                        if (go.ModelPath != "" && go.ModelPath is not null)
                         {
                             Model m = LoadModel(go.ModelPath);
                             for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
