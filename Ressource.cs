@@ -29,6 +29,14 @@ namespace Uniray
                 this._sounds.Add(_sounds[i].Split('/').Last().Split('.')[0], Raylib.LoadSound(_sounds[i]));
             }
         }
+        /// <summary>
+        /// Empty lists constructor
+        /// </summary>
+        public Ressource()
+        {
+            this._textures = new Dictionary<string, Texture2D>();
+            this._sounds = new Dictionary<string, Sound>();
+        }
 
         public Texture2D GetTexture(string index)
         {

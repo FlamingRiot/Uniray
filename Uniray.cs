@@ -784,7 +784,8 @@ namespace Uniray
 
                 Scene defaultScene = new(camera);
                 List<Scene> scenes = new() { defaultScene };
-                currentProject = new Project(name, path, scenes);
+                currentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
+                Ressource = new Ressource();
                 currentScene = currentProject.GetScene(0);
                 selectedElement = null;
 
