@@ -551,7 +551,6 @@ namespace Uniray
                     }
                 }
             }
-            DrawText(fileManager.OutputFilePath, 10, 100, 20, Color.Green);
         }
 
         /// <summary>
