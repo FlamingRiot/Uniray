@@ -6,9 +6,6 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
-using System.IO;
-using System.Globalization;
-using Microsoft.VisualBasic.FileIO;
 
 namespace Uniray
 {
@@ -536,9 +533,13 @@ namespace Uniray
                                 labels.Add(fileType);
                                 break;
                             case "play":
-                                /*var p = new Process();
-                                p.StartInfo = new ProcessStartInfo(@"C:\Users\ComtesseE1\Desktop\Crossy Road\bin\Debug\net7.0\crossy_road.exe");
-                                p.Start();*/
+                                if (currentProject is not null)
+                                {
+                                    // Build and run project here...
+                                    string projectPath = Path.GetDirectoryName(currentProject.Path);
+                                    string commmand = "/C cd " + projectPath + " && dotnet run --project uniray_Project.csproj";
+                                    System.Diagnostics.Process.Start("CMD.exe", commmand);
+                                }
                                 break;
                             case "openProject":
                                 openModalOpenProject = true;
