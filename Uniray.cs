@@ -26,6 +26,14 @@ namespace Uniray
         /// </summary>
         public Model arrow = LoadModelFromMesh(GenMeshCylinder(0.05f, 0.7f, 20));
         /// <summary>
+        /// 3D model of the displayed scene camera
+        /// </summary>
+        public Model cameraModel;
+        /// <summary>
+        /// Angle of the camera
+        /// </summary>
+        public float cameraAngle = 0;
+        /// <summary>
         /// Y arrow box
         /// </summary>
         public BoundingBox yArrowBox = new BoundingBox(new Vector3(-0.1f, 0f, -0.1f), new Vector3(0.1f, 1.4f, 0.1f));
@@ -148,6 +156,14 @@ namespace Uniray
             animationsPathList = new List<string>();
             scriptPathList = new List<string>();
 
+            // Load camera model
+            cameraModel = LoadModel("data/camera.m3d");
+            cameraModel.Transform = new Matrix4x4(
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1);
+
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;
             float cont1Y = hWindow - hWindow / 3;
@@ -257,6 +273,19 @@ namespace Uniray
                 selectedElement = currentScene.GetGameObject(index);
             }
 
+            // Draw 3D camera of the currently displayed scene
+            if (currentProject is not null)
+            {
+                DrawModelEx(cameraModel, currentScene.Camera.Position, Vector3.Zero, 0, Vector3.One, Color.White);
+            }
+
+            cameraModel.Transform.M11 = (float)Math.Cos(cameraAngle / RAD2DEG);
+            cameraModel.Transform.M31 = (float)-Math.Sin(cameraAngle / RAD2DEG);
+            cameraModel.Transform.M13 = (float)Math.Sin(cameraAngle / RAD2DEG);
+            cameraModel.Transform.M33 = (float)Math.Cos(cameraAngle / RAD2DEG);
+
+            cameraAngle += 0.1f;
+
             // Draw directional arrows
             if (selectedElement != null) 
             {
@@ -317,24 +346,36 @@ namespace Uniray
                     }
                     else if (IsKeyDown(KeyboardKey.R))
                     {
-                        Vector3 newRot = selectedElement.Rotation;
                         if (IsKeyDown(KeyboardKey.X))
                         {
-                            newRot.X += GetMouseDelta().X;
-                        }
-                        else if (IsKeyDown(KeyboardKey.Y))
-                        {
-                            newRot.Z += GetMouseDelta().X;
+                            Matrix4x4 transform = selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement));
+                            transform.M22 = (float)Math.Cos(selectedElement.Rx / RAD2DEG);
+                            transform.M23 = (float)-Math.Sin(selectedElement.Rx / RAD2DEG);
+                            transform.M32 = (float)Math.Sin(selectedElement.Rx / RAD2DEG);
+                            transform.M33 = (float)Math.Cos(selectedElement.Rx / RAD2DEG);
+                            selectedElement.SetTransform(transform, currentScene.GameObjects.IndexOf(selectedElement));
+                            selectedElement.Rx += GetMouseDelta().Y;
                         }
                         else if (IsKeyDown(KeyboardKey.Z))
                         {
-                            newRot.Y += GetMouseDelta().Y;    
+                            Matrix4x4 transform = selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement));
+                            transform.M11 = (float)Math.Cos(selectedElement.Ry / RAD2DEG);
+                            transform.M13 = (float)Math.Sin(selectedElement.Ry / RAD2DEG);
+                            transform.M31 = (float)-Math.Sin(selectedElement.Ry / RAD2DEG);
+                            transform.M33 = (float)Math.Cos(selectedElement.Ry / RAD2DEG);
+                            selectedElement.SetTransform(transform, currentScene.GameObjects.IndexOf(selectedElement));
+                            selectedElement.Ry += GetMouseDelta().X;
                         }
-                        else
+                        else if (IsKeyDown(KeyboardKey.Y))
                         {
-                            newRot += new Vector3(GetMouseDelta().X, GetMouseDelta().Y, GetMouseDelta().X);
+                            Matrix4x4 transform = selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement));
+                            transform.M11 = (float)Math.Cos(selectedElement.Rz / RAD2DEG);
+                            transform.M12 = (float)-Math.Sin(selectedElement.Rz / RAD2DEG);
+                            transform.M21 = (float)Math.Sin(selectedElement.Rz / RAD2DEG);
+                            transform.M22 = (float)Math.Cos(selectedElement.Rz / RAD2DEG);
+                            selectedElement.SetTransform(transform, currentScene.GameObjects.IndexOf(selectedElement));
+                            selectedElement.Rz += GetMouseDelta().Y;
                         }
-                        currentScene.SetGameObjectRotation(currentScene.GameObjects.IndexOf(selectedElement), newRot);
 
                         HideCursor();
                     }

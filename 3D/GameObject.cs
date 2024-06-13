@@ -114,6 +114,24 @@ namespace Uniray
             this.textureID = id;
             Raylib.SetMaterialTexture(&model.Materials[0], MaterialMapIndex.Diffuse, Uniray.Ressource.GetTexture(id));
         }
+        /// <summary>
+        /// Set the 4x4 matrix transform
+        /// </summary>
+        /// <param name="transform">4x4 Matrix</param>
+        /// <param name="index">Game Object Index</param>
+        public void SetTransform(Matrix4x4 transform, int index)
+        {
+            this.model.Transform = transform;
+        }
+        /// <summary>
+        /// Returns the 4x4 matrix transform
+        /// </summary>
+        /// <param name="index">Game Object Index</param>
+        /// <returns></returns>
+        public Matrix4x4 GetTransform(int index)
+        {
+            return this.model.Transform;
+        }
 
         /// <summary>
         /// Game object to string
