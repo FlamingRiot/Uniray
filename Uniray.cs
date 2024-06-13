@@ -348,33 +348,27 @@ namespace Uniray
                     {
                         if (IsKeyDown(KeyboardKey.X))
                         {
-                            Matrix4x4 transform = selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement));
-                            transform.M22 = (float)Math.Cos(selectedElement.Rx / RAD2DEG);
-                            transform.M23 = (float)-Math.Sin(selectedElement.Rx / RAD2DEG);
-                            transform.M32 = (float)Math.Sin(selectedElement.Rx / RAD2DEG);
-                            transform.M33 = (float)Math.Cos(selectedElement.Rx / RAD2DEG);
-                            selectedElement.SetTransform(transform, currentScene.GameObjects.IndexOf(selectedElement));
-                            selectedElement.Rx += GetMouseDelta().Y;
+                            Matrix4x4 newTransform = MatrixRotateX(selectedElement.Rx / RAD2DEG);
+                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement)));
+
+                            selectedElement.SetTransform(resultTransform, currentScene.GameObjects.IndexOf(selectedElement));
+                            selectedElement.Rx = GetMouseDelta().Y;
                         }
                         else if (IsKeyDown(KeyboardKey.Z))
                         {
-                            Matrix4x4 transform = selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement));
-                            transform.M11 = (float)Math.Cos(selectedElement.Ry / RAD2DEG);
-                            transform.M13 = (float)Math.Sin(selectedElement.Ry / RAD2DEG);
-                            transform.M31 = (float)-Math.Sin(selectedElement.Ry / RAD2DEG);
-                            transform.M33 = (float)Math.Cos(selectedElement.Ry / RAD2DEG);
-                            selectedElement.SetTransform(transform, currentScene.GameObjects.IndexOf(selectedElement));
-                            selectedElement.Ry += GetMouseDelta().X;
+                            Matrix4x4 newTransform = MatrixRotateY(selectedElement.Ry / RAD2DEG);
+                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement)));
+
+                            selectedElement.SetTransform(resultTransform, currentScene.GameObjects.IndexOf(selectedElement));
+                            selectedElement.Ry = GetMouseDelta().X;
                         }
                         else if (IsKeyDown(KeyboardKey.Y))
                         {
-                            Matrix4x4 transform = selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement));
-                            transform.M11 = (float)Math.Cos(selectedElement.Rz / RAD2DEG);
-                            transform.M12 = (float)-Math.Sin(selectedElement.Rz / RAD2DEG);
-                            transform.M21 = (float)Math.Sin(selectedElement.Rz / RAD2DEG);
-                            transform.M22 = (float)Math.Cos(selectedElement.Rz / RAD2DEG);
-                            selectedElement.SetTransform(transform, currentScene.GameObjects.IndexOf(selectedElement));
-                            selectedElement.Rz += GetMouseDelta().Y;
+                            Matrix4x4 newTransform = MatrixRotateZ(selectedElement.Rz / RAD2DEG);
+                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement)));
+
+                            selectedElement.SetTransform(resultTransform, currentScene.GameObjects.IndexOf(selectedElement));
+                            selectedElement.Rz = GetMouseDelta().Y;
                         }
 
                         HideCursor();
