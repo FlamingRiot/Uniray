@@ -142,6 +142,8 @@ namespace Uniray
 
                 DrawFPS(40, 200);
 
+                DrawText("Position : " + uniray.CurrentScene.Camera.Position + " Target: " + uniray.CurrentScene.Camera.Target, 40, 300, 20, Color.Red);
+
                 EndDrawing();
             }
             CloseWindow();

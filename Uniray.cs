@@ -364,7 +364,7 @@ namespace Uniray
             string new_File = "";            
             new_File = DrawContainer(ref fileManager);
             new_File = new_File.Replace('\\', '/');
-            if (new_File != "")
+            if (new_File != "" && currentProject is not null)
             {
                 switch (new_File.Split('.').Last())
                 {
