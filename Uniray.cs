@@ -30,9 +30,13 @@ namespace Uniray
         /// </summary>
         public Model cameraModel;
         /// <summary>
-        /// Angle of the camera
+        /// Is the camera selected ?
         /// </summary>
-        public float cameraAngle = 0;
+        public bool cameraSelected;
+        /// <summary>
+        /// Collision with the mouse and camera
+        /// </summary>
+        public RayCollision cameraCollision;
         /// <summary>
         /// Y arrow box
         /// </summary>
@@ -144,6 +148,7 @@ namespace Uniray
             yCollision = new RayCollision();
             zCollision = new RayCollision();
             goCollision = new RayCollision();
+            cameraCollision = new RayCollision();
 
             // Instantiate lists of components
             textboxes = new List<Textbox>();
@@ -158,11 +163,7 @@ namespace Uniray
 
             // Load camera model
             cameraModel = LoadModel("data/camera.m3d");
-            cameraModel.Transform = new Matrix4x4(
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1);
+            cameraSelected = false;
 
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;
@@ -276,15 +277,22 @@ namespace Uniray
             // Draw 3D camera of the currently displayed scene
             if (currentProject is not null)
             {
+
                 DrawModelEx(cameraModel, currentScene.Camera.Position, Vector3.Zero, 0, Vector3.One, Color.White);
+                if (mousePos.X > gameManager.X + gameManager.Width && mousePos.Y < fileManager.Y - 10 && IsMouseButtonPressed(MouseButton.Left))
+                {
+                    BoundingBox box = GetModelBoundingBox(cameraModel);
+                    box.Min += currentScene.Camera.Position;
+                    box.Max += currentScene.Camera.Position;
+
+                    cameraCollision = GetRayCollisionBox(mouseRay, box);
+                    if (cameraCollision.Hit)
+                    {
+                        selectedElement = null;
+                        cameraSelected = true;
+                    }
+                }
             }
-
-            cameraModel.Transform.M11 = (float)Math.Cos(cameraAngle / RAD2DEG);
-            cameraModel.Transform.M31 = (float)-Math.Sin(cameraAngle / RAD2DEG);
-            cameraModel.Transform.M13 = (float)Math.Sin(cameraAngle / RAD2DEG);
-            cameraModel.Transform.M33 = (float)Math.Cos(cameraAngle / RAD2DEG);
-
-            cameraAngle += 0.1f;
 
             // Draw directional arrows
             if (selectedElement != null) 
@@ -315,35 +323,15 @@ namespace Uniray
                 }
 
                 // Manage GameObjects transformations effects
-
-                // Translation
                 if (selectedElement is not null)
                 {
+                    // Translate the currently selected game object
                     if (IsKeyDown(KeyboardKey.G))
                     {
-                        Vector3 newPos = selectedElement.Position;
-                        if (IsKeyDown(KeyboardKey.X))
-                        {
-                            newPos.X += (GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).X;
-                        }
-                        else if (IsKeyDown(KeyboardKey.Y))
-                        {
-                            newPos.Z += (GetCameraForward(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).X;
-                        }
-                        else if (IsKeyDown(KeyboardKey.Z))
-                        {
-                            newPos.Y -= (GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(selectedElement.Position, envCamera.Position)).Y;
-                        }
-                        else
-                        {
-                            newPos += GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
-                            newPos -= GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(selectedElement.Position, envCamera.Position);
-                        }
-
+                        Vector3 newPos = TranslateObject(selectedElement.Position);
                         currentScene.SetGameObjectPosition(currentScene.GameObjects.IndexOf(selectedElement), newPos);
-
-                        HideCursor();
                     }
+                    // Rotate the currently selected game object
                     else if (IsKeyDown(KeyboardKey.R))
                     {
                         if (IsKeyDown(KeyboardKey.X))
@@ -370,13 +358,25 @@ namespace Uniray
                             selectedElement.SetTransform(resultTransform, currentScene.GameObjects.IndexOf(selectedElement));
                             selectedElement.Rz = GetMouseDelta().Y;
                         }
-
                         HideCursor();
                     }
-
                     else ShowCursor();
                 }
             }
+            else if (cameraSelected)
+            {
+                // Translate the currently selected game object
+                if (IsKeyDown(KeyboardKey.G))
+                {
+                    Vector3 newPos = TranslateObject(currentScene.Camera.Position);
+                    currentScene.SetCameraPosition(newPos);
+                }
+                else
+                {
+                    ShowCursor();
+                }
+            }
+            Console.WriteLine(cameraSelected);
         }
         /// <summary>
         /// Draw user interface of the application
@@ -872,14 +872,7 @@ namespace Uniray
             List<Scene> scenes = new();
             for (int i = 0; i < scenesPath.Length; i++)
             {
-                Camera3D camera = new()
-                {
-                    Position = new Vector3(1, 1, 0),
-                    Target = Vector3.Zero,
-                    Up = Vector3.UnitY,
-                    FovY = 45f,
-                    Projection = CameraProjection.Perspective
-                };
+                StreamReader rCam = new(scenesPath[i] + "\\camera.json");
 
                 StreamReader r = new(scenesPath[i] + "\\locs.json");
                 string json = r.ReadToEnd();
@@ -983,6 +976,34 @@ namespace Uniray
             }
             Console.WriteLine(Ressource.ToString());
         }
+        /// <summary>
+        /// Translate a 3-Dimensional vector according to the application standards in Dev environement
+        /// </summary>
+        /// <param name="position">3-Dimensional vector representing the position to translate</param>
+        /// <returns></returns>
+        public Vector3 TranslateObject(Vector3 position)
+        {
+            if (IsKeyDown(KeyboardKey.X))
+            {
+                position.X += (GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, envCamera.Position)).X;
+            }
+            else if (IsKeyDown(KeyboardKey.Y))
+            {
+                position.Z += (GetCameraForward(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, envCamera.Position)).X;
+            }
+            else if (IsKeyDown(KeyboardKey.Z))
+            {
+                position.Y -= (GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(position, envCamera.Position)).Y;
+            }
+            else
+            {
+                position += GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, envCamera.Position);
+                position -= GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(position, envCamera.Position);
+            }
+            HideCursor();
+            return position;
+        }
+
         /// <summary>
         /// Build the current project loaded in Uniray
         /// </summary>

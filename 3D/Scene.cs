@@ -75,6 +75,14 @@ namespace Uniray
             go.Rotation = rotation;
             SetGameObject(index, go);
         }
+        /// <summary>
+        /// Set the new position of the camera 
+        /// </summary>
+        /// <param name="pos"></param>
+        public void SetCameraPosition(Vector3 pos)
+        {
+            camera.Position = pos;
+        }
 
         /// <summary>
         /// Construct new Scene
