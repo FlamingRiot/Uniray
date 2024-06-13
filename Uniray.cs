@@ -478,6 +478,10 @@ namespace Uniray
                     CreateProject(project_path, project_name);
                 }
             }
+            if (IsKeyPressed(KeyboardKey.F5) && currentProject is not null)
+            {
+                BuildProject(currentProject.Path);
+            }
 
             // =========================================================================================================================================================
             // ============================================================= MANAGE CUSTOM BUTTONS =====================================================================
@@ -535,10 +539,7 @@ namespace Uniray
                             case "play":
                                 if (currentProject is not null)
                                 {
-                                    // Build and run project here...
-                                    string projectPath = Path.GetDirectoryName(currentProject.Path);
-                                    string commmand = "/C cd " + projectPath + " && dotnet run --project uniray_Project.csproj";
-                                    System.Diagnostics.Process.Start("CMD.exe", commmand);
+                                    BuildProject(currentProject.Path);
                                 }
                                 break;
                             case "openProject":
@@ -946,6 +947,16 @@ namespace Uniray
                     );
             }
             Console.WriteLine(Ressource.ToString());
+        }
+        /// <summary>
+        /// Build the current project loaded in Uniray
+        /// </summary>
+        public void BuildProject(string path)
+        {
+            // Build and run project here...
+            string? projectPath = Path.GetDirectoryName(path);
+            string commmand = "/C cd " + projectPath + " && dotnet run --project uniray_Project.csproj";
+            System.Diagnostics.Process.Start("CMD.exe", commmand);
         }
     }
 }
