@@ -376,7 +376,6 @@ namespace Uniray
                     ShowCursor();
                 }
             }
-            Console.WriteLine(cameraSelected);
         }
         /// <summary>
         /// Draw user interface of the application
@@ -872,12 +871,16 @@ namespace Uniray
             List<Scene> scenes = new();
             for (int i = 0; i < scenesPath.Length; i++)
             {
+                // Import stored camera
                 StreamReader rCam = new(scenesPath[i] + "\\camera.json");
-
-                StreamReader r = new(scenesPath[i] + "\\locs.json");
-                string json = r.ReadToEnd();
-                List<GameObject>? items = JsonConvert.DeserializeObject<List<GameObject>>(json);
-                r.Close();
+                string camJson = rCam.ReadToEnd();
+                Camera3D camera = JsonConvert.DeserializeObject<Camera3D>(camJson);
+                rCam.Close();
+                // Import stored game objects
+                StreamReader rGos = new(scenesPath[i] + "\\locs.json");
+                string gosJson = rGos.ReadToEnd();
+                List<GameObject>? items = JsonConvert.DeserializeObject<List<GameObject>>(gosJson);
+                rGos.Close();
 
                 if (items is not null)
                 {
