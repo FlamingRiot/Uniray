@@ -337,25 +337,25 @@ namespace Uniray
                         if (IsKeyDown(KeyboardKey.X))
                         {
                             Matrix4x4 newTransform = MatrixRotateX(selectedElement.Rx / RAD2DEG);
-                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement)));
+                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform());
 
-                            selectedElement.SetTransform(resultTransform, currentScene.GameObjects.IndexOf(selectedElement));
+                            selectedElement.SetTransform(resultTransform);
                             selectedElement.Rx = GetMouseDelta().Y;
                         }
                         else if (IsKeyDown(KeyboardKey.Z))
                         {
                             Matrix4x4 newTransform = MatrixRotateY(selectedElement.Ry / RAD2DEG);
-                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement)));
+                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform());
 
-                            selectedElement.SetTransform(resultTransform, currentScene.GameObjects.IndexOf(selectedElement));
+                            selectedElement.SetTransform(resultTransform);
                             selectedElement.Ry = GetMouseDelta().X;
                         }
                         else if (IsKeyDown(KeyboardKey.Y))
                         {
                             Matrix4x4 newTransform = MatrixRotateZ(selectedElement.Rz / RAD2DEG);
-                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform(currentScene.GameObjects.IndexOf(selectedElement)));
+                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform());
 
-                            selectedElement.SetTransform(resultTransform, currentScene.GameObjects.IndexOf(selectedElement));
+                            selectedElement.SetTransform(resultTransform);
                             selectedElement.Rz = GetMouseDelta().Y;
                         }
                         HideCursor();

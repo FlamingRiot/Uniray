@@ -119,7 +119,7 @@ namespace Uniray
         /// </summary>
         /// <param name="transform">4x4 Matrix</param>
         /// <param name="index">Game Object Index</param>
-        public void SetTransform(Matrix4x4 transform, int index)
+        public void SetTransform(Matrix4x4 transform)
         {
             this.model.Transform = transform;
         }
@@ -128,7 +128,7 @@ namespace Uniray
         /// </summary>
         /// <param name="index">Game Object Index</param>
         /// <returns></returns>
-        public Matrix4x4 GetTransform(int index)
+        public Matrix4x4 GetTransform()
         {
             return this.model.Transform;
         }
