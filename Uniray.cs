@@ -314,12 +314,22 @@ namespace Uniray
                         // Cast the object to apply the appropriate rotation effects
                         if (selectedElement is UModel)
                         {
+                            UModel model = (UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement));
                             Matrix4x4 t = RotateObject(((UModel)selectedElement).Yaw, ((UModel)selectedElement).Pitch, ((UModel)selectedElement).Roll, ((UModel)selectedElement).Model.Transform);
-                            ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement))).SetTransform(t);
+                            model.SetTransform(t);
+                            if (IsKeyDown(KeyboardKey.X)) model.Pitch = GetMouseDelta().Y;
+                            if (IsKeyDown(KeyboardKey.Z)) model.Yaw = GetMouseDelta().X;
+                            if (IsKeyDown(KeyboardKey.Y)) model.Roll = GetMouseDelta().Y;
+                            
                         }
                         else if (selectedElement is UCamera)
                         {
+                            UCamera camera = (UCamera)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement));
                             cameraModel.Transform = RotateObject(((UCamera)selectedElement).Yaw, ((UCamera)selectedElement).Pitch, ((UCamera)selectedElement).Roll, cameraModel.Transform);
+
+                            if (IsKeyDown(KeyboardKey.X)) camera.Pitch = GetMouseDelta().Y;
+                            if (IsKeyDown(KeyboardKey.Z)) camera.Yaw = GetMouseDelta().X;
+                            if (IsKeyDown(KeyboardKey.Y)) camera.Roll = GetMouseDelta().Y;
                         }
                         HideCursor();
                     }
@@ -412,11 +422,6 @@ namespace Uniray
                 if (Hover(newProjNameTxb.X, newProjNameTxb.Y, newProjNameTxb.Width, newProjNameTxb.Height)) { focus = true; }
             }
 
-            // Draw game layers infos
-            foreach (GameObject go in CurrentScene.GameObjects)
-            {
-                DrawLabel(new Label((int)gameManager.X + 30, (int)gameManager.Y + 30 + CurrentScene.GameObjects.IndexOf(go) * 20, go.Name), baseFont);
-            }
             if (!focus && selectedFile is null) { SetMouseCursor(MouseCursor.Default); }
 
             if (openModalOpenProject)
@@ -600,7 +605,7 @@ namespace Uniray
                                 for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
                                     m.Meshes[0].Colors[j] = 255;
                                 UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-                                currentScene.AddGameObject(new GameObject(envCamera.Position + GetCameraForward(ref envCamera) * 5, Vector3.Zero, Vector3.One, "[New model]", m, selectedFile));
+                                currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, m, selectedFile));
                                 selectedElement = currentScene.GameObjects.Last();
                             }
                             // Import texture in game object attributes
@@ -608,14 +613,8 @@ namespace Uniray
                             {
                                 if (selectedElement != null)
                                 {
-                                    foreach (GameObject go in currentScene.GameObjects)
-                                    {
-                                        if (go == selectedElement)
-                                        {
-                                            string dictionaryKey = selectedFile.Split('/').Last().Split('.')[0];
-                                            go.SetTexture(dictionaryKey);
-                                        }
-                                    }
+                                    string dictionaryKey = selectedFile.Split('/').Last().Split('.')[0];
+                                    ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement))).SetTexture(dictionaryKey, Ressource.GetTexture(dictionaryKey));
                                 }
                             }
                             selectedFile = null;
@@ -679,7 +678,7 @@ namespace Uniray
         {
             if (currentProject != null)
             {
-                string json = JsonfyGos(currentScene.GameObjects);
+                string[] jsons = JsonfyGos(currentScene.GameObjects);
                 string? path;
                 if (currentProject.Path.Contains('.'))
                 {
@@ -691,11 +690,11 @@ namespace Uniray
                 }
                 
                 StreamWriter stream = new (path + "/scenes/new_scene/locs.json", false);
-                stream.Write(json);
+                stream.Write(jsons[0]);
                 stream.Close();
 
                 StreamWriter camStream = new (path + "/scenes/new_scene/camera.json", false);
-                camStream.Write(JsonConvert.SerializeObject(currentScene.Camera));
+                camStream.Write(jsons[1]);
                 camStream.Close();
 
                 TraceLog(TraceLogLevel.Info, "Project was saved successfully !");
@@ -765,9 +764,9 @@ namespace Uniray
                     Projection = CameraProjection.Perspective,
                     FovY = 90
                 };
-                
+                UCamera ucamera = new UCamera("Camera", camera);
 
-                Scene defaultScene = new(camera);
+                Scene defaultScene = new(ucamera);
                 List<Scene> scenes = new() { defaultScene };
                 currentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
                 Ressource = new Ressource();
@@ -796,19 +795,34 @@ namespace Uniray
         /// </summary>
         /// <param name="gos">Game objects list</param>
         /// <returns></returns>
-        public string JsonfyGos(List<GameObject> gos)
+        public string[] JsonfyGos(List<GameObject3D> gos)
         {
-            string json = "[";
-            foreach(GameObject go in gos)
+            // Open the jsons
+            string modelsJson = "[";
+            string cameraJson = "[";
+            // Go through every element of the scene's list
+            foreach(GameObject3D go in gos)
             {
-                json += "{" + "X: " + go.X + ",Y: " + go.Y + ",Z: " + go.Z + ",Rx: " + go.Rx +
-                    ",Ry: " + go.Ry + ",Rz: " + go.Rz + ",Sx: " + go.Sx + ",Sy: " + go.Sy + ",Sz: " + 
-                    go.Sz + ",ModelPath: \"" + go.ModelPath + "\",TextureID: \"" + go.TextureID;
-                if (gos.IndexOf(go) == gos.Count - 1) json += "\"}";
-                else json += "\"},";
+                if (go is UModel model)
+                {
+                    modelsJson += "{" + "X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
+                    ",Pitch: " + model.Pitch + ",Roll: " + model.Roll + ",ModelPath: \"" + model.ModelPath + "\",TextureID: \"" + model.TextureID + "\"},";
+                }
+                else if (go is UCamera camera)
+                {
+                    cameraJson += modelsJson += "{" + "X: " + camera.X + ",Y: " + camera.Y + ",Z: " + camera.Z + ",Yaw: " + camera.Yaw +
+                    ",Pitch: " + camera.Pitch + ",Roll: " + camera.Roll + "\"},";
+                }
+
             }
-            json += "]";
-            return json;
+            // Delete the last comma of the jsons
+            modelsJson = modelsJson.Substring(0, modelsJson.LastIndexOf(','));
+            cameraJson = cameraJson.Substring(0, cameraJson.LastIndexOf(','));
+
+            // Close the jsons
+            modelsJson += "]";
+            cameraJson += "]";
+            return new string[] { modelsJson, cameraJson };
         }
 
         /// <summary>
@@ -824,17 +838,17 @@ namespace Uniray
                 // Import stored camera
                 StreamReader rCam = new(scenesPath[i] + "\\camera.json");
                 string camJson = rCam.ReadToEnd();
-                Camera3D camera = JsonConvert.DeserializeObject<Camera3D>(camJson);
+                List<UCamera> ucameras = JsonConvert.DeserializeObject<List<UCamera>>(camJson);
                 rCam.Close();
                 // Import stored game objects
                 StreamReader rGos = new(scenesPath[i] + "\\locs.json");
                 string gosJson = rGos.ReadToEnd();
-                List<GameObject>? items = JsonConvert.DeserializeObject<List<GameObject>>(gosJson);
+                List<UModel>? umodels = JsonConvert.DeserializeObject<List<UModel>>(gosJson);
                 rGos.Close();
 
-                if (items is not null)
+                if (umodels is not null)
                 {
-                    foreach (GameObject go in items)
+                    foreach (UModel go in umodels)
                     {
                         if (go.ModelPath != "" && go.ModelPath is not null)
                         {
@@ -843,19 +857,17 @@ namespace Uniray
                                 m.Meshes[0].Colors[j] = 255;
                             UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
                             go.Model = m;
-                            if (go.TextureID != "") go.SetTexture(go.TextureID);
+                            if (go.TextureID != "") go.SetTexture(go.TextureID, Ressource.GetTexture(go.TextureID));
                         }
                     }
                 }
-                            
-                if (items is not null)
-                {
-                    scenes.Add(new Scene(camera, items));
-                }
-                else
-                {
-                    scenes.Add(new Scene(camera));
-                }
+
+                // Transfer all the objects into a single GameObject3D list
+                List<GameObject3D> gos = new List<GameObject3D>();
+                gos.AddRange(ucameras);
+                gos.AddRange(umodels);
+
+                scenes.Add(new Scene(ucameras.First(), gos));
             }
             return scenes;
         }
@@ -1013,7 +1025,6 @@ namespace Uniray
                 Matrix4x4 resultTransform = MatrixMultiply(newTransform, transform);
 
                 return resultTransform;
-                selectedElement.Rx = GetMouseDelta().Y;
             }
             else if (IsKeyDown(KeyboardKey.Z))
             {
@@ -1021,7 +1032,6 @@ namespace Uniray
                 Matrix4x4 resultTransform = MatrixMultiply(newTransform, transform);
 
                 return resultTransform;
-                selectedElement.Ry = GetMouseDelta().X;
             }
             else if (IsKeyDown(KeyboardKey.Y))
             {
@@ -1029,7 +1039,6 @@ namespace Uniray
                 Matrix4x4 resultTransform = MatrixMultiply(newTransform, transform);
 
                 return resultTransform;
-                selectedElement.Rz = GetMouseDelta().Y;
             }
             else
             {

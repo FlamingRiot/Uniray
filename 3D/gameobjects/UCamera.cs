@@ -49,14 +49,14 @@ namespace Uniray
         /// <summary>
         /// UCamera default Constructor
         /// </summary>
-        public UCamera():base(){ }
+        public UCamera() : base() { }
         /// <summary>
         /// UCamera Constructor
         /// </summary>
         /// <param name="name">Object name</param>
         /// <param name="position">Object position</param>
         /// <param name="camera">Object camera</param>
-        public UCamera(string name, Vector3 position, Camera3D camera):base(name, position) 
+        public UCamera(string name, Camera3D camera):base(name, camera.Position) 
         {
             Camera = camera;
         }

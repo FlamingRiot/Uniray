@@ -47,7 +47,7 @@ namespace Uniray
             Vector2 fakePos = Vector2.Zero;
 
             // Set UI and application default
-            Scene scene = new Scene(camera);
+            Scene scene = new Scene(new UCamera(), new List<GameObject3D>());
             Uniray uniray = new Uniray(wWindow, hWindow, font, scene);
 
 
@@ -142,7 +142,7 @@ namespace Uniray
 
                 DrawFPS(40, 200);
 
-                DrawText("Position : " + uniray.CurrentScene.Camera.Position + " Target: " + uniray.CurrentScene.Camera.Target, 40, 300, 20, Color.Red);
+                DrawText("Position : " + ((UCamera)uniray.CurrentScene.GameObjects[0]).Position + " Target: " + ((UCamera)uniray.CurrentScene.GameObjects[0]).Target, 40, 300, 20, Color.Red);
 
                 EndDrawing();
             }
