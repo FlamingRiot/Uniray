@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using System.Runtime.CompilerServices;
 using Raylib_cs;
 
 namespace Uniray
@@ -114,6 +113,10 @@ namespace Uniray
         public Matrix4x4 GetTransform() 
         { 
             return this.model.Transform;
+        }
+        public override string ToString()
+        {
+            return "Name: " + Name + " Position: " + Position + " Rotation: < " + Yaw + "; " + Pitch + "; " + Roll + " >";  
         }
     }
 }

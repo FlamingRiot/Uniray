@@ -11,12 +11,11 @@ namespace Uniray
         /// <summary>
         /// 3-Dimensional position of the object
         /// </summary>
-        private Vector3 position;
+        protected Vector3 position;
         /// <summary>
         /// Behaviour of the object
         /// </summary>
         private Behaviour? behaviour;
-
         /// <summary>
         /// Name of the object
         /// </summary>
@@ -24,7 +23,7 @@ namespace Uniray
         /// <summary>
         /// 3-Dimensional position of the object
         /// </summary>
-        public Vector3 Position { get { return position; } set { position = value; } }
+        abstract public Vector3 Position { get; set; }
         /// <summary>
         /// Behaviour of the object
         /// </summary>
