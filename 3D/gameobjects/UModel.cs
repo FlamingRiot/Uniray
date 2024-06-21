@@ -30,6 +30,10 @@ namespace Uniray
         /// </summary>
         private string modelPath;
         /// <summary>
+        /// 3-Dimensional position of the object
+        /// </summary>
+        public override Vector3 Position { get { return position; } set { position = value; } }
+        /// <summary>
         /// Yaw rotation
         /// </summary>
         public float Yaw { get { return yaw; } set { yaw = value; } }

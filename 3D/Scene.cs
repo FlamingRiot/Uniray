@@ -8,38 +8,25 @@ namespace Uniray
         /// <summary>
         /// Objects of the scene
         /// </summary>
-        private List<GameObject> gameObjects;
-
-        /// <summary>
-        /// Camera of the scene
-        /// </summary>
-        private Camera3D camera;
-
-        /// <summary>
-        /// Camera property
-        /// </summary>
-        public Camera3D Camera { get { return camera; } set { camera = value; } }
-
+        private List<GameObject3D> gameObjects;
         /// <summary>
         /// Game objects list property
         /// </summary>
-        public List<GameObject> GameObjects { get { return gameObjects; } }    
-
+        public List<GameObject3D> GameObjects { get { return gameObjects; } }    
         /// <summary>
         /// Add game object
         /// </summary>
         /// <param name="go">Game object</param>
-        public void AddGameObject(GameObject go)
+        public void AddGameObject(GameObject3D go)
         {
             gameObjects.Add(go);
         }
-
         /// <summary>
         /// Get game object
         /// </summary>
         /// <param name="index">Index of the object</param>
         /// <returns>Game object</returns>
-        public GameObject GetGameObject(int index)
+        public GameObject3D GetGameObject(int index)
         {
             return gameObjects[index];
         }
@@ -48,11 +35,10 @@ namespace Uniray
         /// </summary>
         /// <param name="index">Index of the object</param>
         /// <param name="go">Game object</param>
-        public void SetGameObject(int index, GameObject go)
+        public void SetGameObject(int index, GameObject3D go)
         {
             gameObjects[index] = go;
         }
-
         /// <summary>
         /// Set game object position
         /// </summary>
@@ -60,48 +46,42 @@ namespace Uniray
         /// <param name="position">Game object position</param>
         public void SetGameObjectPosition(int index, Vector3 position)
         {
-            GameObject go = gameObjects[index];
-            go.Position = position;
-            SetGameObject(index, go);
+            if (gameObjects[index] is UModel)
+            {
+                UModel go = (UModel)gameObjects[index];
+                go.Position = position;
+                gameObjects[index] = go;
+            }
+            else if (gameObjects[index] is UCamera)
+            {
+                UCamera go = (UCamera)gameObjects[index];
+                go.Position = position;
+                gameObjects[index] = go;
+            }
         }
         /// <summary>
-        /// Set game object rotation
+        /// Scene Constructor
         /// </summary>
-        /// <param name="index">Index of the object</param>
-        /// <param name="rotation">Game object position</param>
-        public void SetGameObjectRotation(int index, Vector3 rotation)
+        /// <param name="camera">Scene base camera</param>
+        public Scene(UCamera camera)
         {
-            GameObject go = gameObjects[index];
-            go.Rotation = rotation;
-            SetGameObject(index, go);
+            gameObjects = new List<GameObject3D> 
+            { 
+                camera
+            };
         }
         /// <summary>
-        /// Set the new position of the camera 
+        /// Scene Constructor
         /// </summary>
-        /// <param name="pos"></param>
-        public void SetCameraPosition(Vector3 pos)
+        /// <param name="camera">Scene base camera</param>
+        /// <param name="gameObjects">Scene game objects</param>
+        public Scene(UCamera camera, List<GameObject3D> gameObjects)
         {
-            camera.Position = pos;
-        }
-
-        /// <summary>
-        /// Construct new Scene
-        /// </summary>
-        /// <param name="camera"></param>
-        public Scene(Camera3D camera)
-        {
-            gameObjects = new List<GameObject>();
-            this.camera = camera;
-        }
-
-        public Scene(Camera3D camera, List<GameObject> gameObjects)
-        {
-            this.camera = camera;
             this.gameObjects = gameObjects;
+            this.gameObjects.Add(camera);
         }
-
         /// <summary>
-        /// Scene to string
+        /// Scene scene informations
         /// </summary>
         /// <returns>String</returns>
         public override string ToString()
