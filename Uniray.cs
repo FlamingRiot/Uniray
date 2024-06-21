@@ -6,6 +6,7 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
+using System;
 
 namespace Uniray
 {
@@ -29,10 +30,6 @@ namespace Uniray
         /// 3D model of the displayed scene camera
         /// </summary>
         public Model cameraModel;
-        /// <summary>
-        /// Is the camera selected ?
-        /// </summary>
-        public bool cameraSelected;
         /// <summary>
         /// Collision with the mouse and camera
         /// </summary>
@@ -103,7 +100,7 @@ namespace Uniray
 
         private List<string> scriptPathList;
 
-        private GameObject? selectedElement;
+        private GameObject3D? selectedElement;
 
         private string? selectedFile;
 
@@ -163,7 +160,6 @@ namespace Uniray
 
             // Load camera model
             cameraModel = LoadModel("data/camera.m3d");
-            cameraSelected = false;
 
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;
@@ -246,52 +242,33 @@ namespace Uniray
             // ================================================================ MANAGE 3D DRAWING ======================================================================
             // =========================================================================================================================================================
 
+            // Update the selected element from the reference list
             if (selectedElement != null) { selectedElement = currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)); }
 
+            // Define a mouse ray for collision check
             Vector2 mousePos = GetMousePosition();
             mouseRay = GetMouseRay(mousePos, EnvCamera);
 
+            // Draw 3-Dimensional models of the current scene and check for a hypothetical new selected object
             int index = -1;
-            foreach (GameObject go in currentScene.GameObjects)
+            foreach (GameObject3D go in currentScene.GameObjects)
             {
-                DrawModelEx(go.Model, go.Position, go.Rotation, 1, go.Scale, Color.White);
-
-                if (mousePos.X > gameManager.X + gameManager.Width && mousePos.Y < fileManager.Y - 10 && IsMouseButtonPressed(MouseButton.Left))
+                // Manage objects drawing + object selection (according to the object type)
+                if (go is UModel)
                 {
-                    BoundingBox box = GetModelBoundingBox(go.Model);
-                    box.Min += go.Position;
-                    box.Max += go.Position;
-
-                    goCollision = GetRayCollisionBox(mouseRay, box);
-                    if (goCollision.Hit)
-                    {
-                        index = currentScene.GameObjects.IndexOf(go);
-                    }
+                    DrawModel(((UModel)go).Model, go.Position, 1, Color.White);
+                    index = CheckCollisionScreenToWorld(go, ((UModel)go).Model, mousePos);
+                }
+                else if (go is UCamera)
+                {
+                    DrawModel(cameraModel, go.Position, 1, Color.White);
+                    index = CheckCollisionScreenToWorld(go, cameraModel, mousePos);
                 }
             }
+            // Assign the newly selected object to the according variable
             if (index != -1)
             {
                 selectedElement = currentScene.GetGameObject(index);
-            }
-
-            // Draw 3D camera of the currently displayed scene
-            if (currentProject is not null)
-            {
-
-                DrawModelEx(cameraModel, currentScene.Camera.Position, Vector3.Zero, 0, Vector3.One, Color.White);
-                if (mousePos.X > gameManager.X + gameManager.Width && mousePos.Y < fileManager.Y - 10 && IsMouseButtonPressed(MouseButton.Left))
-                {
-                    BoundingBox box = GetModelBoundingBox(cameraModel);
-                    box.Min += currentScene.Camera.Position;
-                    box.Max += currentScene.Camera.Position;
-
-                    cameraCollision = GetRayCollisionBox(mouseRay, box);
-                    if (cameraCollision.Hit)
-                    {
-                        selectedElement = null;
-                        cameraSelected = true;
-                    }
-                }
             }
 
             // Draw directional arrows
@@ -325,7 +302,7 @@ namespace Uniray
                 // Manage GameObjects transformations effects
                 if (selectedElement is not null)
                 {
-                    // Translate the currently selected game object
+                    // Translate the currently selected object, indpendently of its type
                     if (IsKeyDown(KeyboardKey.G))
                     {
                         Vector3 newPos = TranslateObject(selectedElement.Position);
@@ -334,46 +311,19 @@ namespace Uniray
                     // Rotate the currently selected game object
                     else if (IsKeyDown(KeyboardKey.R))
                     {
-                        if (IsKeyDown(KeyboardKey.X))
+                        // Cast the object to apply the appropriate rotation effects
+                        if (selectedElement is UModel)
                         {
-                            Matrix4x4 newTransform = MatrixRotateX(selectedElement.Rx / RAD2DEG);
-                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform());
-
-                            selectedElement.SetTransform(resultTransform);
-                            selectedElement.Rx = GetMouseDelta().Y;
+                            Matrix4x4 t = RotateObject(((UModel)selectedElement).Yaw, ((UModel)selectedElement).Pitch, ((UModel)selectedElement).Roll, ((UModel)selectedElement).Model.Transform);
+                            ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement))).SetTransform(t);
                         }
-                        else if (IsKeyDown(KeyboardKey.Z))
+                        else if (selectedElement is UCamera)
                         {
-                            Matrix4x4 newTransform = MatrixRotateY(selectedElement.Ry / RAD2DEG);
-                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform());
-
-                            selectedElement.SetTransform(resultTransform);
-                            selectedElement.Ry = GetMouseDelta().X;
-                        }
-                        else if (IsKeyDown(KeyboardKey.Y))
-                        {
-                            Matrix4x4 newTransform = MatrixRotateZ(selectedElement.Rz / RAD2DEG);
-                            Matrix4x4 resultTransform = MatrixMultiply(newTransform, selectedElement.GetTransform());
-
-                            selectedElement.SetTransform(resultTransform);
-                            selectedElement.Rz = GetMouseDelta().Y;
+                            cameraModel.Transform = RotateObject(((UCamera)selectedElement).Yaw, ((UCamera)selectedElement).Pitch, ((UCamera)selectedElement).Roll, cameraModel.Transform);
                         }
                         HideCursor();
                     }
                     else ShowCursor();
-                }
-            }
-            else if (cameraSelected)
-            {
-                // Translate the currently selected game object
-                if (IsKeyDown(KeyboardKey.G))
-                {
-                    Vector3 newPos = TranslateObject(currentScene.Camera.Position);
-                    currentScene.SetCameraPosition(newPos);
-                }
-                else
-                {
-                    ShowCursor();
                 }
             }
         }
@@ -1016,6 +966,75 @@ namespace Uniray
             string? projectPath = Path.GetDirectoryName(path);
             string commmand = "/C cd " + projectPath + " && dotnet run --project uniray_Project.csproj";
             System.Diagnostics.Process.Start("CMD.exe", commmand);
+        }
+        /// <summary>
+        /// Check if a collision occurs between the mouse (screen) and an object of the world (Game object)
+        /// </summary>
+        /// <param name="go">Game object</param>
+        /// <param name="model">Model</param>
+        /// <param name="mousePos">2-Dimensional position of the mouse</param>
+        /// <returns></returns>
+        public int CheckCollisionScreenToWorld(GameObject3D go, Model model, Vector2 mousePos)
+        {
+            if (mousePos.X > gameManager.X + gameManager.Width && mousePos.Y < fileManager.Y - 10 && IsMouseButtonPressed(MouseButton.Left))
+            {
+                BoundingBox box = GetModelBoundingBox(model);
+                box.Min += go.Position;
+                box.Max += go.Position;
+
+                goCollision = GetRayCollisionBox(mouseRay, box);
+                if (goCollision.Hit)
+                {
+                    return currentScene.GameObjects.IndexOf(go);
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        /// <summary>
+        /// Rotate a 3-Dimensional model according to the X/Y/Z keys
+        /// </summary>
+        /// <param name="yaw">Y axis angle</param>
+        /// <param name="pitch">X axis angle</param>
+        /// <param name="roll">Z axis angle</param>
+        /// <param name="transform">4x4 matrix to transform</param>
+        /// <returns></returns>
+        public Matrix4x4 RotateObject(float yaw, float pitch, float roll, Matrix4x4 transform)
+        {
+            if (IsKeyDown(KeyboardKey.X))
+            {
+                Matrix4x4 newTransform = MatrixRotateX(pitch / RAD2DEG);
+                Matrix4x4 resultTransform = MatrixMultiply(newTransform, transform);
+
+                return resultTransform;
+                selectedElement.Rx = GetMouseDelta().Y;
+            }
+            else if (IsKeyDown(KeyboardKey.Z))
+            {
+                Matrix4x4 newTransform = MatrixRotateY(yaw / RAD2DEG);
+                Matrix4x4 resultTransform = MatrixMultiply(newTransform, transform);
+
+                return resultTransform;
+                selectedElement.Ry = GetMouseDelta().X;
+            }
+            else if (IsKeyDown(KeyboardKey.Y))
+            {
+                Matrix4x4 newTransform = MatrixRotateZ(roll / RAD2DEG);
+                Matrix4x4 resultTransform = MatrixMultiply(newTransform, transform);
+
+                return resultTransform;
+                selectedElement.Rz = GetMouseDelta().Y;
+            }
+            else
+            {
+                return transform;
+            }
         }
     }
 }

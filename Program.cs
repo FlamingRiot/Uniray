@@ -20,7 +20,7 @@ namespace Uniray
             SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
 
-            // Change culture info to enabled parsing float values in json
+            // Change culture info to enable parsing float values in json
             var clone = Thread.CurrentThread.CurrentCulture.Clone() as CultureInfo;
             clone.NumberFormat.NumberDecimalSeparator = ".";
             Thread.CurrentThread.CurrentCulture = clone;
