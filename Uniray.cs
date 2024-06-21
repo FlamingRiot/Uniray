@@ -243,6 +243,7 @@ namespace Uniray
             // =========================================================================================================================================================
 
             // Update the selected element from the reference list
+            Console.WriteLine("Index of the selected element : " + currentScene.GameObjects.IndexOf(selectedElement));
             if (selectedElement != null) { selectedElement = currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)); }
 
             // Define a mouse ray for collision check
@@ -630,8 +631,8 @@ namespace Uniray
         /// <param name="path">path to the .uproj file</param>
         public void LoadProject(string path)
         {
-            try
-            {
+            /*try
+            {*/
                 string project_name = "";
                 StreamReader stream = new StreamReader(path);
                 if (stream.ReadLine() == "<Project>")
@@ -664,11 +665,11 @@ namespace Uniray
                 SetWindowTitle("Uniray - " + project_name);
 
                 TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
-            }
-            catch
-            {
-                TraceLog(TraceLogLevel.Warning, "Project could not be loaded !");
-            }
+            //}
+            //catch
+            //{
+              //  TraceLog(TraceLogLevel.Warning, "Project could not be loaded !");
+            //}
         }
 
         /// <summary>
@@ -810,8 +811,8 @@ namespace Uniray
                 }
                 else if (go is UCamera camera)
                 {
-                    cameraJson += modelsJson += "{" + "X: " + camera.X + ",Y: " + camera.Y + ",Z: " + camera.Z + ",Yaw: " + camera.Yaw +
-                    ",Pitch: " + camera.Pitch + ",Roll: " + camera.Roll + "\"},";
+                    cameraJson += "{" + "X: " + camera.X + ",Y: " + camera.Y + ",Z: " + camera.Z + ",Yaw: " + camera.Yaw +
+                    ",Pitch: " + camera.Pitch + ",Roll: " + camera.Roll + "},";
                 }
 
             }
