@@ -123,6 +123,7 @@ namespace Uniray
         public Container FileManager { get { return fileManager; } set { fileManager = value; } }
         public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
         public Scene CurrentScene { get { return currentScene; } }
+        public Project CurrentProject { get { return currentProject; } }
 
         /// <summary>
         /// Construct UI
@@ -243,7 +244,6 @@ namespace Uniray
             // =========================================================================================================================================================
 
             // Update the selected element from the reference list
-            Console.WriteLine("Index of the selected element : " + currentScene.GameObjects.IndexOf(selectedElement));
             if (selectedElement != null) { selectedElement = currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)); }
 
             // Define a mouse ray for collision check
@@ -258,12 +258,12 @@ namespace Uniray
                 if (go is UModel)
                 {
                     DrawModel(((UModel)go).Model, go.Position, 1, Color.White);
-                    index = CheckCollisionScreenToWorld(go, ((UModel)go).Model, mousePos);
+                    if (index == -1) index = CheckCollisionScreenToWorld(go, ((UModel)go).Model, mousePos);
                 }
                 else if (go is UCamera)
                 {
                     DrawModel(cameraModel, go.Position, 1, Color.White);
-                    index = CheckCollisionScreenToWorld(go, cameraModel, mousePos);
+                    if (index == -1) index = CheckCollisionScreenToWorld(go, cameraModel, mousePos);
                 }
             }
             // Assign the newly selected object to the according variable
@@ -817,8 +817,9 @@ namespace Uniray
 
             }
             // Delete the last comma of the jsons
-            modelsJson = modelsJson.Substring(0, modelsJson.LastIndexOf(','));
-            cameraJson = cameraJson.Substring(0, cameraJson.LastIndexOf(','));
+            
+            if (modelsJson != "[") modelsJson = modelsJson.Substring(0, modelsJson.LastIndexOf(','));
+            if (cameraJson != "[") cameraJson = cameraJson.Substring(0, cameraJson.LastIndexOf(','));
 
             // Close the jsons
             modelsJson += "]";
@@ -840,6 +841,7 @@ namespace Uniray
                 StreamReader rCam = new(scenesPath[i] + "\\camera.json");
                 string camJson = rCam.ReadToEnd();
                 List<UCamera> ucameras = JsonConvert.DeserializeObject<List<UCamera>>(camJson);
+                foreach (UCamera u in ucameras) Console.WriteLine(u.ToString());
                 rCam.Close();
                 // Import stored game objects
                 StreamReader rGos = new(scenesPath[i] + "\\locs.json");
