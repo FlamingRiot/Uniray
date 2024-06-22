@@ -50,25 +50,8 @@ namespace Uniray
             Scene scene = new Scene(new List<GameObject3D>());
             Uniray uniray = new Uniray(wWindow, hWindow, font, scene);
 
-
-            // Set FPS
-            //SetTargetFPS(60);
-
-            /*List<int> keys = new List<int>();
-            int index = 0;
-            int key;*/
-
             while (!WindowShouldClose())
             {
-                /*
-                 function sum(int a)...
-                 function sum(int b)..
-                    
-                    sum(b:12)
-                 */
-                /*key = GetKeyPressed();
-                if (key != 0)keys.Add(key);
-                if (keys.Count != 0)Console.WriteLine(keys.Last());*/
 
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.S))
                 {

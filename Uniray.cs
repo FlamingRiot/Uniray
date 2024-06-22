@@ -318,19 +318,12 @@ namespace Uniray
                             UModel model = (UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement));
                             Matrix4x4 t = RotateObject(((UModel)selectedElement).Yaw, ((UModel)selectedElement).Pitch, ((UModel)selectedElement).Roll, ((UModel)selectedElement).Model.Transform);
                             model.SetTransform(t);
-                            if (IsKeyDown(KeyboardKey.X)) model.Pitch = GetMouseDelta().Y;
-                            if (IsKeyDown(KeyboardKey.Z)) model.Yaw = GetMouseDelta().X;
-                            if (IsKeyDown(KeyboardKey.Y)) model.Roll = GetMouseDelta().Y;
                             
                         }
                         else if (selectedElement is UCamera)
                         {
                             UCamera camera = (UCamera)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement));
                             cameraModel.Transform = RotateObject(((UCamera)selectedElement).Yaw, ((UCamera)selectedElement).Pitch, ((UCamera)selectedElement).Roll, cameraModel.Transform);
-
-                            if (IsKeyDown(KeyboardKey.X)) camera.Pitch = GetMouseDelta().Y;
-                            if (IsKeyDown(KeyboardKey.Z)) camera.Yaw = GetMouseDelta().X;
-                            if (IsKeyDown(KeyboardKey.Y)) camera.Roll = GetMouseDelta().Y;
                         }
                         HideCursor();
                     }
@@ -754,6 +747,12 @@ namespace Uniray
                 }
                 write.Close();
                 fileManager.OutputFilePath = path + "\\assets\\models\\";
+
+                StreamWriter cs = new StreamWriter(path + "\\scenes\\new_scene\\camera.json");
+                string newCam = "[{" + "X: " + 0 + ",Y: " + 0 + ",Z: " + 0 + ",Yaw: " + 0 +
+                    ",Pitch: " + 0 + ",Roll: " + 0 + "}]";
+                cs.Write(newCam);
+                cs.Close();
 
                 SetWindowTitle("Uniray - " + name);
 
