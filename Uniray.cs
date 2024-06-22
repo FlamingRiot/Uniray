@@ -767,7 +767,7 @@ namespace Uniray
                 };
                 UCamera ucamera = new UCamera("Camera", camera);
 
-                Scene defaultScene = new(ucamera);
+                Scene defaultScene = new(new List<GameObject3D> { ucamera });
                 List<Scene> scenes = new() { defaultScene };
                 currentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
                 Ressource = new Ressource();
@@ -870,7 +870,7 @@ namespace Uniray
                 gos.AddRange(ucameras);
                 gos.AddRange(umodels);
 
-                scenes.Add(new Scene(ucameras.First(), gos));
+                scenes.Add(new Scene(gos));
             }
             return scenes;
         }

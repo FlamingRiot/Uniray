@@ -60,25 +60,19 @@ namespace Uniray
             }
         }
         /// <summary>
-        /// Scene Constructor
+        /// Scene default Constructor
         /// </summary>
-        /// <param name="camera">Scene base camera</param>
-        public Scene(UCamera camera)
+        public Scene()
         {
-            gameObjects = new List<GameObject3D> 
-            { 
-                camera
-            };
+            gameObjects = new List<GameObject3D>();
         }
         /// <summary>
         /// Scene Constructor
         /// </summary>
-        /// <param name="camera">Scene base camera</param>
         /// <param name="gameObjects">Scene game objects</param>
-        public Scene(UCamera camera, List<GameObject3D> gameObjects)
+        public Scene(List<GameObject3D> gameObjects)
         {
             this.gameObjects = gameObjects;
-            this.gameObjects.Add(camera);
         }
         /// <summary>
         /// Scene scene informations
