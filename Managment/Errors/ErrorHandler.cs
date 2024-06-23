@@ -49,7 +49,7 @@ namespace Uniray
                 error.Y = position.Y - (error.Height + 10) * errors.IndexOf(error);
                 // Draw error label
                 Raylib.DrawRectangleGradientH((int)error.Position.X, (int)error.Position.Y, (int)error.Size.X, (int)error.Size.Y, new Color(130, 12, 3, 255), new Color(201, 27, 14, 255));
-                Raylib.DrawTextPro(font, error.Code + ": " + error.Message, new Vector2(error.Position.X + error.Size.X / 2 - error.Message.Length * 4, error.Position.Y + error.Size.Y / 3), Vector2.Zero, 0, 1, 1, Color.White);
+                Raylib.DrawTextPro(font, "U" + error.Code + ": " + error.Message, new Vector2(error.Position.X + error.Size.X / 2 - error.Message.Length * 4, error.Position.Y + error.Size.Y / 3), Vector2.Zero, 0, 1, 1, Color.White);
                 // Check displayed time
                 if ((Raylib.GetTime() - error.Time) > 5)
                 {

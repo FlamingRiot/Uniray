@@ -630,8 +630,8 @@ namespace Uniray
         /// <param name="path">path to the .uproj file</param>
         public void LoadProject(string path)
         {
-            /*try
-            {*/
+            try
+            {
                 string project_name = "";
                 StreamReader stream = new StreamReader(path);
                 if (stream.ReadLine() == "<Project>")
@@ -664,11 +664,11 @@ namespace Uniray
                 SetWindowTitle("Uniray - " + project_name);
 
                 TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
-            //}
-            //catch
-            //{
-              //  TraceLog(TraceLogLevel.Warning, "Project could not be loaded !");
-            //}
+            }
+            catch
+            {
+                errorHandler.Send(new Error(2, "Project could not be loaded !"));
+            }
         }
 
         /// <summary>
@@ -783,8 +783,7 @@ namespace Uniray
             }
             catch
             {
-                TraceLog(TraceLogLevel.Warning, "Project " + name + " could not be created");
-                errorHandler.Send(new Error(1, "Projet " + name + " could not be created"));
+                errorHandler.Send(new Error(1, "Project " + name + " could not be created"));
             }
         }
 
@@ -794,7 +793,7 @@ namespace Uniray
         /// <returns>Message</returns>
         public override string ToString()
         {
-            return "Uniray is a game engine developped by Evan Comtesse";
+            return "Uniray is a game engine by Evan Comtesse";
         }
 
         /// <summary>

@@ -1,0 +1,10 @@
+{
+	{
+		"code":"U1",
+		"message":"Project <name> could not be created !"
+	},
+	{
+		"code":"U2",
+		"message":"Project could not be loaded !"
+	}
+}
