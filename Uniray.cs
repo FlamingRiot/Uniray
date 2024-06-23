@@ -86,9 +86,10 @@ namespace Uniray
 
         private List<Label> labels;
 
-        private Scene currentScene;
+        private ErrorHandler errorHandler;
 
         // 3D related attributes
+        private Scene currentScene;
 
         private List<string> modelsPathList;
 
@@ -236,6 +237,9 @@ namespace Uniray
 
             Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "File type : .m3d");
             labels.Add(fileType);
+
+            // Initialize the error handler
+            errorHandler = new ErrorHandler(new Vector2((fileManager.X + fileManager.Width / 2) - 150, fileManager.Y - 60), font);
         }
         public void DrawScene()
         {
@@ -345,6 +349,8 @@ namespace Uniray
             bool focus = false;
 
             DrawContainer(ref gameManager);
+
+            errorHandler.Tick();
 
             string new_File = "";            
             new_File = DrawContainer(ref fileManager);
@@ -778,6 +784,7 @@ namespace Uniray
             catch
             {
                 TraceLog(TraceLogLevel.Warning, "Project " + name + " could not be created");
+                errorHandler.Send(new Error(1, "Projet " + name + " could not be created"));
             }
         }
 
