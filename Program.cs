@@ -52,7 +52,6 @@ namespace Uniray
 
             while (!WindowShouldClose())
             {
-
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.S))
                 {
                     uniray.SaveProject();

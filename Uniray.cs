@@ -107,6 +107,8 @@ namespace Uniray
 
         private Camera3D envCamera;
 
+        private RenderTexture2D cameraView;
+
         // Collision related variables
 
         private Ray mouseRay;
@@ -125,7 +127,6 @@ namespace Uniray
         public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
         public Scene CurrentScene { get { return currentScene; } }
         public Project CurrentProject { get { return currentProject; } }
-
         /// <summary>
         /// Construct UI
         /// </summary>
@@ -136,6 +137,7 @@ namespace Uniray
             baseFont = font;
             currentScene = scene;
             envCamera = new Camera3D();
+            cameraView = new RenderTexture2D();
 
             selectedElement = null;
             selectedFile = null;
@@ -319,15 +321,21 @@ namespace Uniray
                         // Cast the object to apply the appropriate rotation effects
                         if (selectedElement is UModel)
                         {
+                            float yaw = GetMouseDelta().X;
+                            float pitch = GetMouseDelta().Y;
+                            float roll = GetMouseDelta().Y;
                             UModel model = (UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement));
-                            Matrix4x4 t = RotateObject(((UModel)selectedElement).Yaw, ((UModel)selectedElement).Pitch, ((UModel)selectedElement).Roll, ((UModel)selectedElement).Model.Transform);
+                            Matrix4x4 t = RotateObject(yaw, pitch, roll, ((UModel)selectedElement).Model.Transform);
                             model.SetTransform(t);
                             
                         }
                         else if (selectedElement is UCamera)
                         {
+                            float yaw = GetMouseDelta().X;
+                            float pitch = GetMouseDelta().Y;
+                            float roll = GetMouseDelta().Y;
                             UCamera camera = (UCamera)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement));
-                            cameraModel.Transform = RotateObject(((UCamera)selectedElement).Yaw, ((UCamera)selectedElement).Pitch, ((UCamera)selectedElement).Roll, cameraModel.Transform);
+                            cameraModel.Transform = RotateObject(yaw, pitch, roll, cameraModel.Transform);
                         }
                         HideCursor();
                     }
