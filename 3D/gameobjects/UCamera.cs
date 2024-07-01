@@ -45,7 +45,7 @@ namespace Uniray
         /// <summary>
         /// 3-Dimensional position of the camera
         /// </summary>
-        public override Vector3 Position { get { return position; } set { position = value; camera.Position = value; } }
+        public override Vector3 Position { get { return camera.Position; } set { position = value; camera.Position = value; } }
         /// <summary>
         /// UCamera default Constructor
         /// </summary>

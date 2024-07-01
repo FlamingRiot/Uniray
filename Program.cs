@@ -49,7 +49,7 @@ namespace Uniray
             // Set UI and application default
             Scene scene = new Scene(new List<GameObject3D>());
             Uniray uniray = new Uniray(wWindow, hWindow, font, scene);
-
+            //SetTargetFPS(30);
             while (!WindowShouldClose())
             {
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.S))

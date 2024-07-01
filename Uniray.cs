@@ -346,27 +346,15 @@ namespace Uniray
             {
                 EndMode3D();
 
-                Camera3D cam = new Camera3D();
-                cam.Position = new Vector3(40f, 10f, 10f);
-                cam.Target = Vector3.Zero;
-                cam.Up = Vector3.UnitY;
-                cam.Projection = CameraProjection.Perspective;
-                cam.FovY = 45f;
-
+                Console.WriteLine(((UCamera)selectedElement).Position);
 
                 BeginTextureMode(cameraView);
-                DrawRectangle(0,0, wWindow, hWindow / 2, Color.Violet);
 
-                BeginMode3D(cam);
+                ClearBackground(ColorAlpha(new Color(70, 70, 70, 255), 0));
 
-                DrawCube(Vector3.Zero, 10f, 10f, 10f, Color.Yellow);
-
-                EndMode3D();
-
-                EndTextureMode();
-
-                return;
                 BeginMode3D(((UCamera)selectedElement).Camera);
+
+                DrawGrid(10, 10);
 
                 foreach (GameObject3D go in currentScene.GameObjects)
                 {
@@ -374,15 +362,14 @@ namespace Uniray
                     if (go is UModel)
                     {
                         DrawModel(((UModel)go).Model, go.Position, 1, Color.White);
-                        if (index == -1) index = CheckCollisionScreenToWorld(go, ((UModel)go).Model, mousePos);
-                    }
-                    else if (go is UCamera)
-                    {
-                        DrawModel(cameraModel, go.Position, 1, Color.White);
-                        if (index == -1) index = CheckCollisionScreenToWorld(go, cameraModel, mousePos);
                     }
                 }
-                DrawCube(Vector3.Zero, 2f, 2f, 2f, Color.Red);
+
+                EndMode3D();
+                
+                EndTextureMode();
+
+                BeginMode3D(envCamera);
             }
         }
         /// <summary>
@@ -477,7 +464,8 @@ namespace Uniray
             // Render the selected camera view to the top right corner of the screen
             if (selectedElement is UCamera)
             {
-                DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(0, 10, cameraView.Texture.Width, cameraView.Texture.Height), Vector2.Zero, 0, Color.Red);
+                DrawRectangleLinesEx(new Rectangle(wWindow - wWindow / 5 - 10, 10, wWindow / 5, hWindow / 5), 2, Color.White);
+                DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(wWindow - wWindow / 5 - 10, 10, wWindow / 5, hWindow / 5), Vector2.Zero, 0, Color.White);
             }
 
             if (openModalOpenProject)
@@ -902,7 +890,6 @@ namespace Uniray
                 StreamReader rCam = new(scenesPath[i] + "\\camera.json");
                 string camJson = rCam.ReadToEnd();
                 List<UCamera> ucameras = JsonConvert.DeserializeObject<List<UCamera>>(camJson);
-                foreach (UCamera u in ucameras) Console.WriteLine(u.ToString());
                 rCam.Close();
                 // Import stored game objects
                 StreamReader rGos = new(scenesPath[i] + "\\locs.json");
@@ -923,6 +910,23 @@ namespace Uniray
                             go.Model = m;
                             if (go.TextureID != "") go.SetTexture(go.TextureID, Ressource.GetTexture(go.TextureID));
                         }
+                    }
+                }
+
+                if (ucameras is not null)
+                {
+                    foreach (UCamera uCamera in ucameras)
+                    {
+                        Camera3D camera = new Camera3D()
+                        {
+                            Position = new Vector3(uCamera.X, uCamera.Y, uCamera.Z),
+                            Target = Vector3.Zero,
+                            Up = Vector3.UnitY,
+                            FovY = 45f,
+                            Projection = CameraProjection.Perspective
+                        };
+
+                        uCamera.Camera = camera;
                     }
                 }
 
