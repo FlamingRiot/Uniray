@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
 using System;
+using System.Reflection;
 
 namespace Uniray
 {
@@ -109,6 +110,8 @@ namespace Uniray
 
         private RenderTexture2D cameraView;
 
+        private Rectangle cameraViewRec;
+
         // Collision related variables
 
         private Ray mouseRay;
@@ -137,7 +140,9 @@ namespace Uniray
             baseFont = font;
             currentScene = scene;
             envCamera = new Camera3D();
-            cameraView = new RenderTexture2D();
+
+            cameraView = LoadRenderTexture(WWindow / 2, HWindow / 2);
+            cameraViewRec = new Rectangle(0, 0, WWindow / 2, -(HWindow / 2));
 
             selectedElement = null;
             selectedFile = null;
@@ -272,6 +277,7 @@ namespace Uniray
                     if (index == -1) index = CheckCollisionScreenToWorld(go, cameraModel, mousePos);
                 }
             }
+
             // Assign the newly selected object to the according variable
             if (index != -1)
             {
@@ -321,26 +327,62 @@ namespace Uniray
                         // Cast the object to apply the appropriate rotation effects
                         if (selectedElement is UModel)
                         {
-                            float yaw = GetMouseDelta().X;
-                            float pitch = GetMouseDelta().Y;
-                            float roll = GetMouseDelta().Y;
                             UModel model = (UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement));
-                            Matrix4x4 t = RotateObject(yaw, pitch, roll, ((UModel)selectedElement).Model.Transform);
-                            model.SetTransform(t);
-                            
+                            RotateObject(ref model);                            
                         }
                         else if (selectedElement is UCamera)
                         {
-                            float yaw = GetMouseDelta().X;
-                            float pitch = GetMouseDelta().Y;
-                            float roll = GetMouseDelta().Y;
                             UCamera camera = (UCamera)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement));
-                            cameraModel.Transform = RotateObject(yaw, pitch, roll, cameraModel.Transform);
+                            RotateObject(ref camera);
                         }
                         HideCursor();
                     }
                     else ShowCursor();
                 }
+            }
+
+            // Draw the scene all over again for the camera render, if activated
+            if (selectedElement is UCamera)
+            {
+                EndMode3D();
+
+                Camera3D cam = new Camera3D();
+                cam.Position = new Vector3(40f, 10f, 10f);
+                cam.Target = Vector3.Zero;
+                cam.Up = Vector3.UnitY;
+                cam.Projection = CameraProjection.Perspective;
+                cam.FovY = 45f;
+
+
+                BeginTextureMode(cameraView);
+                DrawRectangle(0,0, wWindow, hWindow / 2, Color.Violet);
+
+                BeginMode3D(cam);
+
+                DrawCube(Vector3.Zero, 10f, 10f, 10f, Color.Yellow);
+
+                EndMode3D();
+
+                EndTextureMode();
+
+                return;
+                BeginMode3D(((UCamera)selectedElement).Camera);
+
+                foreach (GameObject3D go in currentScene.GameObjects)
+                {
+                    // Manage objects drawing + object selection (according to the object type)
+                    if (go is UModel)
+                    {
+                        DrawModel(((UModel)go).Model, go.Position, 1, Color.White);
+                        if (index == -1) index = CheckCollisionScreenToWorld(go, ((UModel)go).Model, mousePos);
+                    }
+                    else if (go is UCamera)
+                    {
+                        DrawModel(cameraModel, go.Position, 1, Color.White);
+                        if (index == -1) index = CheckCollisionScreenToWorld(go, cameraModel, mousePos);
+                    }
+                }
+                DrawCube(Vector3.Zero, 2f, 2f, 2f, Color.Red);
             }
         }
         /// <summary>
@@ -355,7 +397,7 @@ namespace Uniray
             DrawRectangle(0, hWindow - hWindow / 3 - 10, wWindow, hWindow - (hWindow - hWindow / 3) + 10, new Color(20, 20, 20, 255));
 
             bool focus = false;
-
+         
             DrawContainer(ref gameManager);
 
             errorHandler.Tick();
@@ -431,6 +473,12 @@ namespace Uniray
             }
 
             if (!focus && selectedFile is null) { SetMouseCursor(MouseCursor.Default); }
+
+            // Render the selected camera view to the top right corner of the screen
+            if (selectedElement is UCamera)
+            {
+                DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(0, 10, cameraView.Texture.Width, cameraView.Texture.Height), Vector2.Zero, 0, Color.Red);
+            }
 
             if (openModalOpenProject)
             {
@@ -1026,40 +1074,53 @@ namespace Uniray
             }
         }
         /// <summary>
-        /// Rotate a 3-Dimensional model according to the X/Y/Z keys
+        /// Rotate a model according to the mouse delta
         /// </summary>
-        /// <param name="yaw">Y axis angle</param>
-        /// <param name="pitch">X axis angle</param>
-        /// <param name="roll">Z axis angle</param>
-        /// <param name="transform">4x4 matrix to transform</param>
-        /// <returns></returns>
-        public Matrix4x4 RotateObject(float yaw, float pitch, float roll, Matrix4x4 transform)
+        /// <param name="model">UModel to rotate</param>
+        public void RotateObject(ref UModel model)
         {
+            // Rotate the model according to the 3-Dimensional axes
+            Vector2 mouse = GetMouseDelta();
             if (IsKeyDown(KeyboardKey.X))
             {
-                Matrix4x4 newTransform = MatrixRotateX(pitch / RAD2DEG);
-                Matrix4x4 resultTransform = MatrixMultiply(newTransform, transform);
-
-                return resultTransform;
+                model.Pitch += mouse.Y;
             }
-            else if (IsKeyDown(KeyboardKey.Z))
+            if (IsKeyDown(KeyboardKey.Y))
             {
-                Matrix4x4 newTransform = MatrixRotateY(yaw / RAD2DEG);
-                Matrix4x4 resultTransform = MatrixMultiply(newTransform, transform);
-
-                return resultTransform;
+                model.Roll += mouse.Y;
             }
-            else if (IsKeyDown(KeyboardKey.Y))
+            if (IsKeyDown(KeyboardKey.Z))
             {
-                Matrix4x4 newTransform = MatrixRotateZ(roll / RAD2DEG);
-                Matrix4x4 resultTransform = MatrixMultiply(newTransform, transform);
-
-                return resultTransform;
+                model.Yaw += mouse.X;
             }
-            else
+            // Set the model tranform
+            model.SetTransform(MatrixRotateXYZ(new Vector3(model.Pitch / RAD2DEG, model.Yaw / RAD2DEG, model.Roll / RAD2DEG)));
+        }
+        /// <summary>
+        /// Rotate a camera according to the mouse delta
+        /// </summary>
+        /// <param name="camera">UCamrea to rotate</param>
+        public void RotateObject(ref UCamera camera)
+        {
+            // Rotate the camera according to the 3-Dimensional axes
+            Vector2 mouse = GetMouseDelta();
+            if (IsKeyDown(KeyboardKey.X))
             {
-                return transform;
+                camera.Pitch += mouse.Y;
             }
+            if (IsKeyDown(KeyboardKey.Y))
+            {
+                camera.Roll += mouse.Y;
+            }
+            if (IsKeyDown(KeyboardKey.Z))
+            {
+                camera.Yaw += mouse.X;
+            }
+            // Set the camera model Transform
+            cameraModel.Transform = MatrixRotateXYZ(new Vector3(camera.Pitch / RAD2DEG, camera.Yaw / RAD2DEG, camera.Roll / RAD2DEG));
+
+            // Set the camera Target according to the rotation matrix
+
         }
     }
 }
