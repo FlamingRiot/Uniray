@@ -346,8 +346,6 @@ namespace Uniray
             {
                 EndMode3D();
 
-                Console.WriteLine(((UCamera)selectedElement).Position);
-
                 BeginTextureMode(cameraView);
 
                 ClearBackground(ColorAlpha(new Color(70, 70, 70, 255), 0));
