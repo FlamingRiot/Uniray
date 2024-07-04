@@ -103,7 +103,7 @@ namespace Uniray
             Raylib.SetMaterialTexture(this.model.Materials, MaterialMapIndex.Diffuse, texture);
         }
         /// <summary>
-        /// Set the model transofmr for rotations and scaling
+        /// Set the model transform for rotations and scaling
         /// </summary>
         /// <param name="transform">4x4 matrix</param>
         public void SetTransform(Matrix4x4 transform)
