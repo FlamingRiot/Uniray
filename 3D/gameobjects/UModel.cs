@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Net.WebSockets;
+using System.Numerics;
 using Raylib_cs;
 
 namespace Uniray
@@ -18,21 +19,41 @@ namespace Uniray
         /// </summary>
         private float roll;
         /// <summary>
-        /// Model path
+        /// Model mesh
         /// </summary>
-        private Model model;
+        private Mesh mesh;
+        /// <summary>
+        /// Model material
+        /// </summary>
+        private Material material;
+        /// <summary>
+        /// Model transform matrix
+        /// </summary>
+        private Matrix4x4 transform;
         /// <summary>
         /// Texture ID of the dictionnary
         /// </summary>
         private string textureID;
         /// <summary>
-        /// Model absolute path
+        /// Model ID of the dictionnary
         /// </summary>
-        private string modelPath;
+        private string modelID;
         /// <summary>
         /// 3-Dimensional position of the object
         /// </summary>
-        public override Vector3 Position { get { return position; } set { position = value; } }
+        public override Vector3 Position 
+        {
+            get 
+            {
+                return new Vector3(transform.M14, transform.M24, transform.M34);
+            } 
+            set 
+            {
+                transform.M14 = value.X; 
+                transform.M24 = value.Y; 
+                transform.M34 = value.Z;
+            } 
+        }
         /// <summary>
         /// Yaw rotation
         /// </summary>
@@ -48,22 +69,31 @@ namespace Uniray
         /// <summary>
         /// Object model
         /// </summary>
-        public Model Model { get { return model; } set { model = value; } } 
+        public Mesh Mesh { get { return mesh; } set { mesh = value; } } 
         /// <summary>
         /// Texture ID in the dictionnary
         /// </summary>
         public string TextureID { get { return textureID; } set { textureID = value; } }
         /// <summary>
-        /// Model absolute path
+        /// Model ID in the dictionnary
         /// </summary>
-        public string ModelPath { get { return modelPath; } set { modelPath = value; } }
+        public string ModelID { get { return modelID; } set { modelID = value; } }
+        /// <summary>
+        /// Model transform matrix
+        /// </summary>
+        public Matrix4x4 Transform { get { return transform; } set { transform = value; } }
+        /// <summary>
+        /// Model material
+        /// </summary>
+        public Material Material { get { return material; } set { material = value; } }
         /// <summary>
         /// UModel default Constructor
         /// </summary>
         public UModel() : base()
         {
             this.textureID = "";
-            this.modelPath = "";
+            this.modelID = "";
+            this.Transform = Matrix4x4.Identity;
         }
         /// <summary>
         /// UModel Constructor
@@ -72,11 +102,13 @@ namespace Uniray
         /// <param name="position">Object position</param>
         /// <param name="model">Object model</param>
         /// <param name="modelPath">Object model path</param>
-        public UModel(string name, Vector3 position, Model model, string modelPath) : base(name, position)
+        public UModel(string name, Vector3 position, Mesh mesh, string modelID) : base(name, position)
         {
-            this.model = model;
-            this.modelPath = modelPath;
+            Mesh = mesh;
+            Position = position;
+            this.modelID = modelID;
             this.textureID = "";
+            this.Transform = Matrix4x4.Identity;
         }
         /// <summary>
         /// UModel Constructor
@@ -86,11 +118,13 @@ namespace Uniray
         /// <param name="model">Object model</param>
         /// <param name="modelPath">Object model path</param>
         /// <param name="textureID">Object texture ID</param>
-        public UModel(string name, Vector3 position, Model model, string modelPath, string textureID) : base(name, position)
+        public UModel(string name, Vector3 position, Mesh mesh, string modelID, string textureID) : base(name, position)
         {
-            this.model = model;
-            this.modelPath = modelPath;
+            Mesh = mesh;
+            Position = position;
+            this.modelID = modelID;
             this.textureID = textureID;
+            this.Transform = Matrix4x4.Identity;
         }
         /// <summary>
         /// Set the model texture by giving on of the ressource's texture
@@ -100,23 +134,7 @@ namespace Uniray
         public void SetTexture(string textureID, Texture2D texture)
         {
             this.textureID = textureID;
-            Raylib.SetMaterialTexture(this.model.Materials, MaterialMapIndex.Diffuse, texture);
-        }
-        /// <summary>
-        /// Set the model transform for rotations and scaling
-        /// </summary>
-        /// <param name="transform">4x4 matrix</param>
-        public void SetTransform(Matrix4x4 transform)
-        {
-            this.model.Transform = transform;
-        }
-        /// <summary>
-        /// Get the model transform for rotations and scaling
-        /// </summary>
-        /// <returns>4x4 Matrix</returns>
-        public Matrix4x4 GetTransform() 
-        { 
-            return this.model.Transform;
+            Raylib.SetMaterialTexture(ref material, MaterialMapIndex.Diffuse, texture);
         }
         public override string ToString()
         {

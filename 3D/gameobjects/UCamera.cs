@@ -23,6 +23,10 @@ namespace Uniray
         /// </summary>
         private Camera3D camera;
         /// <summary>
+        /// Model transform matrix
+        /// </summary>
+        private Matrix4x4 transform;
+        /// <summary>
         /// Yaw rotation
         /// </summary>
         public float Yaw { get { return yaw; } set { yaw = value; } }
@@ -43,9 +47,26 @@ namespace Uniray
         /// </summary>
         public Vector3 Target { get { return camera.Target; } set { camera.Target = value; } }
         /// <summary>
+        /// Model transform matrix
+        /// </summary>
+        public Matrix4x4 Transform { get { return transform; } set { transform = value; } }
+        /// <summary>
         /// 3-Dimensional position of the camera
         /// </summary>
-        public override Vector3 Position { get { return camera.Position; } set { position = value; camera.Position = value; } }
+        public override Vector3 Position 
+        { 
+            get 
+            { 
+                return camera.Position; 
+            } 
+            set 
+            { 
+                camera.Position = value;
+                transform.M14 = value.X;
+                transform.M24 = value.Y;
+                transform.M34 = value.Z;
+            }
+        }
         /// <summary>
         /// UCamera default Constructor
         /// </summary>
@@ -59,6 +80,7 @@ namespace Uniray
         public UCamera(string name, Camera3D camera):base(name, camera.Position) 
         {
             Camera = camera;
+            transform = Matrix4x4.Identity;
         }
         /// <summary>
         /// Send object informations

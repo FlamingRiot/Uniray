@@ -8,6 +8,7 @@ using System.Text;
 using Newtonsoft.Json;
 using System;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
 
 namespace Uniray
 {
@@ -31,6 +32,10 @@ namespace Uniray
         /// 3D model of the displayed scene camera
         /// </summary>
         public Model cameraModel;
+        /// <summary>
+        /// Material of the generic camera model used for the application
+        /// </summary>
+        public Material cameraMaterial;
         /// <summary>
         /// Collision with the mouse and camera
         /// </summary>
@@ -169,6 +174,8 @@ namespace Uniray
 
             // Load camera model
             cameraModel = LoadModel("data/camera.m3d");
+            cameraMaterial = LoadMaterialDefault();
+            SetMaterialTexture(ref cameraMaterial, MaterialMapIndex.Diffuse, LoadTexture("data/cameraTex.png"));
 
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;
@@ -268,13 +275,15 @@ namespace Uniray
                 // Manage objects drawing + object selection (according to the object type)
                 if (go is UModel)
                 {
-                    DrawModel(((UModel)go).Model, go.Position, 1, Color.White);
-                    if (index == -1) index = CheckCollisionScreenToWorld(go, ((UModel)go).Model, mousePos);
+                    //DrawModel(((UModel)go).Model, go.Position, 1, Color.White);
+                    DrawMesh(((UModel)go).Mesh, ((UModel)go).Material, ((UModel)go).Transform);
+                    if (index == -1) index = CheckCollisionScreenToWorld(go, ((UModel)go).Mesh, mousePos, ((UModel)go).Transform);
                 }
                 else if (go is UCamera)
                 {
-                    DrawModel(cameraModel, go.Position, 1, Color.White);
-                    if (index == -1) index = CheckCollisionScreenToWorld(go, cameraModel, mousePos);
+                    //DrawModel(cameraModel, go.Position, 1, Color.White);
+                    DrawMesh(cameraModel.Meshes[0], cameraMaterial, ((UCamera)go).Transform);
+                    if (index == -1) index = CheckCollisionScreenToWorld(go, cameraModel.Meshes[0], mousePos, ((UCamera)go).Transform);
                 }
             }
 
@@ -359,7 +368,7 @@ namespace Uniray
                     // Manage objects drawing + object selection (according to the object type)
                     if (go is UModel)
                     {
-                        DrawModel(((UModel)go).Model, go.Position, 1, Color.White);
+                        DrawMesh(((UModel)go).Mesh, ((UModel)go).Material, ((UModel)go).Transform);
                     }
                 }
 
@@ -643,11 +652,17 @@ namespace Uniray
                             // Import model into the scene
                             if (mouse.X > gameManager.X + gameManager.Width + 10 && mouse.Y < fileManager.Y - 10 && selectedFile.Split('.').Last() == "m3d")
                             {
-                                Model m = LoadModel(selectedFile);
-                                for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                                    m.Meshes[0].Colors[j] = 255;
-                                UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-                                currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, m, selectedFile));
+                                string modelKey = selectedFile.Split('/').Last().Split('.')[0];
+
+                                if (Ressource.ModelExists(selectedFile.Split('.').First()))
+                                {
+                                    currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
+                                }
+                                else
+                                {
+                                    Ressource.AddModel(LoadModel(selectedFile), modelKey);
+                                    currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
+                                }
                                 selectedElement = currentScene.GameObjects.Last();
                             }
                             // Import texture in game object attributes
@@ -672,8 +687,8 @@ namespace Uniray
         /// <param name="path">path to the .uproj file</param>
         public void LoadProject(string path)
         {
-            try
-            {
+            //try
+            //{
                 string project_name = "";
                 StreamReader stream = new StreamReader(path);
                 if (stream.ReadLine() == "<Project>")
@@ -706,11 +721,11 @@ namespace Uniray
                 SetWindowTitle("Uniray - " + project_name);
 
                 TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
-            }
-            catch
+            //}
+            /*catch
             {
                 errorHandler.Send(new Error(2, "Project could not be loaded !"));
-            }
+            }*/
         }
 
         /// <summary>
@@ -796,12 +811,6 @@ namespace Uniray
                 write.Close();
                 fileManager.OutputFilePath = path + "\\assets\\models\\";
 
-                StreamWriter cs = new StreamWriter(path + "\\scenes\\new_scene\\camera.json");
-                string newCam = "[{" + "X: " + 0 + ",Y: " + 0 + ",Z: " + 0 + ",Yaw: " + 0 +
-                    ",Pitch: " + 0 + ",Roll: " + 0 + "}]";
-                cs.Write(newCam);
-                cs.Close();
-
                 SetWindowTitle("Uniray - " + name);
 
                 Camera3D camera = new()
@@ -812,7 +821,13 @@ namespace Uniray
                     Projection = CameraProjection.Perspective,
                     FovY = 90
                 };
-                UCamera ucamera = new UCamera("Camera", camera);
+                UCamera ucamera = new UCamera("Default camera", camera);
+                Matrix4x4 transform = Matrix4x4.Identity;
+
+                StreamWriter cs = new StreamWriter(path + "\\scenes\\new_scene\\camera.json");
+                string newCam = JsonConvert.SerializeObject(ucamera);
+                cs.Write(newCam);
+                cs.Close();
 
                 Scene defaultScene = new(new List<GameObject3D> { ucamera });
                 List<Scene> scenes = new() { defaultScene };
@@ -853,13 +868,13 @@ namespace Uniray
             {
                 if (go is UModel model)
                 {
-                    modelsJson += "{" + "X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
-                    ",Pitch: " + model.Pitch + ",Roll: " + model.Roll + ",ModelPath: \"" + model.ModelPath + "\",TextureID: \"" + model.TextureID + "\"},";
+                    modelsJson += JsonConvert.SerializeObject(model);
+                    modelsJson += ",";
                 }
                 else if (go is UCamera camera)
                 {
-                    cameraJson += "{" + "X: " + camera.X + ",Y: " + camera.Y + ",Z: " + camera.Z + ",Yaw: " + camera.Yaw +
-                    ",Pitch: " + camera.Pitch + ",Roll: " + camera.Roll + "},";
+                    cameraJson += JsonConvert.SerializeObject(camera);
+                    cameraJson += ",";
                 }
 
             }
@@ -899,13 +914,9 @@ namespace Uniray
                 {
                     foreach (UModel go in umodels)
                     {
-                        if (go.ModelPath != "" && go.ModelPath is not null)
+                        if (go.ModelID != "" && go.ModelID is not null)
                         {
-                            Model m = LoadModel(go.ModelPath);
-                            for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                                m.Meshes[0].Colors[j] = 255;
-                            UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-                            go.Model = m;
+                            go.Mesh = Ressource.GetModel(go.ModelID).Meshes[0];
                             if (go.TextureID != "") go.SetTexture(go.TextureID, Ressource.GetTexture(go.TextureID));
                         }
                     }
@@ -917,7 +928,7 @@ namespace Uniray
                     {
                         Camera3D camera = new Camera3D()
                         {
-                            Position = new Vector3(uCamera.X, uCamera.Y, uCamera.Z),
+                            Position = uCamera.Position,
                             Target = Vector3.Zero,
                             Up = Vector3.UnitY,
                             FovY = 45f,
@@ -1002,7 +1013,8 @@ namespace Uniray
                 }
                 Ressource = new Ressource(
                     texturesPathList,
-                    soundsPathList
+                    soundsPathList,
+                    modelsPathList
                     );
             }
             Console.WriteLine(Ressource.ToString());
@@ -1049,18 +1061,15 @@ namespace Uniray
         /// Check if a collision occurs between the mouse (screen) and an object of the world (Game object)
         /// </summary>
         /// <param name="go">Game object</param>
-        /// <param name="model">Model</param>
+        /// <param name="mesh">Mesh</param>
         /// <param name="mousePos">2-Dimensional position of the mouse</param>
         /// <returns></returns>
-        public int CheckCollisionScreenToWorld(GameObject3D go, Model model, Vector2 mousePos)
+        public int CheckCollisionScreenToWorld(GameObject3D go, Mesh mesh, Vector2 mousePos, Matrix4x4 transform)
         {
             if (mousePos.X > gameManager.X + gameManager.Width && mousePos.Y < fileManager.Y - 10 && IsMouseButtonPressed(MouseButton.Left))
             {
-                BoundingBox box = GetModelBoundingBox(model);
-                box.Min += go.Position;
-                box.Max += go.Position;
 
-                goCollision = GetRayCollisionBox(mouseRay, box);
+                goCollision = GetRayCollisionMesh(mouseRay, mesh, transform);
                 if (goCollision.Hit)
                 {
                     return currentScene.GameObjects.IndexOf(go);
@@ -1096,7 +1105,13 @@ namespace Uniray
                 model.Yaw += mouse.X;
             }
             // Set the model tranform
-            model.SetTransform(MatrixRotateXYZ(new Vector3(model.Pitch / RAD2DEG, model.Yaw / RAD2DEG, model.Roll / RAD2DEG)));
+            Matrix4x4 nm = MatrixRotateXYZ(new Vector3(model.Pitch / RAD2DEG, model.Yaw / RAD2DEG, model.Roll / RAD2DEG));
+
+            nm.M14 = model.Position.X;
+            nm.M24 = model.Position.Y;
+            nm.M34 = model.Position.Z;
+
+            model.Transform = nm;
         }
         /// <summary>
         /// Rotate a camera according to the mouse delta
@@ -1119,8 +1134,13 @@ namespace Uniray
                 camera.Yaw += mouse.X;
             }
             // Set the camera model Transform
-            cameraModel.Transform = MatrixRotateXYZ(new Vector3(camera.Pitch / RAD2DEG, camera.Yaw / RAD2DEG, camera.Roll / RAD2DEG));
+            Matrix4x4 nm = MatrixRotateXYZ(new Vector3(camera.Pitch / RAD2DEG, camera.Yaw / RAD2DEG, camera.Roll / RAD2DEG));
 
+            nm.M14 = camera.Position.X;
+            nm.M24 = camera.Position.Y;
+            nm.M34 = camera.Position.Z;
+
+            camera.Transform = nm;
             // Set the camera Target according to the rotation matrix
 
         }
