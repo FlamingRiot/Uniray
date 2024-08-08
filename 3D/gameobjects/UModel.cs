@@ -94,6 +94,7 @@ namespace Uniray
             this.textureID = "";
             this.modelID = "";
             this.Transform = Matrix4x4.Identity;
+            Material = Raylib.LoadMaterialDefault();
         }
         /// <summary>
         /// UModel Constructor
@@ -109,6 +110,10 @@ namespace Uniray
             this.modelID = modelID;
             this.textureID = "";
             this.Transform = Matrix4x4.Identity;
+            this.transform.M14 = position.X;
+            this.transform.M24 = position.Y;
+            this.transform.M34 = position.Z;
+            Material = Raylib.LoadMaterialDefault();
         }
         /// <summary>
         /// UModel Constructor
@@ -125,6 +130,10 @@ namespace Uniray
             this.modelID = modelID;
             this.textureID = textureID;
             this.Transform = Matrix4x4.Identity;
+            this.transform.M14 = position.X;
+            this.transform.M24 = position.Y;
+            this.transform.M34 = position.Z;
+            Material = Raylib.LoadMaterialDefault();
         }
         /// <summary>
         /// Set the model texture by giving on of the ressource's texture

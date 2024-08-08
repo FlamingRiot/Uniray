@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using System;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 
 namespace Uniray
 {
@@ -654,13 +656,18 @@ namespace Uniray
                             {
                                 string modelKey = selectedFile.Split('/').Last().Split('.')[0];
 
-                                if (Ressource.ModelExists(selectedFile.Split('.').First()))
+                                if (Ressource.ModelExists(modelKey))
                                 {
                                     currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
                                 }
                                 else
                                 {
-                                    Ressource.AddModel(LoadModel(selectedFile), modelKey);
+                                    Model m = LoadModel(selectedFile);
+                                    for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                                        m.Meshes[0].Colors[j] = 255;
+                                    UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+
+                                    Ressource.AddModel(m, modelKey);
                                     currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
                                 }
                                 selectedElement = currentScene.GameObjects.Last();
@@ -868,8 +875,10 @@ namespace Uniray
             {
                 if (go is UModel model)
                 {
-                    modelsJson += JsonConvert.SerializeObject(model);
-                    modelsJson += ",";
+                    modelsJson += "{" + "X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
+                    ",Pitch: " + model.Pitch + ",Roll: " + model.Roll + ",ModelID: \"" + model.ModelID + "\",TextureID: \"" + model.TextureID + "\", Transform:";
+                    modelsJson += JsonConvert.SerializeObject(model.Transform);
+                    modelsJson += "}, ";
                 }
                 else if (go is UCamera camera)
                 {
