@@ -164,11 +164,6 @@ namespace Uniray
             goCollision = new RayCollision();
             cameraCollision = new RayCollision();
 
-            // Instantiate lists of components
-            textboxes = new List<Textbox>();
-            buttons = new List<Button>();
-            labels = new List<Label>();
-
             modelsPathList = new List<string>();
             texturesPathList = new List<string>();
             soundsPathList = new List<string>();
@@ -314,13 +309,22 @@ namespace Uniray
             // =========================================================================================================================================================
             // ================================================================ MANAGE 2D DRAWING ======================================================================
             // =========================================================================================================================================================
+            // Check if the window has been resized to adjust the size of the UI
+            if (IsWindowResized())
+            {
+                BuildUI(GetScreenWidth(), GetScreenHeight(), baseFont);
+            }
+            // Draw the outline rectangles that appear behind the main panels
             DrawRectangle(0, 0, (int)(wWindow - wWindow / 1.25f), hWindow, new Color(20, 20, 20, 255));
             DrawRectangle(0, hWindow - hWindow / 3 - 10, wWindow, hWindow - (hWindow - hWindow / 3) + 10, new Color(20, 20, 20, 255));
 
+            // Restart the new focus check
             bool focus = false;
          
+            // Draw the left main panel
             DrawContainer(ref gameManager);
 
+            // Tick the error handler for the errors to potentially disappear
             errorHandler.Tick();
 
             string new_File = "";            
@@ -1024,8 +1028,13 @@ namespace Uniray
         /// <param name="HWindow">Window height</param>
         /// <param name="font">Used font for the UI</param>
         /// </summary>
-        public void BuildUI(int WWindow, int HWindow, Font font)
+        public void BuildUI(int wWindow, int hWindow, Font font)
         {
+            // Instantiate lists of components
+            textboxes = new List<Textbox>();
+            buttons = new List<Button>();
+            labels = new List<Label>();
+
             // Containers
             float cont1X = wWindow - wWindow / 1.25f;
             float cont1Y = hWindow - hWindow / 3;
@@ -1035,7 +1044,7 @@ namespace Uniray
 
             gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR, "gameManager");
 
-            Container modal_template = new Container(WWindow / 2 - WWindow / 6, HWindow / 2 - HWindow / 6, WWindow / 3, HWindow / 3, APPLICATION_COLOR, FOCUS_COLOR, "modal");
+            Container modal_template = new Container(wWindow / 2 - wWindow / 6, hWindow / 2 - hWindow / 6, wWindow / 3, hWindow / 3, APPLICATION_COLOR, FOCUS_COLOR, "modal");
 
             modalOpenProject = modal_template;
 
@@ -1103,6 +1112,9 @@ namespace Uniray
 
             // Initialize the error handler
             errorHandler = new ErrorHandler(new Vector2((fileManager.X + fileManager.Width / 2) - 150, fileManager.Y - 60), font);
+
+            this.wWindow = wWindow;
+            this.hWindow = hWindow;
         }
         /// <summary>
         /// Rotate a model according to the mouse delta
