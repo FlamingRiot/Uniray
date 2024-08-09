@@ -279,7 +279,7 @@ namespace Uniray
 
                 BeginTextureMode(cameraView);
 
-                ClearBackground(ColorAlpha(new Color(70, 70, 70, 255), 0));
+                ClearBackground(new Color(70, 70, 70, 255));
 
                 BeginMode3D(((UCamera)selectedElement).Camera);
 
@@ -402,7 +402,7 @@ namespace Uniray
             // Render the selected camera view to the top right corner of the screen
             if (selectedElement is UCamera)
             {
-                DrawRectangleLinesEx(new Rectangle(wWindow - wWindow / 5 - 10, 10, wWindow / 5, hWindow / 5), 2, Color.White);
+                DrawRectangleLinesEx(new Rectangle(wWindow - wWindow / 5 - 11, 9, wWindow / 5 + 2, hWindow / 5 + 2), 2, Color.White);
                 DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(wWindow - wWindow / 5 - 10, 10, wWindow / 5, hWindow / 5), Vector2.Zero, 0, Color.White);
             }
 
