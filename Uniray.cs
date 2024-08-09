@@ -11,6 +11,7 @@ using System.Reflection;
 using Newtonsoft.Json.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 
 namespace Uniray
 {
@@ -179,83 +180,7 @@ namespace Uniray
             cameraMaterial = LoadMaterialDefault();
             SetMaterialTexture(ref cameraMaterial, MaterialMapIndex.Diffuse, LoadTexture("data/cameraTex.png"));
 
-            // Containers
-            float cont1X = wWindow - wWindow / 1.25f;
-            float cont1Y = hWindow - hWindow / 3;
-            fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X - 10, hWindow - (int)cont1Y - 10, APPLICATION_COLOR, FOCUS_COLOR, "models");
-            fileManager.Type = ContainerType.FileDropper;
-            fileManager.ExtensionFile = "m3d";
-
-            gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR, "gameManager");
-
-            Container modal_template = new Container(WWindow / 2 - WWindow / 6, HWindow / 2 - HWindow / 6, WWindow / 3, HWindow / 3, APPLICATION_COLOR, FOCUS_COLOR, "modal");
-
-            modalOpenProject = modal_template;
-
-            modalNewProject = modal_template;
-
-            // Buttons
-            Button modelsButton = new Button("Models", (int)fileManager.X + 48, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "modelsSection");
-            buttons.Add(modelsButton);
-
-            Button texturesButton = new Button("Textures", (int)fileManager.X + 164, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "texturesSection");
-            buttons.Add(texturesButton);
-
-            Button soundsButton = new Button("Sounds", (int)fileManager.X + 260, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "soundsSection");
-            buttons.Add(soundsButton);
-
-            Button animationsButton = new Button("Animations", (int)fileManager.X + 392, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "animationsSections");
-            buttons.Add(animationsButton);
-
-            Button scriptsButton = new Button("Scripts", (int)fileManager.X + 492, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "scriptsSections");
-            buttons.Add(scriptsButton);
-
-            Button openFileButton = new Button("Open", (int)fileManager.X + fileManager.Width - 38, (int)fileManager.Y + 5, 40, 20, APPLICATION_COLOR, FOCUS_COLOR, "openExplorer") { Type = ButtonType.PathFinder };
-            buttons.Add(openFileButton);
-
-            Button openProjectButton = new Button("Open project", (int)fileManager.X + fileManager.Width - 175, (int)fileManager.Y + 5, 125, 20, APPLICATION_COLOR, FOCUS_COLOR, "openProject");
-            buttons.Add(openProjectButton);
-
-            Button newProjectButton = new Button("New project", (int)fileManager.X + fileManager.Width - 303, (int)fileManager.Y + 5, 50, 20, APPLICATION_COLOR, FOCUS_COLOR, "newProject");
-            buttons.Add(newProjectButton);
-
-            Button playButton = new Button("Play", (GetScreenWidth() - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, APPLICATION_COLOR, FOCUS_COLOR, "play");
-            buttons.Add(playButton);
-
-            Button addGameObject = new Button("+", (int)gameManager.X + gameManager.Width - 20, (int)gameManager.Y + 10, 10, 15, APPLICATION_COLOR, FOCUS_COLOR, "addGameObject");
-            buttons.Add(addGameObject);
-
-            closeModal = new Button("x", (int)modal_template.X + modal_template.Width - 30, (int)modal_template.Y + 10, 20, 20, Color.Red, FOCUS_COLOR, "closeModal");
-            
-            okModalOpen = new Button("Proceed", (int)modal_template.X + modal_template.Width - 70, (int)modal_template.Y + modal_template.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalOpen");
-
-            okModalNew = new Button("Proceed", (int)modal_template.X + modal_template.Width - 70, (int)modal_template.Y + modal_template.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalNew");
-
-            // Textboxes
-            Textbox goTexture = new Textbox("",  (int)gameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 290, gameManager.Width - 120, 40, APPLICATION_COLOR, FOCUS_COLOR);
-            textboxes.Add(goTexture);
-
-            openProjTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
-
-            newProjTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
-
-            newProjNameTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 120, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
-
-            // Labels
-            Label gameLayersLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + 10, "Game Layers");
-            labels.Add(gameLayersLabel);
-
-            Label goTextureLabel = new Label((int)gameManager.X + 20, (int)gameManager.Y + gameManager.Height / 2 + 300, "Texture");
-            labels.Add(goTextureLabel);
-
-            Label gameObjectLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + hWindow / 2, "Game Object");
-            labels.Add(gameObjectLabel);
-
-            Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "File type : .m3d");
-            labels.Add(fileType);
-
-            // Initialize the error handler
-            errorHandler = new ErrorHandler(new Vector2((fileManager.X + fileManager.Width / 2) - 150, fileManager.Y - 60), font);
+            BuildUI(WWindow, HWindow, font);
         }
         public void DrawScene()
         {
@@ -694,8 +619,8 @@ namespace Uniray
         /// <param name="path">path to the .uproj file</param>
         public void LoadProject(string path)
         {
-            //try
-            //{
+            try
+            {
                 string project_name = "";
                 StreamReader stream = new StreamReader(path);
                 if (stream.ReadLine() == "<Project>")
@@ -728,11 +653,11 @@ namespace Uniray
                 SetWindowTitle("Uniray - " + project_name);
 
                 TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
-            //}
-            /*catch
+            }
+            catch
             {
                 errorHandler.Send(new Error(2, "Project could not be loaded !"));
-            }*/
+            }
         }
 
         /// <summary>
@@ -1092,6 +1017,92 @@ namespace Uniray
             {
                 return -1;
             }
+        }
+        /// <summary>
+        /// Build the 2-Dimensional UI according to the window size
+        /// <param name="WWindow">Window width</param>
+        /// <param name="HWindow">Window height</param>
+        /// <param name="font">Used font for the UI</param>
+        /// </summary>
+        public void BuildUI(int WWindow, int HWindow, Font font)
+        {
+            // Containers
+            float cont1X = wWindow - wWindow / 1.25f;
+            float cont1Y = hWindow - hWindow / 3;
+            fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X - 10, hWindow - (int)cont1Y - 10, APPLICATION_COLOR, FOCUS_COLOR, "models");
+            fileManager.Type = ContainerType.FileDropper;
+            fileManager.ExtensionFile = "m3d";
+
+            gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR, "gameManager");
+
+            Container modal_template = new Container(WWindow / 2 - WWindow / 6, HWindow / 2 - HWindow / 6, WWindow / 3, HWindow / 3, APPLICATION_COLOR, FOCUS_COLOR, "modal");
+
+            modalOpenProject = modal_template;
+
+            modalNewProject = modal_template;
+
+            // Buttons
+            Button modelsButton = new Button("Models", (int)fileManager.X + 48, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "modelsSection");
+            buttons.Add(modelsButton);
+
+            Button texturesButton = new Button("Textures", (int)fileManager.X + 164, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "texturesSection");
+            buttons.Add(texturesButton);
+
+            Button soundsButton = new Button("Sounds", (int)fileManager.X + 260, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "soundsSection");
+            buttons.Add(soundsButton);
+
+            Button animationsButton = new Button("Animations", (int)fileManager.X + 392, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "animationsSections");
+            buttons.Add(animationsButton);
+
+            Button scriptsButton = new Button("Scripts", (int)fileManager.X + 492, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "scriptsSections");
+            buttons.Add(scriptsButton);
+
+            Button openFileButton = new Button("Open", (int)fileManager.X + fileManager.Width - 38, (int)fileManager.Y + 5, 40, 20, APPLICATION_COLOR, FOCUS_COLOR, "openExplorer") { Type = ButtonType.PathFinder };
+            buttons.Add(openFileButton);
+
+            Button openProjectButton = new Button("Open project", (int)fileManager.X + fileManager.Width - 175, (int)fileManager.Y + 5, 125, 20, APPLICATION_COLOR, FOCUS_COLOR, "openProject");
+            buttons.Add(openProjectButton);
+
+            Button newProjectButton = new Button("New project", (int)fileManager.X + fileManager.Width - 303, (int)fileManager.Y + 5, 50, 20, APPLICATION_COLOR, FOCUS_COLOR, "newProject");
+            buttons.Add(newProjectButton);
+
+            Button playButton = new Button("Play", (GetScreenWidth() - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, APPLICATION_COLOR, FOCUS_COLOR, "play");
+            buttons.Add(playButton);
+
+            Button addGameObject = new Button("+", (int)gameManager.X + gameManager.Width - 20, (int)gameManager.Y + 10, 10, 15, APPLICATION_COLOR, FOCUS_COLOR, "addGameObject");
+            buttons.Add(addGameObject);
+
+            closeModal = new Button("x", (int)modal_template.X + modal_template.Width - 30, (int)modal_template.Y + 10, 20, 20, Color.Red, FOCUS_COLOR, "closeModal");
+
+            okModalOpen = new Button("Proceed", (int)modal_template.X + modal_template.Width - 70, (int)modal_template.Y + modal_template.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalOpen");
+
+            okModalNew = new Button("Proceed", (int)modal_template.X + modal_template.Width - 70, (int)modal_template.Y + modal_template.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalNew");
+
+            // Textboxes
+            Textbox goTexture = new Textbox("", (int)gameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 290, gameManager.Width - 120, 40, APPLICATION_COLOR, FOCUS_COLOR);
+            textboxes.Add(goTexture);
+
+            openProjTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+
+            newProjTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+
+            newProjNameTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 120, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+
+            // Labels
+            Label gameLayersLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + 10, "Game Layers");
+            labels.Add(gameLayersLabel);
+
+            Label goTextureLabel = new Label((int)gameManager.X + 20, (int)gameManager.Y + gameManager.Height / 2 + 300, "Texture");
+            labels.Add(goTextureLabel);
+
+            Label gameObjectLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + hWindow / 2, "Game Object");
+            labels.Add(gameObjectLabel);
+
+            Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "File type : .m3d");
+            labels.Add(fileType);
+
+            // Initialize the error handler
+            errorHandler = new ErrorHandler(new Vector2((fileManager.X + fileManager.Width / 2) - 150, fileManager.Y - 60), font);
         }
         /// <summary>
         /// Rotate a model according to the mouse delta
