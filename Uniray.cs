@@ -6,6 +6,7 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
+using Uniray._2D;
 
 namespace Uniray
 {
@@ -51,6 +52,8 @@ namespace Uniray
         public BoundingBox zArrowBox = new BoundingBox(new Vector3(0f, -0.1f, -0.1f), new Vector3(1.4f, 0.1f, 0.1f));
 
         // 2D related attributes
+        public UI UI;
+
         private int hWindow;
 
         private int wWindow;
@@ -63,9 +66,9 @@ namespace Uniray
 
         private Font baseFont;
 
-        private Container fileManager;
+       // private Container fileManager;
 
-        private Container gameManager;
+       // private Container gameManager;
 
         private Container modalOpenProject;
 
@@ -127,8 +130,6 @@ namespace Uniray
         private RayCollision goCollision;
 
         public List<Button> Buttons { get { return buttons; } }
-        public Container GameManager { get { return gameManager; } set { gameManager = value; } }
-        public Container FileManager { get { return fileManager; } set { fileManager = value; } }
         public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
         public Scene CurrentScene { get { return currentScene; } }
         public Project CurrentProject { get { return currentProject; } }
@@ -169,6 +170,7 @@ namespace Uniray
             cameraMaterial = LoadMaterialDefault();
             SetMaterialTexture(ref cameraMaterial, MaterialMapIndex.Diffuse, LoadTexture("data/cameraTex.png"));
 
+            UI = new UI(WWindow, HWindow, font);
             BuildUI(WWindow, HWindow, font);
         }
         public void DrawScene()
@@ -314,15 +316,15 @@ namespace Uniray
 
             // Restart the new focus check
             bool focus = false;
-         
-            // Draw the left main panel
-            DrawContainer(ref gameManager);
+
+
+            UI.Draw();
 
             // Tick the error handler for the errors to potentially disappear
             errorHandler.Tick();
 
-            string new_File = "";            
-            new_File = DrawContainer(ref fileManager);
+            string new_File = "";
+            new_File = ((Container)UI.Components["fileManager"]).GetLastFile();
             new_File = new_File.Replace('\\', '/');
             if (new_File != "" && currentProject is not null)
             {
@@ -362,7 +364,7 @@ namespace Uniray
             {
                 DrawButton(button, baseFont);
                 if (Hover(button.X, button.Y, button.Width, button.Height)) { focus = true; }
-            }switch (fileManager.Tag)
+            }switch (UI.Components["fileManager"].Tag)
             {
                 case "models":
                     DrawManagerFiles(ref modelsPathList);
@@ -457,8 +459,8 @@ namespace Uniray
                 {
                     if (IsButtonPressed(section))
                     {
-                        Container c = FileManager;
-                        Label fileType = new ((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "");
+                        Container c = (Container)UI.Components["fileManager"];
+                        Label fileType = new(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2, UI.Components["fileManager"].Y + UI.Components["fileManager"].Height / 2, "");
                         switch (section.Tag)
                         {
                             case "modelsSection":
@@ -514,7 +516,7 @@ namespace Uniray
                                 openModalNewProject = true;
                                 break;
                         }
-                        FileManager = c;
+                        UI.Components["fileManager"] = c;
                     }
                 }
             }
@@ -528,19 +530,19 @@ namespace Uniray
         {
             if (files.Count != 0)
             {
-                string directory = fileManager.GetLastFile().Split("\\")[0];
+                string directory = ((Container)UI.Components["fileManager"]).GetLastFile().Split("\\")[0];
                 string aimedDirectory = files[0].Split("\\")[0];
-                string name = fileManager.GetLastFile().Split("\\").Last();
+                string name = ((Container)UI.Components["fileManager"]).GetLastFile().Split("\\").Last();
 
                 // Check if there needs to be a recheck for the files
                 if (directory == aimedDirectory)
                 {
                     if (!files.Exists(e => e.EndsWith(name)))
                     {
-                        string extension = fileManager.GetLastFile().Split('.').Last();
-                        if (extension == fileManager.ExtensionFile)
+                        string extension = ((Container)UI.Components["fileManager"]).GetLastFile().Split('.').Last();
+                        if (extension == ((Container)UI.Components["fileManager"]).ExtensionFile)
                         {
-                            files.Add(fileManager.GetLastFile());
+                            files.Add(((Container)UI.Components["fileManager"]).GetLastFile());
                         }
                     }
                 }
@@ -549,8 +551,8 @@ namespace Uniray
                 {
                     int positionX = (i + 9) % 8;
                     if (positionX == 0) _ = 8;
-                    int xPos = (int)fileManager.X + 150 * (i + 1) - 100;
-                    int yPos = (int)fileManager.Y + 60;
+                    int xPos = UI.Components["fileManager"].X + 150 * (i + 1) - 100;
+                    int yPos = UI.Components["fileManager"].Y + 60;
                     DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
                     string[] pathArryBySlash = files[i].Split('/');
                     DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), baseFont);
@@ -575,7 +577,7 @@ namespace Uniray
                         if (IsMouseButtonReleased(MouseButton.Left))
                         {
                             // Import model into the scene
-                            if (mouse.X > gameManager.X + gameManager.Width + 10 && mouse.Y < fileManager.Y - 10 && selectedFile.Split('.').Last() == "m3d")
+                            if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && selectedFile.Split('.').Last() == "m3d")
                             {
                                 string modelKey = selectedFile.Split('/').Last().Split('.')[0];
 
@@ -596,7 +598,10 @@ namespace Uniray
                                 selectedElement = currentScene.GameObjects.Last();
                             }
                             // Import texture in game object attributes
-                            else if (mouse.X > gameManager.X + 100 && mouse.X < gameManager.X + 350 && mouse.Y > gameManager.Y + gameManager.Height / 2 + 300 && mouse.Y < gameManager.Y + gameManager.Height / 2 + 320 && selectedFile.Split('.').Last() == "png")
+                            else if (mouse.X > UI.Components["gameManager"].X + 100 && mouse.X < UI.Components["gameManager"].X + 350 && 
+                                mouse.Y > UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 300 
+                                && mouse.Y < UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 320 
+                                && selectedFile.Split('.').Last() == "png")
                             {
                                 if (selectedElement != null)
                                 {
@@ -637,10 +642,13 @@ namespace Uniray
                 else throw new Exception($"Could not load the assets of project {path}");
 
                 // Change to default assets page of the manager container
-                Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "");
-                fileManager.ExtensionFile = "m3d";
-                fileManager.Tag = "models";
-                fileManager.OutputFilePath = directory + "/assets/models";
+                Label fileType = new Label(
+                    UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2, 
+                    UI.Components["fileManager"].Y + UI.Components["fileManager"].Height / 2, 
+                    "");
+                ((Container)UI.Components["fileManager"]).ExtensionFile = "m3d";
+                ((Container)UI.Components["fileManager"]).Tag = "models";
+                ((Container)UI.Components["fileManager"]).OutputFilePath = directory + "/assets/models";
                 fileType.Text = "File type : .m3d";
                 labels.RemoveAt(labels.IndexOf(labels.Last()));
                 labels.Add(fileType);
@@ -739,7 +747,7 @@ namespace Uniray
                     write.WriteLine(file[i]);
                 }
                 write.Close();
-                fileManager.OutputFilePath = path + "\\assets\\models\\";
+                ((Container)UI.Components["fileManager"]).OutputFilePath = path + "\\assets\\models\\";
 
                 SetWindowTitle("Uniray - " + name);
 
@@ -998,7 +1006,7 @@ namespace Uniray
         /// <returns></returns>
         public int CheckCollisionScreenToWorld(GameObject3D go, Mesh mesh, Vector2 mousePos, Matrix4x4 transform)
         {
-            if (mousePos.X > gameManager.X + gameManager.Width && mousePos.Y < fileManager.Y - 10 && IsMouseButtonPressed(MouseButton.Left))
+            if (mousePos.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width && mousePos.Y < UI.Components["fileManager"].Y - 10 && IsMouseButtonPressed(MouseButton.Left))
             {
 
                 goCollision = GetRayCollisionMesh(mouseRay, mesh, transform);
@@ -1029,83 +1037,72 @@ namespace Uniray
             buttons = new List<Button>();
             labels = new List<Label>();
 
-            // Containers
-            float cont1X = wWindow - wWindow / 1.25f;
-            float cont1Y = hWindow - hWindow / 3;
-            fileManager = new Container((int)cont1X, (int)cont1Y, wWindow - (int)cont1X - 10, hWindow - (int)cont1Y - 10, APPLICATION_COLOR, FOCUS_COLOR, "models");
-            fileManager.Type = ContainerType.FileDropper;
-            fileManager.ExtensionFile = "m3d";
+            modalOpenProject = (Container)UI.Components["modalTemplate"];
 
-            gameManager = new Container(10, 10, (int)cont1X - 20, hWindow - 20, APPLICATION_COLOR, FOCUS_COLOR, "gameManager");
-
-            Container modal_template = new Container(wWindow / 2 - wWindow / 6, hWindow / 2 - hWindow / 6, wWindow / 3, hWindow / 3, APPLICATION_COLOR, FOCUS_COLOR, "modal");
-
-            modalOpenProject = modal_template;
-
-            modalNewProject = modal_template;
+            modalNewProject = (Container)UI.Components["modalTemplate"];
 
             // Buttons
-            Button modelsButton = new Button("Models", (int)fileManager.X + 48, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "modelsSection");
+            Button modelsButton = new Button("Models", UI.Components["fileManager"].X + 48, UI.Components["fileManager"].Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "modelsSection");
             buttons.Add(modelsButton);
 
-            Button texturesButton = new Button("Textures", (int)fileManager.X + 164, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "texturesSection");
+            Button texturesButton = new Button("Textures", UI.Components["fileManager"].X + 164, UI.Components["fileManager"].Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "texturesSection");
             buttons.Add(texturesButton);
 
-            Button soundsButton = new Button("Sounds", (int)fileManager.X + 260, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "soundsSection");
+            Button soundsButton = new Button("Sounds", UI.Components["fileManager"].X + 260, UI.Components["fileManager"].Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "soundsSection");
             buttons.Add(soundsButton);
 
-            Button animationsButton = new Button("Animations", (int)fileManager.X + 392, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "animationsSections");
+            Button animationsButton = new Button("Animations", UI.Components["fileManager"].X + 392, UI.Components["fileManager"].Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "animationsSections");
             buttons.Add(animationsButton);
 
-            Button scriptsButton = new Button("Scripts", (int)fileManager.X + 492, (int)fileManager.Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "scriptsSections");
+            Button scriptsButton = new Button("Scripts", UI.Components["fileManager"].X + 492, UI.Components["fileManager"].Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "scriptsSections");
             buttons.Add(scriptsButton);
 
-            Button openFileButton = new Button("Open", (int)fileManager.X + fileManager.Width - 38, (int)fileManager.Y + 5, 40, 20, APPLICATION_COLOR, FOCUS_COLOR, "openExplorer") { Type = ButtonType.PathFinder };
+            Button openFileButton = new Button("Open", UI.Components["fileManager"].X + UI.Components["fileManager"].Width - 38, UI.Components["fileManager"].Y + 5, 40, 20, APPLICATION_COLOR, FOCUS_COLOR, "openExplorer") { Type = ButtonType.PathFinder };
             buttons.Add(openFileButton);
 
-            Button openProjectButton = new Button("Open project", (int)fileManager.X + fileManager.Width - 175, (int)fileManager.Y + 5, 125, 20, APPLICATION_COLOR, FOCUS_COLOR, "openProject");
+            Button openProjectButton = new Button("Open project", UI.Components["fileManager"].X + UI.Components["fileManager"].Width - 175, UI.Components["fileManager"].Y + 5, 125, 20, APPLICATION_COLOR, FOCUS_COLOR, "openProject");
             buttons.Add(openProjectButton);
 
-            Button newProjectButton = new Button("New project", (int)fileManager.X + fileManager.Width - 303, (int)fileManager.Y + 5, 50, 20, APPLICATION_COLOR, FOCUS_COLOR, "newProject");
+            Button newProjectButton = new Button("New project", UI.Components["fileManager"].X + UI.Components["fileManager"].Width - 303, UI.Components["fileManager"].Y + 5, 50, 20, APPLICATION_COLOR, FOCUS_COLOR, "newProject");
             buttons.Add(newProjectButton);
 
-            Button playButton = new Button("Play", (GetScreenWidth() - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, APPLICATION_COLOR, FOCUS_COLOR, "play");
+            Button playButton = new Button("Play", (GetScreenWidth() - UI.Components["gameManager"].Width - 20) / 2 + UI.Components["gameManager"].Width + 20, 10, 100, 30, APPLICATION_COLOR, FOCUS_COLOR, "play");
             buttons.Add(playButton);
 
-            Button addGameObject = new Button("+", (int)gameManager.X + gameManager.Width - 20, (int)gameManager.Y + 10, 10, 15, APPLICATION_COLOR, FOCUS_COLOR, "addGameObject");
+            Button addGameObject = new Button("+", UI.Components["gameManager"].X + UI.Components["gameManager"].Width - 20, UI.Components["gameManager"].Y + 10, 10, 15, APPLICATION_COLOR, FOCUS_COLOR, "addGameObject");
             buttons.Add(addGameObject);
 
-            closeModal = new Button("x", (int)modal_template.X + modal_template.Width - 30, (int)modal_template.Y + 10, 20, 20, Color.Red, FOCUS_COLOR, "closeModal");
+            closeModal = new Button("x", (int)UI.Components["modalTemplate"].X + UI.Components["modalTemplate"].Width - 30, (int)UI.Components["modalTemplate"].Y + 10, 20, 20, Color.Red, FOCUS_COLOR, "closeModal");
 
-            okModalOpen = new Button("Proceed", (int)modal_template.X + modal_template.Width - 70, (int)modal_template.Y + modal_template.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalOpen");
+            okModalOpen = new Button("Proceed", (int)UI.Components["modalTemplate"].X + UI.Components["modalTemplate"].Width - 70, (int)UI.Components["modalTemplate"].Y + UI.Components["modalTemplate"].Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalOpen");
 
-            okModalNew = new Button("Proceed", (int)modal_template.X + modal_template.Width - 70, (int)modal_template.Y + modal_template.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalNew");
+            okModalNew = new Button("Proceed", (int)UI.Components["modalTemplate"].X + UI.Components["modalTemplate"].Width - 70, (int)UI.Components["modalTemplate"].Y + UI.Components["modalTemplate"].Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalNew");
 
             // Textboxes
-            Textbox goTexture = new Textbox((int)gameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 290, gameManager.Width - 120, 40, "", APPLICATION_COLOR, FOCUS_COLOR);
+            Textbox goTexture = new Textbox(UI.Components["gameManager"].X + 100, UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 290, UI.Components["gameManager"].Width - 120, 40, "", APPLICATION_COLOR, FOCUS_COLOR);
             textboxes.Add(goTexture);
 
-            openProjTxb = new Textbox((int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
+            openProjTxb = new Textbox((int)UI.Components["modalTemplate"].X + 20, (int)UI.Components["modalTemplate"].Y + 70, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
 
-            newProjTxb = new Textbox((int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
+            newProjTxb = new Textbox((int)UI.Components["modalTemplate"].X + 20, (int)UI.Components["modalTemplate"].Y + 70, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
 
-            newProjNameTxb = new Textbox((int)modal_template.X + 20, (int)modal_template.Y + 120, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
+            newProjNameTxb = new Textbox((int)UI.Components["modalTemplate"].X + 20, (int)UI.Components["modalTemplate"].Y + 120, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
 
             // Labels
-            Label gameLayersLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + 10, "Game Layers");
+            Label gameLayersLabel = new Label(UI.Components["gameManager"].X + 10, UI.Components["gameManager"].Y + 10, "Game Layers");
             labels.Add(gameLayersLabel);
 
-            Label goTextureLabel = new Label((int)gameManager.X + 20, (int)gameManager.Y + gameManager.Height / 2 + 300, "Texture");
+            Label goTextureLabel = new Label(UI.Components["gameManager"].X + 20, UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 300, "Texture");
             labels.Add(goTextureLabel);
 
-            Label gameObjectLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + hWindow / 2, "Game Object");
+            Label gameObjectLabel = new Label(UI.Components["gameManager"].X + 10, UI.Components["gameManager"].Y + hWindow / 2, "Game Object");
             labels.Add(gameObjectLabel);
 
-            Label fileType = new Label((int)fileManager.X + (int)fileManager.Width / 2, (int)fileManager.Y + (int)fileManager.Height / 2, "File type : .m3d");
+            Label fileType = new Label(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2, UI.Components["fileManager"].Y + UI.Components["fileManager"].Height / 2, "File type : .m3d");
             labels.Add(fileType);
 
             // Initialize the error handler
-            errorHandler = new ErrorHandler(new Vector2((fileManager.X + fileManager.Width / 2) - 150, fileManager.Y - 60), font);
+            errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), font);
 
             this.wWindow = wWindow;
             this.hWindow = hWindow;

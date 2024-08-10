@@ -61,7 +61,8 @@ namespace Uniray
                 // ============================================================= MANAGE 3D ENVIRONMENT =====================================================================
                 // =========================================================================================================================================================
                 
-                if (Hover((int)uniray.GameManager.X + uniray.GameManager.Width + 10, 0, wWindow - uniray.GameManager.Width - 20, hWindow - uniray.FileManager.Height - 20))
+                if (Hover(uniray.UI.Components["gameManager"].X + uniray.UI.Components["gameManager"].Width + 
+                    10, 0, wWindow - uniray.UI.Components["gameManager"].Width - 20, hWindow - uniray.UI.Components["fileManager"].Height - 20))
                 {
                     if (IsMouseButtonReleased(MouseButton.Middle))
                     {
