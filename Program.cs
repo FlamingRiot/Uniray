@@ -108,7 +108,7 @@ namespace Uniray
 
                 DrawGrid(10, 10);
 
-                if (uniray.CurrentProject is not null) uniray.DrawScene();
+                if (Uniray.Data.CurrentProject is not null) uniray.DrawScene();
 
                 EndMode3D();
 

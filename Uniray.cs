@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
 using Uniray._2D;
+using Uniray.Managment;
 
 namespace Uniray
 {
@@ -54,6 +55,8 @@ namespace Uniray
         // 2D related attributes
         public UI UI;
 
+        public static UData Data;
+
         private int hWindow;
 
         private int wWindow;
@@ -61,8 +64,6 @@ namespace Uniray
         private bool openModalOpenProject;
 
         private bool openModalNewProject;
-
-        private Project? currentProject;
 
         private Font baseFont;
 
@@ -88,8 +89,6 @@ namespace Uniray
 
         private List<Textbox> textboxes;
 
-        private List<Button> buttons;
-
         private List<Label> labels;
 
         private ErrorHandler errorHandler;
@@ -109,8 +108,6 @@ namespace Uniray
 
         private GameObject3D? selectedElement;
 
-        private string? selectedFile;
-
         private Camera3D envCamera;
 
         private RenderTexture2D cameraView;
@@ -128,11 +125,8 @@ namespace Uniray
         private RayCollision zCollision;
 
         private RayCollision goCollision;
-
-        public List<Button> Buttons { get { return buttons; } }
         public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
         public Scene CurrentScene { get { return currentScene; } }
-        public Project CurrentProject { get { return currentProject; } }
         /// <summary>
         /// Main constructor
         /// </summary>
@@ -148,10 +142,8 @@ namespace Uniray
             cameraViewRec = new Rectangle(0, 0, WWindow / 2, -(HWindow / 2));
 
             selectedElement = null;
-            selectedFile = null;
             openModalOpenProject = false;
             openModalNewProject = false;
-            currentProject = null;
             mouseRay = new Ray();
             xCollision = new RayCollision();
             yCollision = new RayCollision();
@@ -170,6 +162,7 @@ namespace Uniray
             cameraMaterial = LoadMaterialDefault();
             SetMaterialTexture(ref cameraMaterial, MaterialMapIndex.Diffuse, LoadTexture("data/cameraTex.png"));
 
+            Data = new UData();
             UI = new UI(WWindow, HWindow, font);
             BuildUI(WWindow, HWindow, font);
         }
@@ -314,10 +307,6 @@ namespace Uniray
             DrawRectangle(0, 0, (int)(wWindow - wWindow / 1.25f), hWindow, new Color(20, 20, 20, 255));
             DrawRectangle(0, hWindow - hWindow / 3 - 10, wWindow, hWindow - (hWindow - hWindow / 3) + 10, new Color(20, 20, 20, 255));
 
-            // Restart the new focus check
-            bool focus = false;
-
-
             UI.Draw();
 
             // Tick the error handler for the errors to potentially disappear
@@ -326,7 +315,7 @@ namespace Uniray
             string new_File = "";
             new_File = ((Container)UI.Components["fileManager"]).GetLastFile();
             new_File = new_File.Replace('\\', '/');
-            if (new_File != "" && currentProject is not null)
+            if (new_File != "" && Data.CurrentProject is not null)
             {
                 switch (new_File.Split('.').Last())
                 {
@@ -360,11 +349,8 @@ namespace Uniray
             }
 
             foreach (Label label in labels) { DrawLabel(label, baseFont); }
-            foreach (Button button in buttons)
-            {
-                DrawButton(button, baseFont);
-                if (Hover(button.X, button.Y, button.Width, button.Height)) { focus = true; }
-            }switch (UI.Components["fileManager"].Tag)
+
+            switch (UI.Components["fileManager"].Tag)
             {
                 case "models":
                     DrawManagerFiles(ref modelsPathList);
@@ -387,13 +373,7 @@ namespace Uniray
             {
                 Textbox textbox = textboxes[i];
                 textboxes[i] = DrawTextbox(ref textbox, baseFont);
-                if (Hover(textbox.X, textbox.Y, textbox.Width, textbox.Height)) { focus = true; }
-                if (Hover(newProjTxb.X, newProjTxb.Y, newProjTxb.Width, newProjTxb.Height)) { focus = true; }
-                if (Hover(openProjTxb.X, openProjTxb.Y, openProjTxb.Width, openProjTxb.Height)) { focus = true; }
-                if (Hover(newProjNameTxb.X, newProjNameTxb.Y, newProjNameTxb.Width, newProjNameTxb.Height)) { focus = true; }
             }
-
-            if (!focus && selectedFile is null) { SetMouseCursor(MouseCursor.Default); }
 
             // Render the selected camera view to the top right corner of the screen
             if (selectedElement is UCamera)
@@ -445,80 +425,9 @@ namespace Uniray
                     CreateProject(project_path, project_name);
                 }
             }
-            if (IsKeyPressed(KeyboardKey.F5) && currentProject is not null)
+            if (IsKeyPressed(KeyboardKey.F5) && Data.CurrentProject is not null)
             {
-                BuildProject(currentProject.Path);
-            }
-
-            // =========================================================================================================================================================
-            // ============================================================= MANAGE CUSTOM BUTTONS =====================================================================
-            // =========================================================================================================================================================
-            foreach (Button section in buttons)
-            {
-                if (section.Type == ButtonType.Custom)
-                {
-                    if (IsButtonPressed(section))
-                    {
-                        Container c = (Container)UI.Components["fileManager"];
-                        Label fileType = new(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2, UI.Components["fileManager"].Y + UI.Components["fileManager"].Height / 2, "");
-                        switch (section.Tag)
-                        {
-                            case "modelsSection":
-                                c.ExtensionFile = "m3d";
-                                c.Tag = "models";
-                                if (currentProject is not null) c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/models";
-                                fileType.Text = "File type : .m3d";
-                                labels.RemoveAt(labels.IndexOf(labels.Last()));
-                                labels.Add(fileType);
-                                break;
-                            case "texturesSection":
-                                c.ExtensionFile = "png";
-                                c.Tag = "textures";
-                                if (currentProject is not null) c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/textures";
-                                fileType.Text = "File type : .png";
-                                labels.RemoveAt(labels.IndexOf(labels.Last()));
-                                labels.Add(fileType);
-                                break;
-                            case "soundsSection":
-                                c.ExtensionFile = "wav";
-                                c.Tag = "sounds";
-                                if (currentProject is not null) c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/sounds";
-                                fileType.Text = "File type : .wav";
-                                labels.RemoveAt(labels.IndexOf(labels.Last()));
-                                labels.Add(fileType);
-                                break;
-                            case "animationsSections":
-                                c.ExtensionFile = "m3d";
-                                c.Tag = "animations";
-                                if (currentProject is not null) c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/animations";
-                                fileType.Text = "File type : .m3d";
-                                labels.RemoveAt(labels.IndexOf(labels.Last()));
-                                labels.Add(fileType);
-                                break;
-                            case "scriptsSections":
-                                c.ExtensionFile = "cs";
-                                c.Tag = "scripts";
-                                if (currentProject is not null) c.OutputFilePath = Path.GetDirectoryName(currentProject.Path) + "/assets/scripts";
-                                fileType.Text = "File type : .cs";
-                                labels.RemoveAt(labels.IndexOf(labels.Last()));
-                                labels.Add(fileType);
-                                break;
-                            case "play":
-                                if (currentProject is not null)
-                                {
-                                    BuildProject(currentProject.Path);
-                                }
-                                break;
-                            case "openProject":
-                                openModalOpenProject = true;
-                                break;
-                            case "newProject":
-                                openModalNewProject = true;
-                                break;
-                        }
-                        UI.Components["fileManager"] = c;
-                    }
-                }
+                BuildProject(Data.CurrentProject.Path);
             }
         }
 
@@ -562,7 +471,7 @@ namespace Uniray
                     {
                         if (IsMouseButtonDown(MouseButton.Left))
                         {
-                            selectedFile = files[i];
+                            Data.SelectedFile = files[i];
                             SetMouseCursor(MouseCursor.PointingHand);
                         }
                         if (IsMouseButtonPressed(MouseButton.Middle))
@@ -572,14 +481,14 @@ namespace Uniray
                             files.Remove(files[i]);
                         }
                     }
-                    if (selectedFile is not null)
+                    if (Data.SelectedFile is not null)
                     {
                         if (IsMouseButtonReleased(MouseButton.Left))
                         {
                             // Import model into the scene
-                            if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && selectedFile.Split('.').Last() == "m3d")
+                            if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && Data.SelectedFile.Split('.').Last() == "m3d")
                             {
-                                string modelKey = selectedFile.Split('/').Last().Split('.')[0];
+                                string modelKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
 
                                 if (Ressource.ModelExists(modelKey))
                                 {
@@ -587,7 +496,7 @@ namespace Uniray
                                 }
                                 else
                                 {
-                                    Model m = LoadModel(selectedFile);
+                                    Model m = LoadModel(Data.SelectedFile);
                                     for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
                                         m.Meshes[0].Colors[j] = 255;
                                     UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
@@ -601,15 +510,15 @@ namespace Uniray
                             else if (mouse.X > UI.Components["gameManager"].X + 100 && mouse.X < UI.Components["gameManager"].X + 350 && 
                                 mouse.Y > UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 300 
                                 && mouse.Y < UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 320 
-                                && selectedFile.Split('.').Last() == "png")
+                                && Data.SelectedFile.Split('.').Last() == "png")
                             {
                                 if (selectedElement != null)
                                 {
-                                    string dictionaryKey = selectedFile.Split('/').Last().Split('.')[0];
+                                    string dictionaryKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
                                     ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement))).SetTexture(dictionaryKey, Ressource.GetTexture(dictionaryKey));
                                 }
                             }
-                            selectedFile = null;
+                            Data.SelectedFile = null;
                         }
                     }
                 }
@@ -654,8 +563,8 @@ namespace Uniray
                 labels.Add(fileType);
 
                 // Load scenes along with their game objects
-                currentProject = new Project(project_name, path, LoadScenes(directory));
-                currentScene = currentProject.GetScene(0);
+                Data.CurrentProject = new Project(project_name, path, LoadScenes(directory));
+                currentScene = Data.CurrentProject.GetScene(0);
                 SetWindowTitle("Uniray - " + project_name);
 
                 TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
@@ -671,17 +580,17 @@ namespace Uniray
         /// </summary>
         public void SaveProject()
         {
-            if (currentProject != null)
+            if (Data.CurrentProject != null)
             {
                 string[] jsons = JsonfyGos(currentScene.GameObjects);
                 string? path;
-                if (currentProject.Path.Contains('.'))
+                if (Data.CurrentProject.Path.Contains('.'))
                 {
-                    path = Path.GetDirectoryName(currentProject.Path);
+                    path = Path.GetDirectoryName(Data.CurrentProject.Path);
                 }
                 else
                 {
-                    path = currentProject.Path;
+                    path = Data.CurrentProject.Path;
                 }
                 
                 StreamWriter stream = new (path + "/scenes/new_scene/locs.json", false);
@@ -769,9 +678,9 @@ namespace Uniray
 
                 Scene defaultScene = new(new List<GameObject3D> { ucamera });
                 List<Scene> scenes = new() { defaultScene };
-                currentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
+                Data.CurrentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
                 Ressource = new Ressource();
-                currentScene = currentProject.GetScene(0);
+                currentScene = Data.CurrentProject.GetScene(0);
                 selectedElement = null;
 
                 TraceLog(TraceLogLevel.Warning, "Project \"" + name + "\" has been created");
@@ -1034,43 +943,11 @@ namespace Uniray
         {
             // Instantiate lists of components
             textboxes = new List<Textbox>();
-            buttons = new List<Button>();
             labels = new List<Label>();
 
             modalOpenProject = (Container)UI.Components["modalTemplate"];
 
             modalNewProject = (Container)UI.Components["modalTemplate"];
-
-            // Buttons
-            Button modelsButton = new Button("Models", UI.Components["fileManager"].X + 48, UI.Components["fileManager"].Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "modelsSection");
-            buttons.Add(modelsButton);
-
-            Button texturesButton = new Button("Textures", UI.Components["fileManager"].X + 164, UI.Components["fileManager"].Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "texturesSection");
-            buttons.Add(texturesButton);
-
-            Button soundsButton = new Button("Sounds", UI.Components["fileManager"].X + 260, UI.Components["fileManager"].Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "soundsSection");
-            buttons.Add(soundsButton);
-
-            Button animationsButton = new Button("Animations", UI.Components["fileManager"].X + 392, UI.Components["fileManager"].Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "animationsSections");
-            buttons.Add(animationsButton);
-
-            Button scriptsButton = new Button("Scripts", UI.Components["fileManager"].X + 492, UI.Components["fileManager"].Y, 60, 25, APPLICATION_COLOR, FOCUS_COLOR, "scriptsSections");
-            buttons.Add(scriptsButton);
-
-            Button openFileButton = new Button("Open", UI.Components["fileManager"].X + UI.Components["fileManager"].Width - 38, UI.Components["fileManager"].Y + 5, 40, 20, APPLICATION_COLOR, FOCUS_COLOR, "openExplorer") { Type = ButtonType.PathFinder };
-            buttons.Add(openFileButton);
-
-            Button openProjectButton = new Button("Open project", UI.Components["fileManager"].X + UI.Components["fileManager"].Width - 175, UI.Components["fileManager"].Y + 5, 125, 20, APPLICATION_COLOR, FOCUS_COLOR, "openProject");
-            buttons.Add(openProjectButton);
-
-            Button newProjectButton = new Button("New project", UI.Components["fileManager"].X + UI.Components["fileManager"].Width - 303, UI.Components["fileManager"].Y + 5, 50, 20, APPLICATION_COLOR, FOCUS_COLOR, "newProject");
-            buttons.Add(newProjectButton);
-
-            Button playButton = new Button("Play", (GetScreenWidth() - UI.Components["gameManager"].Width - 20) / 2 + UI.Components["gameManager"].Width + 20, 10, 100, 30, APPLICATION_COLOR, FOCUS_COLOR, "play");
-            buttons.Add(playButton);
-
-            Button addGameObject = new Button("+", UI.Components["gameManager"].X + UI.Components["gameManager"].Width - 20, UI.Components["gameManager"].Y + 10, 10, 15, APPLICATION_COLOR, FOCUS_COLOR, "addGameObject");
-            buttons.Add(addGameObject);
 
             closeModal = new Button("x", (int)UI.Components["modalTemplate"].X + UI.Components["modalTemplate"].Width - 30, (int)UI.Components["modalTemplate"].Y + 10, 20, 20, Color.Red, FOCUS_COLOR, "closeModal");
 
@@ -1097,9 +974,6 @@ namespace Uniray
 
             Label gameObjectLabel = new Label(UI.Components["gameManager"].X + 10, UI.Components["gameManager"].Y + hWindow / 2, "Game Object");
             labels.Add(gameObjectLabel);
-
-            Label fileType = new Label(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2, UI.Components["fileManager"].Y + UI.Components["fileManager"].Height / 2, "File type : .m3d");
-            labels.Add(fileType);
 
             // Initialize the error handler
             errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), font);
