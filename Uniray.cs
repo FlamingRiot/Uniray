@@ -87,10 +87,6 @@ namespace Uniray
 
         private Button okModalNew;
 
-        private List<Textbox> textboxes;
-
-        private List<Label> labels;
-
         private ErrorHandler errorHandler;
 
         // 3D related attributes
@@ -348,8 +344,6 @@ namespace Uniray
                 }
             }
 
-            foreach (Label label in labels) { DrawLabel(label, baseFont); }
-
             switch (UI.Components["fileManager"].Tag)
             {
                 case "models":
@@ -369,12 +363,6 @@ namespace Uniray
                     break;
             }
 
-            for (int i = 0; i < textboxes.Count; i++) 
-            {
-                Textbox textbox = textboxes[i];
-                textboxes[i] = DrawTextbox(ref textbox, baseFont);
-            }
-
             // Render the selected camera view to the top right corner of the screen
             if (selectedElement is UCamera)
             {
@@ -382,7 +370,7 @@ namespace Uniray
                 DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(wWindow - wWindow / 5 - 10, 10, wWindow / 5, hWindow / 5), Vector2.Zero, 0, Color.White);
             }
 
-            if (openModalOpenProject)
+            /*if (openModalOpenProject)
             {
                 DrawRectanglePro(new Rectangle(0, 0, wWindow, hWindow), Vector2.Zero, 0, new Color(0, 0, 0, 75));
                 DrawContainer(ref modalOpenProject);
@@ -400,9 +388,42 @@ namespace Uniray
                     openModalOpenProject = false;
                     LoadProject(openProjTxb.Text);
                 }
+            }*/
+            // Draw the currently displayed modal and define its state
+            if (Data.CurrentModal is not null)
+            {
+                UI.DrawModal(Data.CurrentModal);
+
+                // If the user closed the modal without proceeding
+                if (Data.LastModalExitCode == 0)
+                {
+                    Data.CurrentModal = null;
+                    Data.LastModalExitCode = null;
+                }
+                // If the user closed the modal by proceeding
+                else if (Data.LastModalExitCode == 1)
+                {
+                    switch (Data.CurrentModal)
+                    {
+                        // Open project modal
+                        case "openProjectModal":
+                            LoadProject(((Textbox)UI.Modals[Data.CurrentModal].Components["openProjectTextbox"]).Text);
+                            Data.CurrentModal = null;
+                            Data.LastModalExitCode = null;
+                            break;
+                        // Create project modal
+                        case "newProjectModal":
+                            string path = ((Textbox)UI.Modals[Data.CurrentModal].Components["newProjectTextbox1"]).Text;
+                            string name = ((Textbox)UI.Modals[Data.CurrentModal].Components["newProjectTextbox2"]).Text;
+                            CreateProject(path, name);
+                            Data.CurrentModal = null;
+                            Data.LastModalExitCode = null;
+                            break;
+                    }
+                }
             }
 
-            if (openModalNewProject)
+            /*if (openModalNewProject)
             {
                 DrawRectanglePro(new Rectangle(0, 0, wWindow, hWindow), Vector2.Zero, 0, new Color(0, 0, 0, 75));
                 DrawContainer(ref modalNewProject);
@@ -424,7 +445,7 @@ namespace Uniray
                     string project_name = newProjNameTxb.Text;
                     CreateProject(project_path, project_name);
                 }
-            }
+            }*/
             if (IsKeyPressed(KeyboardKey.F5) && Data.CurrentProject is not null)
             {
                 BuildProject(Data.CurrentProject.Path);
@@ -551,16 +572,10 @@ namespace Uniray
                 else throw new Exception($"Could not load the assets of project {path}");
 
                 // Change to default assets page of the manager container
-                Label fileType = new Label(
-                    UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2, 
-                    UI.Components["fileManager"].Y + UI.Components["fileManager"].Height / 2, 
-                    "");
                 ((Container)UI.Components["fileManager"]).ExtensionFile = "m3d";
                 ((Container)UI.Components["fileManager"]).Tag = "models";
                 ((Container)UI.Components["fileManager"]).OutputFilePath = directory + "/assets/models";
-                fileType.Text = "File type : .m3d";
-                labels.RemoveAt(labels.IndexOf(labels.Last()));
-                labels.Add(fileType);
+                ((Label)UI.Components["ressourceInfoLabel"]).Text = "File type : .m3d";
 
                 // Load scenes along with their game objects
                 Data.CurrentProject = new Project(project_name, path, LoadScenes(directory));
@@ -941,9 +956,6 @@ namespace Uniray
         /// </summary>
         public void BuildUI(int wWindow, int hWindow, Font font)
         {
-            // Instantiate lists of components
-            textboxes = new List<Textbox>();
-            labels = new List<Label>();
 
             modalOpenProject = (Container)UI.Components["modalTemplate"];
 
@@ -955,29 +967,16 @@ namespace Uniray
 
             okModalNew = new Button("Proceed", (int)UI.Components["modalTemplate"].X + UI.Components["modalTemplate"].Width - 70, (int)UI.Components["modalTemplate"].Y + UI.Components["modalTemplate"].Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalNew");
 
-            // Textboxes
-            Textbox goTexture = new Textbox(UI.Components["gameManager"].X + 100, UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 290, UI.Components["gameManager"].Width - 120, 40, "", APPLICATION_COLOR, FOCUS_COLOR);
-            textboxes.Add(goTexture);
-
             openProjTxb = new Textbox((int)UI.Components["modalTemplate"].X + 20, (int)UI.Components["modalTemplate"].Y + 70, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
 
             newProjTxb = new Textbox((int)UI.Components["modalTemplate"].X + 20, (int)UI.Components["modalTemplate"].Y + 70, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
 
             newProjNameTxb = new Textbox((int)UI.Components["modalTemplate"].X + 20, (int)UI.Components["modalTemplate"].Y + 120, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
 
-            // Labels
-            Label gameLayersLabel = new Label(UI.Components["gameManager"].X + 10, UI.Components["gameManager"].Y + 10, "Game Layers");
-            labels.Add(gameLayersLabel);
-
-            Label goTextureLabel = new Label(UI.Components["gameManager"].X + 20, UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 300, "Texture");
-            labels.Add(goTextureLabel);
-
-            Label gameObjectLabel = new Label(UI.Components["gameManager"].X + 10, UI.Components["gameManager"].Y + hWindow / 2, "Game Object");
-            labels.Add(gameObjectLabel);
-
             // Initialize the error handler
             errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), font);
 
+            // Update the size variables if needed
             this.wWindow = wWindow;
             this.hWindow = hWindow;
         }

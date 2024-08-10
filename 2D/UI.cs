@@ -1,14 +1,28 @@
-﻿using RayGUI_cs;
+﻿using Newtonsoft.Json.Bson;
+using RayGUI_cs;
 using Raylib_cs;
+using System.Reflection;
 
 namespace Uniray._2D
 {
     public class UI
     {
         /// <summary>
+        /// Width of the UI
+        /// </summary>
+        private int width;
+        /// <summary>
+        /// Height of the UI 
+        /// </summary>
+        private int height;
+        /// <summary>
         /// The list of every components in the UI
         /// </summary>
         public Dictionary<string, Component> Components;
+        /// <summary>
+        /// The list of every modals in the UI that are accessible
+        /// </summary>
+        public Dictionary<string, Modal> Modals;
         /// <summary>
         /// UI Font
         /// </summary>
@@ -17,6 +31,14 @@ namespace Uniray._2D
         /// UI Font
         /// </summary>
         public Font Font { get { return font; } set { font = value; } }
+        /// <summary>
+        /// Width of the UI
+        /// </summary>
+        public int Width { get { return width; } set { width = value; } }
+        /// <summary>
+        /// Height of the UI
+        /// </summary>
+        public int Height { get { return height; } set { height = value; } }
         /// <summary>
         /// UI Constructor
         /// </summary>
@@ -27,7 +49,12 @@ namespace Uniray._2D
         {
             // Instanciate the components dictionary
             Components = new Dictionary<string, Component>();
+            // Instanciate the modals dictionary
+            Modals = new Dictionary<string, Modal>();
+            // Instanciate font and size of the UI
             this.font = font;
+            this.width = width;
+            this.height = height;
 
             // Create the UI components
             int cont1X = (int)(width - width / 1.25f);
@@ -80,10 +107,12 @@ namespace Uniray._2D
 
             // Open project button
             Button openProjectButton = new Button("Open project", fileManager.X + fileManager.Width - 175, fileManager.Y + 5, 125, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "openProject");
+            openProjectButton.Event = OpenProject;
             Components.Add("openProjectButton", openProjectButton);
 
             // New project button
             Button newProjectButton = new Button("New project", fileManager.X + fileManager.Width - 303, fileManager.Y + 5, 50, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "newProject");
+            newProjectButton.Event = NewProject;
             Components.Add("newProjectButton", newProjectButton);
 
             // Play/Build button
@@ -94,16 +123,68 @@ namespace Uniray._2D
             // Labels
             // Ressource info label
             Label ressourceInfoLabel = new Label(Components["fileManager"].X + Components["fileManager"].Width / 2, Components["fileManager"].Y + Components["fileManager"].Height / 2, "");
+            ressourceInfoLabel.Text = "File type: .m3d";
             Components.Add("ressourceInfoLabel", ressourceInfoLabel);
 
+            // Game layer label
+            Label gameLayersLabel = new Label(Components["gameManager"].X + 10, Components["gameManager"].Y + 10, "Game Layers");
+            Components.Add("gameLayerLabel", gameLayersLabel);
+
+            // Texture field label
+            Label goTextureLabel = new Label(Components["gameManager"].X + 20, Components["gameManager"].Y + Components["gameManager"].Height / 2 + 300, "Texture");
+            Components.Add("textureLabel", goTextureLabel);
+
+            // Game object label
+            Label gameObjectLabel = new Label(Components["gameManager"].X + 10, Components["gameManager"].Y + height / 2, "Game Object");
+            Components.Add("gameObjectLabel", gameObjectLabel);
+
+            // Textboxes
+            // Texture field textbox
+            Textbox txb = new Textbox(Components["gameManager"].X + 100, Components["gameManager"].Y + Components["gameManager"].Height / 2 + 290, Components["gameManager"].Width - 120, 40, "", Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            Components.Add("textureTextbox", txb);
+
+            // Modals
+            Button okModalButton = new Button("Proceed", Components["modalTemplate"].X + Components["modalTemplate"].Width - 70, Components["modalTemplate"].Y + Components["modalTemplate"].Height - 30, 60, 20, Color.Lime, Uniray.FOCUS_COLOR);
+            okModalButton.Event = OkModal;
+            Button closeModalButton = new Button("x", Components["modalTemplate"].X + Components["modalTemplate"].Width - 30, Components["modalTemplate"].Y + 10, 20, 20, Color.Red, Uniray.FOCUS_COLOR);
+            closeModalButton.Event = CloseModal;
+            // Open project modal
+            Dictionary<string, Component> openProjModalComponents = new Dictionary<string, Component>();
+            Label openProjectLabel = new Label(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 50, "Copy .uproj link");
+            openProjModalComponents.Add("openProjectLabel", openProjectLabel);
+            Textbox openProjectTextbox = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 70, 250, 20, "", Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            openProjModalComponents.Add("openProjectTextbox", openProjectTextbox);
+            openProjModalComponents.Add("closeModalButton", closeModalButton);
+            openProjModalComponents.Add("okModalButton", okModalButton);
+
+            Modals.Add("openProjectModal", new Modal(openProjModalComponents));
+
+            // New project modal
+            Dictionary<string, Component> newProjModalComponents = new Dictionary<string, Component>();
+            Label newProjectLabel1 = new Label(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 50, "Copy target directory path");
+            newProjModalComponents.Add("newProjectLabel1", newProjectLabel1);
+            Label newProjectLabel2 = new Label(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 100, "Choose your project name");
+            newProjModalComponents.Add("newProjectLabel2", newProjectLabel2);
+            Textbox newProjectTextbox1 = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 70, 250, 20, "", Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            newProjModalComponents.Add("newProjectTextbox1", newProjectTextbox1);
+            Textbox newProjectTextbox2 = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 120, 250, 20, "", Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            newProjModalComponents.Add("newProjectTextbox2", newProjectTextbox2);
+            newProjModalComponents.Add("closeModalButton", closeModalButton);
+            newProjModalComponents.Add("okModalButton", okModalButton);
+
+            Modals.Add("newProjectModal", new Modal(newProjModalComponents));
         }
         /// <summary>
         /// Draw the UI of the application
         /// </summary>
         public void Draw()
         {
+            DrawComponents(Components);
+        }
+        private void DrawComponents(Dictionary<string, Component> components)
+        {
             bool focus = false;
-            foreach (KeyValuePair<string, Component> component in Components)
+            foreach (KeyValuePair<string, Component> component in components)
             {
                 switch (component.Value)
                 {
@@ -113,7 +194,8 @@ namespace Uniray._2D
                         break;
                     case Textbox textbox:
                         RayGUI.DrawTextbox(ref textbox, Font);
-                        Components[component.Key] = textbox;
+                        components[component.Key] = textbox;
+                        if (RayGUI.Hover(textbox.X, textbox.Y, textbox.Width, textbox.Height)) { focus = true; }
                         break;
                     case Label label:
                         RayGUI.DrawLabel(label, Font);
@@ -129,7 +211,7 @@ namespace Uniray._2D
                         RayGUI.DrawDragDropBox(dragDropBox);
                         break;
                     case Container container:
-                        RayGUI.DrawContainer(ref container);
+                        if (container.Tag != "modal") RayGUI.DrawContainer(ref container);
                         Components[component.Key] = container;
                         break;
 
@@ -138,24 +220,18 @@ namespace Uniray._2D
             if (!focus && Uniray.Data.SelectedFile is null) { Raylib.SetMouseCursor(MouseCursor.Default); }
         }
         /// <summary>
-        /// Update the UI components and check interactions
+        /// Draw a give modal
         /// </summary>
-        public void Update()
+        /// <param name="key">Key of the modal to draw</param>
+        public void DrawModal(string key)
         {
-            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
-            {
-                foreach (KeyValuePair<string, Component> component in Components)
-                {
-                    switch (component.Value)
-                    {
-                        case Button button:
-                            button.Activate();
-                            break;
-                    }
-                }
-            }
+            Raylib.DrawRectangle(0, 0, width, height, new Color(0, 0, 0, 75));
+            RayGUI.DrawContainer((Container)Components["modalTemplate"]);
+            DrawComponents(Modals[key].Components);
         }
-        
+        /// <summary>
+        /// Set the file manager to the models page
+        /// </summary>
         private void UpdateToModel()
         {
             ((Container)Components["fileManager"]).ExtensionFile = "m3d";
@@ -164,6 +240,9 @@ namespace Uniray._2D
                 ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/models";
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .m3d";
         }
+        /// <summary>
+        /// Set the file manager to the textures page
+        /// </summary>
         private void UpdateToTexture()
         {
             ((Container)Components["fileManager"]).ExtensionFile = "png";
@@ -172,6 +251,9 @@ namespace Uniray._2D
                 ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/textures";
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .png";
         }
+        /// <summary>
+        /// Set the file manager to the sounds page
+        /// </summary>
         private void UpdateToSound()
         {
             ((Container)Components["fileManager"]).ExtensionFile = "wav";
@@ -180,6 +262,9 @@ namespace Uniray._2D
                 ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/sounds";
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .wav";
         }
+        /// <summary>
+        /// Set the file manager to the animations page
+        /// </summary>
         private void UpdateToAnimation()
         {
             ((Container)Components["fileManager"]).ExtensionFile = "m3d";
@@ -188,6 +273,9 @@ namespace Uniray._2D
                 ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/animations";
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .m3d";
         }
+        /// <summary>
+        /// Set the file manager to the scripts page
+        /// </summary>
         private void UpdateToScript()
         {
             ((Container)Components["fileManager"]).ExtensionFile = "cs";
@@ -205,6 +293,34 @@ namespace Uniray._2D
                 string commmand = "/C cd " + projectPath + " && dotnet run --project uniray_Project.csproj";
                 System.Diagnostics.Process.Start("CMD.exe", commmand);
             }
+        }
+        /// <summary>
+        /// Send exit code for positive response on open project modal
+        /// </summary>
+        private void CloseModal()
+        {
+            Uniray.Data.LastModalExitCode = 0;
+        }
+        /// <summary>
+        /// Send exit code for negative response on new project modal
+        /// </summary>
+        private void OkModal()
+        {
+            Uniray.Data.LastModalExitCode = 1;
+        }
+        /// <summary>
+        /// Open the 'new project' modal
+        /// </summary>
+        private void OpenProject()
+        {
+            Uniray.Data.CurrentModal = "openProjectModal";
+        }
+        /// <summary>
+        /// Open the 'open project' modal
+        /// </summary>
+        private void NewProject()
+        {
+            Uniray.Data.CurrentModal = "newProjectModal";
         }
     }
 }
