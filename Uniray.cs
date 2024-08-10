@@ -158,9 +158,12 @@ namespace Uniray
             cameraMaterial = LoadMaterialDefault();
             SetMaterialTexture(ref cameraMaterial, MaterialMapIndex.Diffuse, LoadTexture("data/cameraTex.png"));
 
+            // Intitialize UI
             Data = new UData();
             UI = new UI(WWindow, HWindow, font);
-            BuildUI(WWindow, HWindow, font);
+            // Initialize the error handler
+            errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), font);
+
         }
         public void DrawScene()
         {
@@ -297,12 +300,16 @@ namespace Uniray
             // Check if the window has been resized to adjust the size of the UI
             if (IsWindowResized())
             {
-                BuildUI(GetScreenWidth(), GetScreenHeight(), baseFont);
+                wWindow = GetScreenWidth();
+                hWindow = GetScreenHeight();
+                UI = new UI(wWindow, hWindow, baseFont);
+                
             }
             // Draw the outline rectangles that appear behind the main panels
             DrawRectangle(0, 0, (int)(wWindow - wWindow / 1.25f), hWindow, new Color(20, 20, 20, 255));
             DrawRectangle(0, hWindow - hWindow / 3 - 10, wWindow, hWindow - (hWindow - hWindow / 3) + 10, new Color(20, 20, 20, 255));
 
+            // Draw the entire UI and handle the events related to it
             UI.Draw();
 
             // Tick the error handler for the errors to potentially disappear
@@ -343,7 +350,7 @@ namespace Uniray
                         break;
                 }
             }
-
+            // Draw the files along with their name in the file manager
             switch (UI.Components["fileManager"].Tag)
             {
                 case "models":
@@ -370,25 +377,6 @@ namespace Uniray
                 DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(wWindow - wWindow / 5 - 10, 10, wWindow / 5, hWindow / 5), Vector2.Zero, 0, Color.White);
             }
 
-            /*if (openModalOpenProject)
-            {
-                DrawRectanglePro(new Rectangle(0, 0, wWindow, hWindow), Vector2.Zero, 0, new Color(0, 0, 0, 75));
-                DrawContainer(ref modalOpenProject);
-                DrawLabel(new Label((int)modalOpenProject.X + 20, (int)modalOpenProject.Y + 50, "Copy .uproj file link"), baseFont);
-                DrawTextbox(ref openProjTxb, baseFont);
-                DrawButton(closeModal, baseFont);
-                DrawButton(okModalOpen, baseFont);
-
-                if (IsButtonPressed(closeModal)) 
-                {
-                    openModalOpenProject = false;
-                }
-                else if (IsButtonPressed(okModalOpen))
-                {
-                    openModalOpenProject = false;
-                    LoadProject(openProjTxb.Text);
-                }
-            }*/
             // Draw the currently displayed modal and define its state
             if (Data.CurrentModal is not null)
             {
@@ -422,30 +410,7 @@ namespace Uniray
                     }
                 }
             }
-
-            /*if (openModalNewProject)
-            {
-                DrawRectanglePro(new Rectangle(0, 0, wWindow, hWindow), Vector2.Zero, 0, new Color(0, 0, 0, 75));
-                DrawContainer(ref modalNewProject);
-                DrawLabel(new Label((int)modalNewProject.X + 20, (int)modalNewProject.Y + 50, "Copy target directory path"), baseFont);
-                DrawLabel(new Label((int)modalNewProject.X + 20, (int)modalNewProject.Y + 100, "Create your project name"), baseFont);
-                DrawTextbox(ref newProjTxb, baseFont);
-                DrawTextbox(ref newProjNameTxb, baseFont);
-                DrawButton(closeModal, baseFont);
-                DrawButton(okModalNew, baseFont);
-
-                if (IsButtonPressed(closeModal))
-                {
-                    openModalNewProject = false;
-                }
-                else if (IsButtonPressed(okModalNew))
-                {
-                    openModalNewProject = false;
-                    string project_path = newProjTxb.Text;
-                    string project_name = newProjNameTxb.Text;
-                    CreateProject(project_path, project_name);
-                }
-            }*/
+            // Check the shortcut for game building
             if (IsKeyPressed(KeyboardKey.F5) && Data.CurrentProject is not null)
             {
                 BuildProject(Data.CurrentProject.Path);
@@ -947,38 +912,6 @@ namespace Uniray
             {
                 return -1;
             }
-        }
-        /// <summary>
-        /// Build the 2-Dimensional UI according to the window size
-        /// <param name="WWindow">Window width</param>
-        /// <param name="HWindow">Window height</param>
-        /// <param name="font">Used font for the UI</param>
-        /// </summary>
-        public void BuildUI(int wWindow, int hWindow, Font font)
-        {
-
-            modalOpenProject = (Container)UI.Components["modalTemplate"];
-
-            modalNewProject = (Container)UI.Components["modalTemplate"];
-
-            closeModal = new Button("x", (int)UI.Components["modalTemplate"].X + UI.Components["modalTemplate"].Width - 30, (int)UI.Components["modalTemplate"].Y + 10, 20, 20, Color.Red, FOCUS_COLOR, "closeModal");
-
-            okModalOpen = new Button("Proceed", (int)UI.Components["modalTemplate"].X + UI.Components["modalTemplate"].Width - 70, (int)UI.Components["modalTemplate"].Y + UI.Components["modalTemplate"].Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalOpen");
-
-            okModalNew = new Button("Proceed", (int)UI.Components["modalTemplate"].X + UI.Components["modalTemplate"].Width - 70, (int)UI.Components["modalTemplate"].Y + UI.Components["modalTemplate"].Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalNew");
-
-            openProjTxb = new Textbox((int)UI.Components["modalTemplate"].X + 20, (int)UI.Components["modalTemplate"].Y + 70, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
-
-            newProjTxb = new Textbox((int)UI.Components["modalTemplate"].X + 20, (int)UI.Components["modalTemplate"].Y + 70, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
-
-            newProjNameTxb = new Textbox((int)UI.Components["modalTemplate"].X + 20, (int)UI.Components["modalTemplate"].Y + 120, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
-
-            // Initialize the error handler
-            errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), font);
-
-            // Update the size variables if needed
-            this.wWindow = wWindow;
-            this.hWindow = hWindow;
         }
         /// <summary>
         /// Rotate a model according to the mouse delta
