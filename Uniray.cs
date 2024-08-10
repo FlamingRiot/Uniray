@@ -6,12 +6,6 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
-using System;
-using System.Reflection;
-using Newtonsoft.Json.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
-using System.Runtime.CompilerServices;
 
 namespace Uniray
 {
@@ -139,7 +133,7 @@ namespace Uniray
         public Scene CurrentScene { get { return currentScene; } }
         public Project CurrentProject { get { return currentProject; } }
         /// <summary>
-        /// Construct UI
+        /// Main constructor
         /// </summary>
         public Uniray(int WWindow, int HWindow, Font font, Scene scene)
         {
@@ -534,19 +528,19 @@ namespace Uniray
         {
             if (files.Count != 0)
             {
-                string directory = fileManager.Files.Last().Split("\\")[0];
+                string directory = fileManager.GetLastFile().Split("\\")[0];
                 string aimedDirectory = files[0].Split("\\")[0];
-                string name = fileManager.Files.Last().Split("\\").Last();
+                string name = fileManager.GetLastFile().Split("\\").Last();
 
                 // Check if there needs to be a recheck for the files
                 if (directory == aimedDirectory)
                 {
                     if (!files.Exists(e => e.EndsWith(name)))
                     {
-                        string extension = fileManager.Files.Last().Split('.').Last();
+                        string extension = fileManager.GetLastFile().Split('.').Last();
                         if (extension == fileManager.ExtensionFile)
                         {
-                            files.Add(fileManager.Files.Last());
+                            files.Add(fileManager.GetLastFile());
                         }
                     }
                 }
@@ -1088,14 +1082,14 @@ namespace Uniray
             okModalNew = new Button("Proceed", (int)modal_template.X + modal_template.Width - 70, (int)modal_template.Y + modal_template.Height - 30, 60, 20, Color.Lime, FOCUS_COLOR, "okModalNew");
 
             // Textboxes
-            Textbox goTexture = new Textbox("", (int)gameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 290, gameManager.Width - 120, 40, APPLICATION_COLOR, FOCUS_COLOR);
+            Textbox goTexture = new Textbox((int)gameManager.X + 100, (int)gameManager.Y + gameManager.Height / 2 + 290, gameManager.Width - 120, 40, "", APPLICATION_COLOR, FOCUS_COLOR);
             textboxes.Add(goTexture);
 
-            openProjTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+            openProjTxb = new Textbox((int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
 
-            newProjTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+            newProjTxb = new Textbox((int)modal_template.X + 20, (int)modal_template.Y + 70, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
 
-            newProjNameTxb = new Textbox("", (int)modal_template.X + 20, (int)modal_template.Y + 120, 250, 20, APPLICATION_COLOR, FOCUS_COLOR);
+            newProjNameTxb = new Textbox((int)modal_template.X + 20, (int)modal_template.Y + 120, 250, 20, "", APPLICATION_COLOR, FOCUS_COLOR);
 
             // Labels
             Label gameLayersLabel = new Label((int)gameManager.X + 10, (int)gameManager.Y + 10, "Game Layers");
