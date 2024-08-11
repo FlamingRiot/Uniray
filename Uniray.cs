@@ -1,5 +1,6 @@
 ﻿using static Raylib_cs.Raylib;
 using static Raylib_cs.Raymath;
+using static Raylib_cs.Rlgl;
 using Raylib_cs;
 using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
@@ -112,6 +113,16 @@ namespace Uniray
         private RayCollision yCollision;
 
         private RayCollision zCollision;
+
+        // Shader related attributes
+        /// <summary>
+        /// Outline shader used for rendering an outline around the currently selected GameObjects
+        /// </summary>
+        private Shader outlineShader;
+        /// <summary>
+        /// The used material to render the outline shader
+        /// </summary>
+        private Material outlineMaterial;
         /// <summary>
         /// The property of the camera used to communicate with the main program
         /// </summary>
@@ -125,6 +136,11 @@ namespace Uniray
         /// <param name="scene">A default scene to be used until the user loads/create a project</param>
         public Uniray(int WWindow, int HWindow, Font font, Scene scene)
         {
+            // Outline shader instanciations
+            outlineShader = LoadShader("data/shaders/outline.vs", "data/shaders/outline.fs");
+            outlineMaterial = LoadMaterialDefault();
+            outlineMaterial.Shader = outlineShader;
+
             // Intitialize the default scene and the render camera for Uniray
             currentScene = scene;
             envCamera = new Camera3D();
@@ -176,6 +192,19 @@ namespace Uniray
             Vector2 mousePos = GetMousePosition();
             mouseRay = GetMouseRay(mousePos, EnvCamera);
 
+            // Render the outlined selected GameObject and deactive the Raylib culling to make it possible
+            SetCullFace(ZERO);
+            switch (selectedElement)
+            {
+                case UModel model:
+                    DrawMesh(model.Mesh, outlineMaterial, model.Transform);
+                    break;
+                case UCamera camera:
+                    DrawMesh(cameraModel.Meshes[0], outlineMaterial, camera.Transform);
+                    break;
+            }
+            SetCullFace(ONE);
+
             // Draw 3-Dimensional models of the current scene and check for a hypothetical new selected object
             int index = -1;
             foreach (GameObject3D go in currentScene.GameObjects)
@@ -183,13 +212,11 @@ namespace Uniray
                 // Manage objects drawing + object selection (according to the object type)
                 if (go is UModel)
                 {
-                    //DrawModel(((UModel)go).Model, go.Position, 1, Color.White);
                     DrawMesh(((UModel)go).Mesh, ((UModel)go).Material, ((UModel)go).Transform);
                     if (index == -1) index = CheckCollisionScreenToWorld(go, ((UModel)go).Mesh, mousePos, ((UModel)go).Transform);
                 }
                 else if (go is UCamera)
                 {
-                    //DrawModel(cameraModel, go.Position, 1, Color.White);
                     DrawMesh(cameraModel.Meshes[0], cameraMaterial, ((UCamera)go).Transform);
                     if (index == -1) index = CheckCollisionScreenToWorld(go, cameraModel.Meshes[0], mousePos, ((UCamera)go).Transform);
                 }
@@ -204,7 +231,8 @@ namespace Uniray
             // Draw directional arrows
             if (selectedElement != null) 
             {
-                if (IsMouseButtonDown(MouseButton.Left))
+
+                /*if (IsMouseButtonDown(MouseButton.Left))
                 {
                     xCollision = GetRayCollisionBox(mouseRay, new BoundingBox(xArrowBox.Min + selectedElement.Position, xArrowBox.Max + selectedElement.Position));
                     yCollision = GetRayCollisionBox(mouseRay, new BoundingBox(yArrowBox.Min + selectedElement.Position, yArrowBox.Max + selectedElement.Position));
@@ -218,7 +246,7 @@ namespace Uniray
                 DrawModelEx(arrow, selectedElement.Position, Vector3.UnitZ, 270, new Vector3(2), Color.Green);
                 DrawModelEx(arrow, selectedElement.Position, Vector3.UnitY, 0, new Vector3(2), Color.Red);
                 DrawModelEx(arrow, selectedElement.Position, Vector3.UnitX, 270, new Vector3(2), Color.Blue);
-
+                */
                 if (IsKeyPressed(KeyboardKey.Delete))
                 {
                     currentScene.GameObjects.Remove(selectedElement);
