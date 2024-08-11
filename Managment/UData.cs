@@ -1,4 +1,4 @@
-﻿namespace Uniray.Managment
+﻿namespace Uniray
 {
     public class UData
     {

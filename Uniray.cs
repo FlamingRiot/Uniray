@@ -6,39 +6,32 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
-using Uniray._2D;
-using Uniray.Managment;
 
 namespace Uniray
 {
-    public unsafe partial struct Uniray
+    public unsafe struct Uniray
     {
+        /// <summary>
+        /// Public application main color
+        /// </summary>
         public static readonly Color APPLICATION_COLOR = new Color(30, 30, 30, 255);
+        /// <summary>
+        /// Public application secondary color
+        /// </summary>
         public static readonly Color FOCUS_COLOR = new Color(60, 60, 60, 255);
-        public Texture2D fileTex = LoadTexture("data/file.png");
 
-        // =========================================================================================================================================================
-        // ================================================================= SEMI-CONSTANTS ========================================================================
-        // =========================================================================================================================================================
-
+        /// <summary>
+        /// The object containing all the assets that have been loaded in the RAM
+        /// </summary>
         public static Ressource Ressource;
-
+        /// <summary>
+        /// The object containing all the short-life/interactive informations of the application
+        /// </summary>
+        public static UData Data;
         /// <summary>
         /// Directionnal arrows model loading
         /// </summary>
         public Model arrow = LoadModelFromMesh(GenMeshCylinder(0.05f, 0.7f, 20));
-        /// <summary>
-        /// 3D model of the displayed scene camera
-        /// </summary>
-        public Model cameraModel;
-        /// <summary>
-        /// Material of the generic camera model used for the application
-        /// </summary>
-        public Material cameraMaterial;
-        /// <summary>
-        /// Collision with the mouse and camera
-        /// </summary>
-        public RayCollision cameraCollision;
         /// <summary>
         /// Y arrow box
         /// </summary>
@@ -53,44 +46,36 @@ namespace Uniray
         public BoundingBox zArrowBox = new BoundingBox(new Vector3(0f, -0.1f, -0.1f), new Vector3(1.4f, 0.1f, 0.1f));
 
         // 2D related attributes
+        /// <summary>
+        /// The UI of the application
+        /// </summary>
         public UI UI;
-
-        public static UData Data;
-
-        private int hWindow;
-
-        private int wWindow;
-
-        private bool openModalOpenProject;
-
-        private bool openModalNewProject;
-
-        private Font baseFont;
-
-       // private Container fileManager;
-
-       // private Container gameManager;
-
-        private Container modalOpenProject;
-
-        private Container modalNewProject;
-
-        private Textbox openProjTxb;
-
-        private Textbox newProjTxb;
-
-        private Textbox newProjNameTxb;
-
-        private Button closeModal;
-
-        private Button okModalOpen;
-
-        private Button okModalNew;
-
+        /// <summary>
+        /// The texture used for rendering files in the file manager
+        /// </summary>
+        private Texture2D fileTex;
+        /// <summary>
+        /// RenderTexture used for the selected camera's POV
+        /// </summary>
+        private RenderTexture2D cameraView;
+        /// <summary>
+        /// The rectangle used to render the selected camera's POV
+        /// </summary>
+        private Rectangle cameraViewRec;
+        /// <summary>
+        /// The error handler system of the application
+        /// </summary>
         private ErrorHandler errorHandler;
 
         // 3D related attributes
+        /// <summary>
+        /// The currently displayed scene
+        /// </summary>
         private Scene currentScene;
+        /// <summary>
+        /// The currently selected GameObject
+        /// </summary>
+        private GameObject3D? selectedElement;
 
         private List<string> modelsPathList;
 
@@ -101,65 +86,78 @@ namespace Uniray
         private List<string> animationsPathList;
 
         private List<string> scriptPathList;
-
-        private GameObject3D? selectedElement;
-
+        /// <summary>
+        /// The used camera for rendering the 3D of the application
+        /// </summary>
         private Camera3D envCamera;
-
-        private RenderTexture2D cameraView;
-
-        private Rectangle cameraViewRec;
-
-        // Collision related variables
-
+        /// <summary>
+        /// The Ray used to check collisions between the 2D and 3D world
+        /// </summary>
         private Ray mouseRay;
+        /// <summary>
+        /// The collision detection used for the GameObjects
+        /// </summary>
+        private RayCollision goCollision;
+        /// <summary>
+        /// 3D model of the displayed scene camera
+        /// </summary>
+        public Model cameraModel;
+        /// <summary>
+        /// Material of the generic camera model used for the application
+        /// </summary>
+        public Material cameraMaterial;
 
         private RayCollision xCollision;
 
         private RayCollision yCollision;
 
         private RayCollision zCollision;
-
-        private RayCollision goCollision;
-        public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
-        public Scene CurrentScene { get { return currentScene; } }
         /// <summary>
-        /// Main constructor
+        /// The property of the camera used to communicate with the main program
         /// </summary>
+        public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
+        /// <summary>
+        /// Uniray constructor
+        /// </summary>
+        /// <param name="WWindow">The width of the window</param>
+        /// <param name="HWindow">The height of the window</param>
+        /// <param name="font">The base font that will be used for the application UI</param>
+        /// <param name="scene">A default scene to be used until the user loads/create a project</param>
         public Uniray(int WWindow, int HWindow, Font font, Scene scene)
         {
-            wWindow = WWindow;
-            hWindow = HWindow;
-            baseFont = font;
+            // Intitialize the default scene and the render camera for Uniray
             currentScene = scene;
             envCamera = new Camera3D();
 
+            // Create the render texture for preview of a camera's POV
             cameraView = LoadRenderTexture(WWindow / 2, HWindow / 2);
             cameraViewRec = new Rectangle(0, 0, WWindow / 2, -(HWindow / 2));
 
+            // 3D-2D Collision variables
             selectedElement = null;
-            openModalOpenProject = false;
-            openModalNewProject = false;
             mouseRay = new Ray();
             xCollision = new RayCollision();
             yCollision = new RayCollision();
             zCollision = new RayCollision();
             goCollision = new RayCollision();
-            cameraCollision = new RayCollision();
 
+            // Instanciate all the assets lists of filepath
             modelsPathList = new List<string>();
             texturesPathList = new List<string>();
             soundsPathList = new List<string>();
             animationsPathList = new List<string>();
             scriptPathList = new List<string>();
 
-            // Load camera model
+            // Load the Uniray camera model and apply its texture
             cameraModel = LoadModel("data/camera.m3d");
             cameraMaterial = LoadMaterialDefault();
             SetMaterialTexture(ref cameraMaterial, MaterialMapIndex.Diffuse, LoadTexture("data/cameraTex.png"));
+            // Load some required textures
+            fileTex = LoadTexture("data/file.png");
 
-            // Intitialize UI
+            // Initialize the Data
             Data = new UData();
+            // Intitialize UI
             UI = new UI(WWindow, HWindow, font);
             // Initialize the error handler
             errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), font);
@@ -261,7 +259,7 @@ namespace Uniray
             }
 
             // Draw the scene all over again for the camera render, if activated
-            if (selectedElement is UCamera)
+            if (selectedElement is UCamera cam)
             {
                 EndMode3D();
 
@@ -269,7 +267,7 @@ namespace Uniray
 
                 ClearBackground(new Color(70, 70, 70, 255));
 
-                BeginMode3D(((UCamera)selectedElement).Camera);
+                BeginMode3D(cam.Camera);
 
                 DrawGrid(10, 10);
 
@@ -300,14 +298,11 @@ namespace Uniray
             // Check if the window has been resized to adjust the size of the UI
             if (IsWindowResized())
             {
-                wWindow = GetScreenWidth();
-                hWindow = GetScreenHeight();
-                UI = new UI(wWindow, hWindow, baseFont);
-                
+                UI = new UI(GetScreenWidth(), GetScreenHeight(), UI.Font);   
             }
             // Draw the outline rectangles that appear behind the main panels
-            DrawRectangle(0, 0, (int)(wWindow - wWindow / 1.25f), hWindow, new Color(20, 20, 20, 255));
-            DrawRectangle(0, hWindow - hWindow / 3 - 10, wWindow, hWindow - (hWindow - hWindow / 3) + 10, new Color(20, 20, 20, 255));
+            DrawRectangle(0, 0, (int)(UI.Width - UI.Width / 1.25f), UI.Height, new Color(20, 20, 20, 255));
+            DrawRectangle(0, UI.Height - UI.Height / 3 - 10, UI.Width, UI.Height - (UI.Height - UI.Height / 3) + 10, new Color(20, 20, 20, 255));
 
             // Draw the entire UI and handle the events related to it
             UI.Draw();
@@ -370,11 +365,11 @@ namespace Uniray
                     break;
             }
 
-            // Render the selected camera view to the top right corner of the screen
+            // Render the selected camera POV to the top right corner of the screen
             if (selectedElement is UCamera)
             {
-                DrawRectangleLinesEx(new Rectangle(wWindow - wWindow / 5 - 11, 9, wWindow / 5 + 2, hWindow / 5 + 2), 2, Color.White);
-                DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(wWindow - wWindow / 5 - 10, 10, wWindow / 5, hWindow / 5), Vector2.Zero, 0, Color.White);
+                DrawRectangleLinesEx(new Rectangle(UI.Width - UI.Width / 5 - 11, 9, UI.Width / 5 + 2, UI.Height / 5 + 2), 2, Color.White);
+                DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(UI.Width - UI.Width / 5 - 10, 10, UI.Width / 5, UI.Height / 5), Vector2.Zero, 0, Color.White);
             }
 
             // Draw the currently displayed modal and define its state
@@ -450,7 +445,7 @@ namespace Uniray
                     int yPos = UI.Components["fileManager"].Y + 60;
                     DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
                     string[] pathArryBySlash = files[i].Split('/');
-                    DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), baseFont);
+                    DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), UI.Font);
 
                     Vector2 mouse = GetMousePosition();
                     if (mouse.X < xPos + fileTex.Width && mouse.X > xPos && mouse.Y < yPos + fileTex.Height && mouse.Y > yPos)
@@ -585,7 +580,8 @@ namespace Uniray
             }
             else
             {
-                openModalNewProject = true;
+                // Open modal for the user to create a new project
+                Data.CurrentModal = "newProjectModal";
             }
         }
 
