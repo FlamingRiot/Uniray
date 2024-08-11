@@ -29,22 +29,6 @@ namespace Uniray
         /// The object containing all the short-life/interactive informations of the application
         /// </summary>
         public static UData Data;
-        /// <summary>
-        /// Directionnal arrows model loading
-        /// </summary>
-        public Model arrow = LoadModelFromMesh(GenMeshCylinder(0.05f, 0.7f, 20));
-        /// <summary>
-        /// Y arrow box
-        /// </summary>
-        public BoundingBox yArrowBox = new BoundingBox(new Vector3(-0.1f, 0f, -0.1f), new Vector3(0.1f, 1.4f, 0.1f));
-        /// <summary>
-        /// X arrow box
-        /// </summary>
-        public BoundingBox xArrowBox = new BoundingBox(new Vector3(-0.1f, -0.1f, -1.4f), new Vector3(0.1f, 0.1f, 0f));
-        /// <summary>
-        /// Z arrow box
-        /// </summary>
-        public BoundingBox zArrowBox = new BoundingBox(new Vector3(0f, -0.1f, -0.1f), new Vector3(1.4f, 0.1f, 0.1f));
 
         // 2D related attributes
         /// <summary>
@@ -108,12 +92,6 @@ namespace Uniray
         /// </summary>
         public Material cameraMaterial;
 
-        private RayCollision xCollision;
-
-        private RayCollision yCollision;
-
-        private RayCollision zCollision;
-
         // Shader related attributes
         /// <summary>
         /// Outline shader used for rendering an outline around the currently selected GameObjects
@@ -152,9 +130,6 @@ namespace Uniray
             // 3D-2D Collision variables
             selectedElement = null;
             mouseRay = new Ray();
-            xCollision = new RayCollision();
-            yCollision = new RayCollision();
-            zCollision = new RayCollision();
             goCollision = new RayCollision();
 
             // Instanciate all the assets lists of filepath
@@ -227,26 +202,10 @@ namespace Uniray
             {
                 selectedElement = currentScene.GetGameObject(index);
             }
-
-            // Draw directional arrows
+            
+            // Manage GameObjects interaction
             if (selectedElement != null) 
             {
-
-                /*if (IsMouseButtonDown(MouseButton.Left))
-                {
-                    xCollision = GetRayCollisionBox(mouseRay, new BoundingBox(xArrowBox.Min + selectedElement.Position, xArrowBox.Max + selectedElement.Position));
-                    yCollision = GetRayCollisionBox(mouseRay, new BoundingBox(yArrowBox.Min + selectedElement.Position, yArrowBox.Max + selectedElement.Position));
-                    zCollision = GetRayCollisionBox(mouseRay, new BoundingBox(zArrowBox.Min + selectedElement.Position, zArrowBox.Max + selectedElement.Position));
-
-                    if (xCollision.Hit) { currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)).Z -= GetMouseDelta().X / 100; }
-                    if (yCollision.Hit) { currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)).Y -= GetMouseDelta().Y / 100; }
-                    if (zCollision.Hit) { currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)).X -= GetMouseDelta().X / 100; }
-                }
-
-                DrawModelEx(arrow, selectedElement.Position, Vector3.UnitZ, 270, new Vector3(2), Color.Green);
-                DrawModelEx(arrow, selectedElement.Position, Vector3.UnitY, 0, new Vector3(2), Color.Red);
-                DrawModelEx(arrow, selectedElement.Position, Vector3.UnitX, 270, new Vector3(2), Color.Blue);
-                */
                 if (IsKeyPressed(KeyboardKey.Delete))
                 {
                     currentScene.GameObjects.Remove(selectedElement);
