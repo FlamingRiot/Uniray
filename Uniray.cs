@@ -61,6 +61,10 @@ namespace Uniray
         /// The currently selected GameObject
         /// </summary>
         private GameObject3D? selectedElement;
+        /// <summary>
+        /// The built-in shaders of Uniray
+        /// </summary>
+        private UShaders shaders;
 
         private List<string> modelsPathList;
 
@@ -84,6 +88,10 @@ namespace Uniray
         /// </summary>
         private RayCollision goCollision;
         /// <summary>
+        /// 3D model of the skybox
+        /// </summary>
+        private Model skybox;
+        /// <summary>
         /// 3D model of the displayed scene camera
         /// </summary>
         public Model cameraModel;
@@ -91,20 +99,14 @@ namespace Uniray
         /// Material of the generic camera model used for the application
         /// </summary>
         public Material cameraMaterial;
-
-        // Shader related attributes
-        /// <summary>
-        /// Outline shader used for rendering an outline around the currently selected GameObjects
-        /// </summary>
-        private Shader outlineShader;
-        /// <summary>
-        /// The used material to render the outline shader
-        /// </summary>
-        private Material outlineMaterial;
         /// <summary>
         /// The property of the camera used to communicate with the main program
         /// </summary>
         public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
+        /// <summary>
+        /// The currently used scene
+        /// </summary>
+        public Scene CurrentScene { get { return currentScene; } }
         /// <summary>
         /// Uniray constructor
         /// </summary>
@@ -114,10 +116,8 @@ namespace Uniray
         /// <param name="scene">A default scene to be used until the user loads/create a project</param>
         public Uniray(int WWindow, int HWindow, Font font, Scene scene)
         {
-            // Outline shader instanciations
-            outlineShader = LoadShader("data/shaders/outline.vs", "data/shaders/outline.fs");
-            outlineMaterial = LoadMaterialDefault();
-            outlineMaterial.Shader = outlineShader;
+            // Intitialize the Uniray shaders
+            shaders = new UShaders();
 
             // Intitialize the default scene and the render camera for Uniray
             currentScene = scene;
@@ -145,6 +145,8 @@ namespace Uniray
             SetMaterialTexture(ref cameraMaterial, MaterialMapIndex.Diffuse, LoadTexture("data/cameraTex.png"));
             // Load some required textures
             fileTex = LoadTexture("data/file.png");
+            // Load the skybox model
+            skybox = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
 
             // Initialize the Data
             Data = new UData();
@@ -172,10 +174,10 @@ namespace Uniray
             switch (selectedElement)
             {
                 case UModel model:
-                    DrawMesh(model.Mesh, outlineMaterial, model.Transform);
+                    DrawMesh(model.Mesh, shaders.OutlineMaterial, model.Transform);
                     break;
                 case UCamera camera:
-                    DrawMesh(cameraModel.Meshes[0], outlineMaterial, camera.Transform);
+                    DrawMesh(cameraModel.Meshes[0], shaders.OutlineMaterial, camera.Transform);
                     break;
             }
             SetCullFace(ONE);

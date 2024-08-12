@@ -118,6 +118,7 @@ namespace Uniray
 
                 EndDrawing();
             }
+
             CloseWindow();
         }
 
