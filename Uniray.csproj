@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Raylib-cs" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +24,9 @@
     <Reference Include="RayGUI_cs">
       <HintPath>data\libraries\RayGUI_cs\RayGUI_cs.dll</HintPath>
     </Reference>
+	<Reference Include="Raylib_cs">
+      <HintPath>data\libraries\Raylib\Raylib-cs.dll</HintPath>
+    </Reference>
   </ItemGroup>
-
+  
 </Project>

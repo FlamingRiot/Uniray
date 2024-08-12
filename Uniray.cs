@@ -115,6 +115,7 @@ namespace Uniray
         
         // Properties
         public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
+        public Mesh Skybox { get { return skybox; } set { skybox = value; } }
         /// <summary>
         /// The currently used scene
         /// </summary>
@@ -134,10 +135,9 @@ namespace Uniray
         {
             // Intitialize the Uniray shaders
             shaders = new UShaders();
-            panorama = LoadTexture("data/shaders/skyboxes/dresden_square_2k.hdr");
-            cubemap = shaders.GenTexureCubemap(panorama, 1024, PixelFormat.UncompressedR8G8B8A8);
+            panorama = LoadTexture("data/shaders/skyboxes/default.hdr");
+            cubemap = shaders.GenTexureCubemap(panorama, 2056, PixelFormat.UncompressedR8G8B8A8);
             shaders.SetCubemap(cubemap);
-            UnloadTexture(panorama);
 
             // Intitialize the default scene and the render camera for Uniray
             currentScene = scene;
@@ -188,13 +188,6 @@ namespace Uniray
             // Define a mouse ray for collision check
             Vector2 mousePos = GetMousePosition();
             mouseRay = GetMouseRay(mousePos, EnvCamera);
-
-            // Draw the external skybox 
-            DisableBackfaceCulling();
-            DisableDepthMask();
-            DrawMesh(skybox, shaders.SkyboxMaterial, MatrixIdentity());
-            EnableBackfaceCulling();
-            EnableDepthMask();
 
             // Render the outlined selected GameObject and deactive the Raylib culling to make it possible
             SetCullFace(ZERO);

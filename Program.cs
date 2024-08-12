@@ -108,6 +108,13 @@ namespace Uniray
 
                 DrawGrid(10, 10);
 
+                // Draw the external skybox 
+                Rlgl.DisableBackfaceCulling();
+                Rlgl.DisableDepthMask();
+                DrawMesh(uniray.Skybox, uniray.Shaders.SkyboxMaterial, Raymath.MatrixIdentity());
+                Rlgl.EnableBackfaceCulling();
+                Rlgl.EnableDepthMask();
+
                 if (Uniray.Data.CurrentProject is not null) uniray.DrawScene();
 
                 EndMode3D();
