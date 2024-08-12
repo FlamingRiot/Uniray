@@ -115,6 +115,9 @@ namespace Uniray
         
         // Properties
         public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
+        /// <summary>
+        /// 3D model of the skybox
+        /// </summary>
         public Mesh Skybox { get { return skybox; } set { skybox = value; } }
         /// <summary>
         /// The currently used scene
@@ -279,6 +282,13 @@ namespace Uniray
                 BeginMode3D(cam.Camera);
 
                 DrawGrid(10, 10);
+
+                // Draw the external skybox 
+                DisableBackfaceCulling();
+                DisableDepthMask();
+                DrawMesh(skybox, shaders.SkyboxMaterial, MatrixIdentity());
+                EnableBackfaceCulling();
+                EnableDepthMask();
 
                 foreach (GameObject3D go in currentScene.GameObjects)
                 {
