@@ -31,5 +31,16 @@ namespace Uniray
             outlineMaterial = LoadMaterialDefault();
             outlineMaterial.Shader = outlineShader;
         }
+        /// <summary>
+        /// Unload shaders and materials
+        /// </summary>
+        public void UnloadShaders()
+        {
+            // Unload shaders
+            UnloadShader(outlineShader);
+
+            // Unload materials
+            UnloadMaterial(outlineMaterial);
+        }
     }
 }

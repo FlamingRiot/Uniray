@@ -108,6 +108,10 @@ namespace Uniray
         /// </summary>
         public Scene CurrentScene { get { return currentScene; } }
         /// <summary>
+        /// The built-in shaders of Uniray
+        /// </summary>
+        public UShaders Shaders { get { return shaders; } }
+        /// <summary>
         /// Uniray constructor
         /// </summary>
         /// <param name="WWindow">The width of the window</param>

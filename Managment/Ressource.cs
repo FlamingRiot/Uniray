@@ -53,7 +53,21 @@ namespace Uniray
             this._sounds = new Dictionary<string, Sound>();
             this._models = new Dictionary<string, Model>();
         }
-
+        public void UnloadRessources()
+        {
+            foreach (Model m in this._models.Values)
+            {
+                Raylib.UnloadModel(m);
+            }
+            foreach (Texture2D t in this._textures.Values)
+            {
+                Raylib.UnloadTexture(t);
+            }
+            foreach (Sound s in this._sounds.Values)
+            {
+                Raylib.UnloadSound(s);
+            }
+        }
         public Texture2D GetTexture(string index)
         {
             return this._textures[index];

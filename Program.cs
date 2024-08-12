@@ -118,8 +118,18 @@ namespace Uniray
 
                 EndDrawing();
             }
-
+            // Close window
             CloseWindow();
+
+            // Unload all used ressources
+            Uniray.Ressource.UnloadRessources();
+            // Unload materials
+            foreach (GameObject3D go in uniray.CurrentScene.GameObjects)
+            {
+                if (go is UModel m) UnloadMaterial(m.Material);
+            }
+            // Unload shaders
+            uniray.Shaders.UnloadShaders();
         }
 
         /// <summary>
