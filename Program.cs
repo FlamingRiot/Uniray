@@ -16,7 +16,6 @@ namespace Uniray
             // Initialize window and set mode
             InitWindow(1800, 900, "Uniray - New Project");
             SetWindowState(ConfigFlags.ResizableWindow);
-            SetWindowState(ConfigFlags.MaximizedWindow);
             SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
 
@@ -50,6 +49,7 @@ namespace Uniray
             Scene scene = new Scene(new List<GameObject3D>());
             Uniray uniray = new Uniray(wWindow, hWindow, font, scene);
             //SetTargetFPS(30);
+            SetWindowState(ConfigFlags.MaximizedWindow);
             while (!WindowShouldClose())
             {
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.S))
