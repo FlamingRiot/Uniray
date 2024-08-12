@@ -128,12 +128,15 @@ namespace Uniray
             // Close window
             CloseWindow();
 
-            // Unload all used ressources
-            Uniray.Ressource.UnloadRessources();
-            // Unload materials
-            foreach (GameObject3D go in uniray.CurrentScene.GameObjects)
+            if (Uniray.Data.CurrentProject is not null)
             {
-                if (go is UModel m) UnloadMaterial(m.Material);
+                // Unload all used ressources
+                Uniray.Ressource.UnloadRessources();
+                // Unload materials
+                foreach (GameObject3D go in uniray.CurrentScene.GameObjects)
+                {
+                    if (go is UModel m) UnloadMaterial(m.Material);
+                }
             }
             // Unload shaders
             uniray.Shaders.UnloadShaders();
