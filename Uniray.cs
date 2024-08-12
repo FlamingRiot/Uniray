@@ -139,8 +139,10 @@ namespace Uniray
             // Intitialize the Uniray shaders
             shaders = new UShaders();
             panorama = LoadTexture("data/shaders/skyboxes/default.hdr");
-            cubemap = shaders.GenTexureCubemap(panorama, 2056, PixelFormat.UncompressedR8G8B8A8);
+            cubemap = shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
             shaders.SetCubemap(cubemap);
+            // Unload useless texture
+            UnloadTexture(panorama);
 
             // Intitialize the default scene and the render camera for Uniray
             currentScene = scene;
