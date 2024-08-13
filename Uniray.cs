@@ -7,6 +7,7 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
+using System.Windows.Input;
 
 namespace Uniray
 {
@@ -36,10 +37,6 @@ namespace Uniray
         /// </summary>
         public UI UI;
         /// <summary>
-        /// The texture used for rendering files in the file manager
-        /// </summary>
-        private Texture2D fileTex;
-        /// <summary>
         /// RenderTexture used for the selected camera's POV
         /// </summary>
         private RenderTexture2D cameraView;
@@ -53,6 +50,14 @@ namespace Uniray
         private ErrorHandler errorHandler;
 
         // File storage related attributes
+        /// <summary>
+        /// The texture used for rendering files in the file manager
+        /// </summary>
+        private Texture2D fileTex;
+        /// <summary>
+        /// The texture used for rendering folders in the file manager
+        /// </summary>
+        private Texture2D folderTex;
 
         private List<UStorage> modelsPathList;
 
@@ -112,9 +117,10 @@ namespace Uniray
         /// </summary>
         private Texture2D cubemap;
         /// <summary>
-        /// The property of the camera used to communicate with the main program
+        /// The last time a button was pressed
         /// </summary>
-        
+        private double lastTimeButtonPressed;
+
         // Properties
         public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
         /// <summary>
@@ -171,7 +177,8 @@ namespace Uniray
             cameraMaterial = LoadMaterialDefault();
             SetMaterialTexture(ref cameraMaterial, MaterialMapIndex.Diffuse, LoadTexture("data/cameraTex.png"));
             // Load some required textures
-            fileTex = LoadTexture("data/file.png");
+            fileTex = LoadTexture("data/img/file.png");
+            folderTex = LoadTexture("data/img/folder.png");
             // Load the skybox model
             skybox = GenMeshCube(1.0f, 1.0f, 1.0f);
 
@@ -465,87 +472,99 @@ namespace Uniray
                 for (int i = 0; i < files.Count; i++)
                 {
                     // Check if the passed unit storage is a folder or not
-                    if (files[i] is UFolder) { DrawManagerFiles(ref ((UFolder)files[i]).Files, ref index); }
-                    else
+                    int positionX = (i + 9) % 8;
+                    if (positionX == 0) _ = 8;
+                    int xPos = UI.Components["fileManager"].X + 150 * (index + 1) - 100;
+                    int yPos = UI.Components["fileManager"].Y + 60;
+
+                    // Shorten the text
+                    string lbl = "";
+                    if (files[i].Name.Length >= 10) { lbl = files[i].Name.Remove(5) + "..."; }
+                    else lbl = files[i].Name;
+                    if (files[i] is UFile)
                     {
-                        int positionX = (i + 9) % 8;
-                        if (positionX == 0) _ = 8;
-                        int xPos = UI.Components["fileManager"].X + 150 * (index + 1) - 100;
-                        int yPos = UI.Components["fileManager"].Y + 60;
                         DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
-                        string[] pathArryBySlash = files[i].Path.Split('/');
-                        DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), UI.Font);
-
-                        Vector2 mouse = GetMousePosition();
-                        if (mouse.X < xPos + fileTex.Width && mouse.X > xPos && mouse.Y < yPos + fileTex.Height && mouse.Y > yPos)
-                        {
-                            if (IsMouseButtonDown(MouseButton.Left))
-                            {
-                                Data.SelectedFile = files[i].Path;
-                                SetMouseCursor(MouseCursor.PointingHand);
-                            }
-                            if (IsMouseButtonPressed(MouseButton.Middle))
-                            {
-                                File.Delete(files[i].Path);
-                                switch (files[i].Path.Split('.').Last())
-                                {
-                                    case "m3d":
-                                        Ressource.DeleteModel(files[i].Name);
-                                        break;
-                                    case "png":
-                                        Ressource.DeleteTexture(files[i].Name);
-                                        break;
-                                    case "wav":
-                                        Ressource.DeleteSound(files[i].Name);
-                                        break;
-                                    case "cs":
-                                        break;
-                                }
-                                files.Remove(files[i]);
-                            }
-                        }
-                        if (Data.SelectedFile is not null)
-                        {
-                            if (IsMouseButtonReleased(MouseButton.Left))
-                            {
-                                // Import model into the scene
-                                if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && Data.SelectedFile.Split('.').Last() == "m3d")
-                                {
-                                    string modelKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
-
-                                    if (Ressource.ModelExists(modelKey))
-                                    {
-                                        currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
-                                    }
-                                    else
-                                    {
-                                        Model m = LoadModel(Data.SelectedFile);
-                                        for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                                            m.Meshes[0].Colors[j] = 255;
-                                        UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-
-                                        Ressource.AddModel(m, modelKey);
-                                        currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
-                                    }
-                                    selectedElement = currentScene.GameObjects.Last();
-                                }
-                                // Import texture in game object attributes
-                                else if (mouse.X > UI.Components["gameManager"].X + 100 && mouse.X < UI.Components["gameManager"].X + 350 &&
-                                    mouse.Y > UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 300
-                                    && mouse.Y < UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 320
-                                    && Data.SelectedFile.Split('.').Last() == "png")
-                                {
-                                    if (selectedElement != null)
-                                    {
-                                        string dictionaryKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
-                                        ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement))).SetTexture(dictionaryKey, Ressource.GetTexture(dictionaryKey));
-                                    }
-                                }
-                                Data.SelectedFile = null;
-                            }
-                        }
-                        index++;
+                        DrawLabel(new Label(xPos + 10 - lbl.Length / 2, yPos + fileTex.Height + 20, lbl), UI.Font);
                     }
+                    else if (files[i] is UFolder)
+                    {
+                        DrawPanel(new Panel(xPos, yPos, 1, 0, folderTex, ""));
+                        DrawLabel(new Label(xPos + 10 + files[i].Name.Length / 3, yPos + fileTex.Height + 20, lbl), UI.Font);
+                    }
+
+                    Vector2 mouse = GetMousePosition();
+                    if (mouse.X < xPos + fileTex.Width && mouse.X > xPos && mouse.Y < yPos + fileTex.Height && mouse.Y > yPos)
+                    {
+                        if (IsMouseButtonDown(MouseButton.Left))
+                        {
+                            Data.SelectedFile = files[i].Path;
+                            SetMouseCursor(MouseCursor.PointingHand);
+                        }
+                        if (IsMouseButtonPressedRepeat(MouseButton.Left))
+                        {
+                            if (files[i] is UFolder) Console.WriteLine("Hey you have won.. greate haha");
+                        }
+                        if (IsMouseButtonPressed(MouseButton.Middle))
+                        {
+                            File.Delete(files[i].Path);
+                            switch (files[i].Path.Split('.').Last())
+                            {
+                                case "m3d":
+                                    Ressource.DeleteModel(files[i].Name);
+                                    break;
+                                case "png":
+                                    Ressource.DeleteTexture(files[i].Name);
+                                    break;
+                                case "wav":
+                                    Ressource.DeleteSound(files[i].Name);
+                                    break;
+                                case "cs":
+                                    break;
+                            }
+                            files.Remove(files[i]);
+                        }
+                    }
+                    if (Data.SelectedFile is not null)
+                    {
+                        if (IsMouseButtonReleased(MouseButton.Left))
+                        {
+                            // Import model into the scene
+                            if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && Data.SelectedFile.Split('.').Last() == "m3d")
+                            {
+                                string modelKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
+
+                                if (Ressource.ModelExists(modelKey))
+                                {
+                                    currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
+                                }
+                                else
+                                {
+                                    Model m = LoadModel(Data.SelectedFile);
+                                    for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                                        m.Meshes[0].Colors[j] = 255;
+                                    UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+
+                                    Ressource.AddModel(m, modelKey);
+                                    currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
+                                }
+                                selectedElement = currentScene.GameObjects.Last();
+                            }
+                            // Import texture in game object attributes
+                            else if (mouse.X > UI.Components["gameManager"].X + 100 && mouse.X < UI.Components["gameManager"].X + 350 &&
+                                mouse.Y > UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 300
+                                && mouse.Y < UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 320
+                                && Data.SelectedFile.Split('.').Last() == "png")
+                            {
+                                if (selectedElement != null)
+                                {
+                                    string dictionaryKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
+                                    ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement))).SetTexture(dictionaryKey, Ressource.GetTexture(dictionaryKey));
+                                }
+                            }
+                            Data.SelectedFile = null;
+                        }
+                    }
+                    index++;
                 }
             }
         }
@@ -1050,6 +1069,27 @@ namespace Uniray
             camera.Transform = nm;
             // Set the camera Target according to the rotation matrix
 
+        }
+        /// <summary>
+        /// Check if a mouse button has been pressed repeateadly
+        /// </summary>
+        /// <param name="button"></param>
+        /// <returns></returns>
+        public bool IsMouseButtonPressedRepeat(MouseButton button)
+        {
+            double currentFrame = GetTime();
+
+            if (IsMouseButtonPressed(button))
+            {
+                if ((currentFrame - lastTimeButtonPressed) <= 0.3)
+                {
+                    lastTimeButtonPressed = 0.0;
+                    return true;
+                }
+                lastTimeButtonPressed = currentFrame;
+                return false;
+            }
+            return false;
         }
     }
 }
