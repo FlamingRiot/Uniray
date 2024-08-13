@@ -373,19 +373,19 @@ namespace Uniray
             switch (UI.Components["fileManager"].Tag)
             {
                 case "models":
-                    DrawManagerFiles(ref modelsPathList);
+                    DrawManagerFiles(modelsPathList, 0);
                     break;
                 case "textures":
-                    DrawManagerFiles(ref texturesPathList);
+                    DrawManagerFiles(texturesPathList, 0);
                     break;
                 case "sounds":
-                    DrawManagerFiles(ref soundsPathList);
+                    DrawManagerFiles(soundsPathList, 0);
                     break;
                 case "animations":
-                    DrawManagerFiles(ref animationsPathList);
+                    DrawManagerFiles(animationsPathList, 0);
                     break;
                 case "scripts":
-                    DrawManagerFiles(ref scriptPathList);
+                    DrawManagerFiles(scriptPathList, 0);
                     break;
             }
 
@@ -438,7 +438,7 @@ namespace Uniray
         /// Draw and manage the files in the bottom container
         /// </summary>
         /// <param name="files">All the files in the asset directory</param>
-        public void DrawManagerFiles(ref List<UStorage> files)
+        public void DrawManagerFiles(List<UStorage> files, int index)
         {
             if (files.Count != 0)
             {
@@ -461,68 +461,74 @@ namespace Uniray
 
                 for (int i = 0; i < files.Count; i++)
                 {
-                    int positionX = (i + 9) % 8;
-                    if (positionX == 0) _ = 8;
-                    int xPos = UI.Components["fileManager"].X + 150 * (i + 1) - 100;
-                    int yPos = UI.Components["fileManager"].Y + 60;
-                    DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
-                    string[] pathArryBySlash = files[i].Path.Split('/');
-                    DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), UI.Font);
-
-                    Vector2 mouse = GetMousePosition();
-                    if (mouse.X < xPos + fileTex.Width && mouse.X > xPos && mouse.Y < yPos + fileTex.Height && mouse.Y > yPos)
+                    // Check if the passed unit storage is a folder or not
+                    if (files[i] is UFolder) { DrawManagerFiles(((UFolder)files[i]).Files, index + 1); }
+                    else
                     {
-                        if (IsMouseButtonDown(MouseButton.Left))
-                        {
-                            Data.SelectedFile = files[i].Path;
-                            SetMouseCursor(MouseCursor.PointingHand);
-                        }
-                        if (IsMouseButtonPressed(MouseButton.Middle))
-                        {
-                            File.Delete(files[i].Path);
-                            File.Delete("..\\..\\..\\" + files[i]);
-                            files.Remove(files[i]);
-                        }
-                    }
-                    if (Data.SelectedFile is not null)
-                    {
-                        if (IsMouseButtonReleased(MouseButton.Left))
-                        {
-                            // Import model into the scene
-                            if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && Data.SelectedFile.Split('.').Last() == "m3d")
-                            {
-                                string modelKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
+                        int positionX = (i + 9) % 8;
+                        if (positionX == 0) _ = 8;
+                        int xPos = UI.Components["fileManager"].X + 150 * (index + 1) - 100;
+                        int yPos = UI.Components["fileManager"].Y + 60;
+                        DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
+                        string[] pathArryBySlash = files[i].Path.Split('/');
+                        DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), UI.Font);
 
-                                if (Ressource.ModelExists(modelKey))
-                                {
-                                    currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
-                                }
-                                else
-                                {
-                                    Model m = LoadModel(Data.SelectedFile);
-                                    for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                                        m.Meshes[0].Colors[j] = 255;
-                                    UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-
-                                    Ressource.AddModel(m, modelKey);
-                                    currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
-                                }
-                                selectedElement = currentScene.GameObjects.Last();
-                            }
-                            // Import texture in game object attributes
-                            else if (mouse.X > UI.Components["gameManager"].X + 100 && mouse.X < UI.Components["gameManager"].X + 350 && 
-                                mouse.Y > UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 300 
-                                && mouse.Y < UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 320 
-                                && Data.SelectedFile.Split('.').Last() == "png")
+                        Vector2 mouse = GetMousePosition();
+                        if (mouse.X < xPos + fileTex.Width && mouse.X > xPos && mouse.Y < yPos + fileTex.Height && mouse.Y > yPos)
+                        {
+                            if (IsMouseButtonDown(MouseButton.Left))
                             {
-                                if (selectedElement != null)
-                                {
-                                    string dictionaryKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
-                                    ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement))).SetTexture(dictionaryKey, Ressource.GetTexture(dictionaryKey));
-                                }
+                                Data.SelectedFile = files[i].Path;
+                                SetMouseCursor(MouseCursor.PointingHand);
                             }
-                            Data.SelectedFile = null;
+                            if (IsMouseButtonPressed(MouseButton.Middle))
+                            {
+                                File.Delete(files[i].Path);
+                                File.Delete("..\\..\\..\\" + files[i]);
+                                files.Remove(files[i]);
+                            }
                         }
+                        if (Data.SelectedFile is not null)
+                        {
+                            if (IsMouseButtonReleased(MouseButton.Left))
+                            {
+                                // Import model into the scene
+                                if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && Data.SelectedFile.Split('.').Last() == "m3d")
+                                {
+                                    string modelKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
+
+                                    if (Ressource.ModelExists(modelKey))
+                                    {
+                                        currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
+                                    }
+                                    else
+                                    {
+                                        Model m = LoadModel(Data.SelectedFile);
+                                        for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                                            m.Meshes[0].Colors[j] = 255;
+                                        UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+
+                                        Ressource.AddModel(m, modelKey);
+                                        currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
+                                    }
+                                    selectedElement = currentScene.GameObjects.Last();
+                                }
+                                // Import texture in game object attributes
+                                else if (mouse.X > UI.Components["gameManager"].X + 100 && mouse.X < UI.Components["gameManager"].X + 350 &&
+                                    mouse.Y > UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 300
+                                    && mouse.Y < UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 320
+                                    && Data.SelectedFile.Split('.').Last() == "png")
+                                {
+                                    if (selectedElement != null)
+                                    {
+                                        string dictionaryKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
+                                        ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement))).SetTexture(dictionaryKey, Ressource.GetTexture(dictionaryKey));
+                                    }
+                                }
+                                Data.SelectedFile = null;
+                            }
+                        }
+                        index++;
                     }
                 }
             }
@@ -862,6 +868,7 @@ namespace Uniray
                                 scriptPathList.Add(storage); break;
                         }
                     }
+                    UnloadDirectoryFiles(pathList);
                 }
                 Ressource = new Ressource(
                     texturesPathList,
@@ -900,6 +907,7 @@ namespace Uniray
                 else storage = new UFolder(filePath, LoadFolderArchitecture(filePath));
                 files.Add(storage);
             }
+            UnloadDirectoryFiles(list);
             return files;
         }
         /// <summary>
