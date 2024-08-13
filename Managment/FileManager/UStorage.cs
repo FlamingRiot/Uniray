@@ -1,6 +1,17 @@
 ﻿namespace Uniray
 {
-    public abstract class UStorage
+    /// <summary>
+    /// IRenamable interface
+    /// </summary>
+    public interface IRenamable
+    {
+        /// <summary>
+        /// Rename the unit storage
+        /// </summary>
+        /// <param name="name">The new name to give</param>
+        public void Rename(string name);
+    }
+    public class UStorage
     {
         /// <summary>
         /// The absolute path to the folder 
@@ -28,11 +39,6 @@
             // Wait for a specific constructor to correctly cut the name out of the path
             this.name = "";
         }
-        /// <summary>
-        /// Rename the unit storage
-        /// </summary>
-        /// <param name="name">The new name to give</param>
-        public abstract void Rename(string name); 
         /// <summary>
         /// Stringed storage unit
         /// </summary>

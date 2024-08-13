@@ -1,6 +1,6 @@
 ﻿namespace Uniray
 {
-    public class UFolder : UStorage
+    public class UFolder : UStorage, IRenamable
     {
         /// <summary>
         /// The files contained inside of the folder
@@ -35,7 +35,7 @@
         /// Rename the folder
         /// </summary>
         /// <param name="name">The new name to give</param>
-        public override void Rename(string name)
+        public void Rename(string name)
         {
             string oldPath = Path;
             Path = Path.Replace($"{this.Name}", $"{name}");

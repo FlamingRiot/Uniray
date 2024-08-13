@@ -1,6 +1,6 @@
 ﻿namespace Uniray
 {
-    public class UFile : UStorage
+    public class UFile : UStorage, IRenamable
     {
         /// <summary>
         /// UFile constructor
@@ -15,7 +15,7 @@
         /// Rename the file
         /// </summary>
         /// <param name="name">The new name of the file</param>
-        public override void Rename(string name)
+        public void Rename(string name)
         {
             string oldPath = Path;
             Path = Path.Replace($"{Name}", $"{name}");

@@ -843,6 +843,9 @@ namespace Uniray
                     {
                         string path = new((sbyte*)pathList.Paths[j]);
                         path = path.Replace("\\", "/");
+                        UFile file;
+                        UFolder folder;
+                        if (path.Split('.').Length > 1) file = new UFile(path);
                         UFile file = new UFile(path);
                         switch (i)
                         {
