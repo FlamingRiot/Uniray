@@ -137,6 +137,7 @@ namespace Uniray
         }
         public void AddTexture(Texture2D texture, string key)
         {
+            if (key == "Image_0") { }
             _textures.Add(key, texture);
         }
         public void AddModel(Model model, string key)
@@ -154,6 +155,33 @@ namespace Uniray
         public bool ModelExists(string key)
         {
             return _models.ContainsKey(key);
+        }
+        /// <summary>
+        /// Remove texture from the list and unload from the RAM
+        /// </summary>
+        /// <param name="key">Key</param>
+        public void DeleteTexture(string key)
+        {
+            Raylib.UnloadTexture(_textures[key]);
+            _textures.Remove(key);
+        }
+        /// <summary>
+        /// Remove model from the list and unload from the RAM
+        /// </summary>
+        /// <param name="key">Key</param>
+        public void DeleteModel(string key)
+        {
+            Raylib.UnloadModel(_models[key]);
+            _models.Remove(key);
+        }
+        /// <summary>
+        /// Remove sound from the list and unload from the RAM
+        /// </summary>
+        /// <param name="key">Key</param>
+        public void DeleteSound(string key)
+        {
+            Raylib.UnloadSound(_sounds[key]);
+            _sounds.Remove(key);
         }
         public override string ToString()
         {

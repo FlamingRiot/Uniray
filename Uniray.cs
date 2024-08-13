@@ -140,7 +140,7 @@ namespace Uniray
         {
             // Intitialize the Uniray shaders
             shaders = new UShaders();
-            panorama = LoadTexture("data/shaders/skyboxes/default.hdr");
+            panorama = LoadTexture("data/shaders/skyboxes/industrial.hdr");
             cubemap = shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
             shaders.SetCubemap(cubemap);
             // Unload useless texture
@@ -337,7 +337,7 @@ namespace Uniray
             new_File = ((Container)UI.Components["fileManager"]).GetLastFile();
             new_File = new_File.Replace('\\', '/');
             UFile file = new UFile(new_File);
-            if (new_File != "" && Data.CurrentProject is not null)
+            if (((Container)UI.Components["fileManager"]).GetLastFile() != ((Container)UI.Components["fileManager"]).LastFile && Data.CurrentProject is not null)
             {
                 switch (new_File.Split('.').Last())
                 {
@@ -346,7 +346,7 @@ namespace Uniray
                         {
                             modelsPathList.Add(file);
                         }
-                        else if (modelsPathList.Last() != file)
+                        else if (modelsPathList.Last().Name != file.Name)
                         {
                             modelsPathList.Add(file);
                         }
@@ -357,7 +357,7 @@ namespace Uniray
                             texturesPathList.Add(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
-                        else if (texturesPathList.Last() != file)
+                        else if (texturesPathList.Last().Name != file.Name)
                         {
                             texturesPathList.Add(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
@@ -368,24 +368,27 @@ namespace Uniray
                     case "cs":
                         break;
                 }
+                ((Container)UI.Components["fileManager"]).ClearFiles();
+                ((Container)UI.Components["fileManager"]).LastFile = "";
             }
             // Draw the files along with their name in the file manager
+            int index = 0;
             switch (UI.Components["fileManager"].Tag)
             {
                 case "models":
-                    DrawManagerFiles(modelsPathList, 0);
+                    DrawManagerFiles(ref modelsPathList, ref index);
                     break;
                 case "textures":
-                    DrawManagerFiles(texturesPathList, 0);
+                    DrawManagerFiles(ref texturesPathList, ref index);
                     break;
                 case "sounds":
-                    DrawManagerFiles(soundsPathList, 0);
+                    DrawManagerFiles(ref soundsPathList, ref index);
                     break;
                 case "animations":
-                    DrawManagerFiles(animationsPathList, 0);
+                    DrawManagerFiles(ref animationsPathList, ref index);
                     break;
                 case "scripts":
-                    DrawManagerFiles(scriptPathList, 0);
+                    DrawManagerFiles(ref scriptPathList, ref index);
                     break;
             }
 
@@ -438,7 +441,7 @@ namespace Uniray
         /// Draw and manage the files in the bottom container
         /// </summary>
         /// <param name="files">All the files in the asset directory</param>
-        public void DrawManagerFiles(List<UStorage> files, int index)
+        public void DrawManagerFiles(ref List<UStorage> files, ref int index)
         {
             if (files.Count != 0)
             {
@@ -462,7 +465,7 @@ namespace Uniray
                 for (int i = 0; i < files.Count; i++)
                 {
                     // Check if the passed unit storage is a folder or not
-                    if (files[i] is UFolder) { DrawManagerFiles(((UFolder)files[i]).Files, index + 1); }
+                    if (files[i] is UFolder) { DrawManagerFiles(ref ((UFolder)files[i]).Files, ref index); }
                     else
                     {
                         int positionX = (i + 9) % 8;
@@ -484,7 +487,20 @@ namespace Uniray
                             if (IsMouseButtonPressed(MouseButton.Middle))
                             {
                                 File.Delete(files[i].Path);
-                                File.Delete("..\\..\\..\\" + files[i]);
+                                switch (files[i].Path.Split('.').Last())
+                                {
+                                    case "m3d":
+                                        Ressource.DeleteModel(files[i].Name);
+                                        break;
+                                    case "png":
+                                        Ressource.DeleteTexture(files[i].Name);
+                                        break;
+                                    case "wav":
+                                        Ressource.DeleteSound(files[i].Name);
+                                        break;
+                                    case "cs":
+                                        break;
+                                }
                                 files.Remove(files[i]);
                             }
                         }

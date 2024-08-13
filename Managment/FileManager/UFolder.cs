@@ -5,11 +5,7 @@
         /// <summary>
         /// The files contained inside of the folder
         /// </summary>
-        List<UStorage> files;
-        /// <summary>
-        /// Return a readonly list
-        /// </summary>
-        public List<UStorage> Files { get { return files; } }
+        public List<UStorage> Files;
         /// <summary>
         /// UFolder constructor
         /// </summary>
@@ -17,7 +13,7 @@
         public UFolder(string path, List<UStorage> files) : base(path)
         {
             Name = path.Split('/').Last();
-            this.files = files;
+            this.Files = files;
         }
         /// <summary>
         /// Add a file to the folder
@@ -25,7 +21,7 @@
         /// <param name="file">The file to add</param>
         public void AddFile(UStorage file)
         {
-            files.Add(file);
+            Files.Add(file);
         }
         /// <summary>
         /// Delete a file from the folder
@@ -33,7 +29,7 @@
         /// <param name="file"></param>
         public void DeleteFile(UStorage file)
         {
-            files.Remove(file);
+            Files.Remove(file);
         }
         /// <summary>
         /// Rename the folder
