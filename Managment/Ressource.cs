@@ -16,22 +16,17 @@ namespace Uniray
         /// Dictionary containing the currently loaded models
         /// </summary>
         private Dictionary<string, Model> _models;
-        public Ressource(List<UFile> _textures, List<UFile> _sounds, List<UFile> _models)
+        public Ressource(List<UStorage> _textures, List<UStorage> _sounds, List<UStorage> _models)
         {
             this._textures = new Dictionary<string, Texture2D>();
             this._sounds = new Dictionary<string, Sound>();
             this._models = new Dictionary<string, Model>();
 
             // Load textures
-            for (int i = 0; i < _textures.Count; i++)
-            {
-                this._textures.Add(_textures[i].Path.Split('/').Last().Split('.')[0] ,Raylib.LoadTexture(_textures[i].Path));
-            }
+            LoadTextures(_textures);
+
             // Load sounds
-            for (int i = 0; i < _sounds.Count; i++)
-            {
-                this._sounds.Add(_sounds[i].Path.Split('/').Last().Split('.')[0], Raylib.LoadSound(_sounds[i].Path));
-            }
+            LoadSounds(_sounds);
             // Load models
             for (int i = 0; i < _models.Count; i++)
             {
@@ -51,6 +46,55 @@ namespace Uniray
             this._textures = new Dictionary<string, Texture2D>();
             this._sounds = new Dictionary<string, Sound>();
             this._models = new Dictionary<string, Model>();
+        }
+        /// <summary>
+        /// Load textures from the whole architecture
+        /// </summary>
+        /// <param name="textures">List of the top directory's storage units</param>
+        private void LoadTextures(List<UStorage> textures)
+        {
+            // Load textures from the whole architecture
+            for (int i = 0; i < textures.Count; i++)
+            {
+                if (textures[i] is UFile) _textures.Add(textures[i].Path.Split('/').Last().Split('.')[0], Raylib.LoadTexture(textures[i].Path));
+                else LoadTextures(((UFolder)textures[i]).Files);
+            }
+        }
+        /// <summary>
+        /// Load models from the whole architecture
+        /// </summary>
+        /// <param name="textures">List of the top directory's storage units</param>
+        private void LoadModels(List<UStorage> models)
+        {
+            // Load sounds from the whole architecture
+            for (int i = 0; i < models.Count; i++)
+            {
+                if (models[i] is UFile)
+                {
+                    // Load the model and fix the material issue
+                    Model m = Raylib.LoadModel(models[i].Path);
+                    for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                        m.Meshes[0].Colors[j] = 255;
+                    Raylib.UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+
+                    // Add the model
+                    _models.Add(models[i].Path.Split('/').Last().Split('.')[0], m);
+                }
+                else LoadTextures(((UFolder)models[i]).Files);
+            }
+        }
+        /// <summary>
+        /// Load sounds from the whole architecture
+        /// </summary>
+        /// <param name="sounds">List of the top directory's storage units</param>
+        private void LoadSounds(List<UStorage> sounds) 
+        {
+            // Load sounds from the whole architecture
+            for (int i = 0; i < sounds.Count; i++)
+            {
+                if (sounds[i] is UFile) _sounds.Add(sounds[i].Path.Split('/').Last().Split('.')[0], Raylib.LoadSound(sounds[i].Path));
+                else LoadTextures(((UFolder)sounds[i]).Files);
+            }
         }
         public void UnloadRessources()
         {

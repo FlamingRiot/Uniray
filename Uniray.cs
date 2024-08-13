@@ -54,15 +54,15 @@ namespace Uniray
 
         // File storage related attributes
 
-        private List<UFile> modelsPathList;
+        private List<UStorage> modelsPathList;
 
-        private List<UFile> texturesPathList;
+        private List<UStorage> texturesPathList;
 
-        private List<UFile> soundsPathList;
+        private List<UStorage> soundsPathList;
 
-        private List<UFile> animationsPathList;
+        private List<UStorage> animationsPathList;
 
-        private List<UFile> scriptPathList;
+        private List<UStorage> scriptPathList;
 
         // 3D related attributes
         /// <summary>
@@ -160,11 +160,11 @@ namespace Uniray
             goCollision = new RayCollision();
 
             // Intitialize all the assets lists of filepath
-            modelsPathList = new List<UFile>();
-            texturesPathList = new List<UFile>();
-            soundsPathList = new List<UFile>();
-            animationsPathList = new List<UFile>();
-            scriptPathList = new List<UFile>();
+            modelsPathList = new List<UStorage>();
+            texturesPathList = new List<UStorage>();
+            soundsPathList = new List<UStorage>();
+            animationsPathList = new List<UStorage>();
+            scriptPathList = new List<UStorage>();
 
             // Load the Uniray camera model and apply its texture
             cameraModel = LoadModel("data/camera.m3d");
@@ -438,7 +438,7 @@ namespace Uniray
         /// Draw and manage the files in the bottom container
         /// </summary>
         /// <param name="files">All the files in the asset directory</param>
-        public void DrawManagerFiles(ref List<UFile> files)
+        public void DrawManagerFiles(ref List<UStorage> files)
         {
             if (files.Count != 0)
             {
@@ -842,23 +842,24 @@ namespace Uniray
                     for (int j = 0; j < pathList.Count; j++)
                     {
                         string path = new((sbyte*)pathList.Paths[j]);
-                        path = path.Replace("\\", "/");
-                        UFile file;
-                        UFolder folder;
-                        if (path.Split('.').Length > 1) file = new UFile(path);
-                        UFile file = new UFile(path);
+                        path = path.Replace('\\', '/');
+
+                        // Pre-create the storage unit
+                        UStorage storage;
+                        if (path.Split('.').Length > 1) storage = new UFile(path);
+                        else storage = new UFolder(path, LoadFolderArchitecture(path));
                         switch (i)
                         {
                             case 0:
-                                modelsPathList.Add(file); break;
+                                modelsPathList.Add(storage); break;
                             case 1:
-                                texturesPathList.Add(file); break;
+                                texturesPathList.Add(storage); break;
                             case 2:
-                                soundsPathList.Add(file); break;
+                                soundsPathList.Add(storage); break;
                             case 3:
-                                animationsPathList.Add(file); break;
+                                animationsPathList.Add(storage); break;
                             case 4:
-                                scriptPathList.Add(file); break;
+                                scriptPathList.Add(storage); break;
                         }
                     }
                 }
@@ -869,6 +870,37 @@ namespace Uniray
                     );
             }
             Console.WriteLine(Ressource.ToString());
+        }
+        /// <summary>
+        /// Load files complete architecture of a specified directory
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public List<UStorage> LoadFolderArchitecture(string path)
+        {
+            List<UStorage> files = new List<UStorage>();
+            // Convert to sbyte*
+            sbyte* sPath;
+            byte[] bytes = Encoding.UTF8.GetBytes(path);
+            fixed (byte* p = bytes)
+            {
+                sbyte* sp = (sbyte*)p;
+                sPath = sp;
+            }
+            // Load directory files
+            FilePathList list = LoadDirectoryFiles(sPath, (int*)30);
+            for (int i = 0; i < list.Count; i++)
+            {
+                string filePath = new((sbyte*)list.Paths[i]);
+                filePath = filePath.Replace('\\', '/');
+
+                // Pre-create the storage unit
+                UStorage storage;
+                if (filePath.Split('.').Length > 1) storage = new UFile(filePath);
+                else storage = new UFolder(filePath, LoadFolderArchitecture(filePath));
+                files.Add(storage);
+            }
+            return files;
         }
         /// <summary>
         /// Translate a 3-Dimensional vector according to the application standards in Dev environement
