@@ -91,7 +91,7 @@ namespace Uniray
                     }
                     else
                     {
-                        camDistance -= GetMouseWheelMove() * 2f;
+                        camDistance -= GetMouseWheelMove() * 2f * Raymath.Vector3Distance(camera.Position, camera.Target) / 10;
                         MoveCamera(camDistance, ref camera, camera.Target, camYOffset, true, mousePos, mouseMovementOrigin);
                     }
                     uniray.EnvCamera = camera;
