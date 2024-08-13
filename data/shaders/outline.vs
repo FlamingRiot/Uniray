@@ -15,7 +15,7 @@ uniform mat4 matNormal;
 
 void main()
 {
-    vec3 inflatedPosition = vertexPosition + vertexNormal * 0.015;
+    vec3 inflatedPosition = vertexPosition + vertexNormal * 0.03;
 
     // Calculate final vertex position
     gl_Position = mvp*vec4(inflatedPosition, 1.0);
