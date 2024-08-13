@@ -396,8 +396,6 @@ namespace Uniray
             // Draw the currently displayed modal and define its state
             if (Data.CurrentModal is not null)
             {
-                UI.DrawModal(Data.CurrentModal);
-
                 // If the user closed the modal without proceeding
                 if (Data.LastModalExitCode == 0)
                 {

@@ -1,5 +1,6 @@
 ﻿using RayGUI_cs;
 using Raylib_cs;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Uniray
 {
@@ -177,11 +178,13 @@ namespace Uniray
         /// </summary>
         public void Draw()
         {
-            DrawComponents(Components);
-        }
-        private void DrawComponents(Dictionary<string, Component> components)
-        {
             bool focus = false;
+            DrawComponents(Components, ref focus);
+            if (Uniray.Data.CurrentModal is not null) DrawModal(Uniray.Data.CurrentModal, ref focus);
+            if (!focus && Uniray.Data.SelectedFile is null) { Raylib.SetMouseCursor(MouseCursor.Default); }
+        }
+        private void DrawComponents(Dictionary<string, Component> components, ref bool focus)
+        {
             foreach (KeyValuePair<string, Component> component in components)
             {
                 switch (component.Value)
@@ -215,17 +218,16 @@ namespace Uniray
 
                 }
             }
-            if (!focus && Uniray.Data.SelectedFile is null) { Raylib.SetMouseCursor(MouseCursor.Default); }
         }
         /// <summary>
         /// Draw a give modal
         /// </summary>
         /// <param name="key">Key of the modal to draw</param>
-        public void DrawModal(string key)
+        public void DrawModal(string key, ref bool focus)
         {
             Raylib.DrawRectangle(0, 0, width, height, new Color(0, 0, 0, 75));
             RayGUI.DrawContainer((Container)Components["modalTemplate"]);
-            DrawComponents(Modals[key].Components);
+            DrawComponents(Modals[key].Components, ref focus);
         }
         /// <summary>
         /// Set the file manager to the models page
