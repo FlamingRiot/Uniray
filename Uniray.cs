@@ -52,6 +52,18 @@ namespace Uniray
         /// </summary>
         private ErrorHandler errorHandler;
 
+        // File storage related attributes
+
+        private List<UFile> modelsPathList;
+
+        private List<UFile> texturesPathList;
+
+        private List<UFile> soundsPathList;
+
+        private List<UFile> animationsPathList;
+
+        private List<UFile> scriptPathList;
+
         // 3D related attributes
         /// <summary>
         /// The currently displayed scene
@@ -61,20 +73,6 @@ namespace Uniray
         /// The currently selected GameObject
         /// </summary>
         private GameObject3D? selectedElement;
-        /// <summary>
-        /// The built-in shaders of Uniray
-        /// </summary>
-        private UShaders shaders;
-
-        private List<string> modelsPathList;
-
-        private List<string> texturesPathList;
-
-        private List<string> soundsPathList;
-
-        private List<string> animationsPathList;
-
-        private List<string> scriptPathList;
         /// <summary>
         /// The used camera for rendering the 3D of the application
         /// </summary>
@@ -97,6 +95,10 @@ namespace Uniray
         public Material cameraMaterial;
 
         // Shader related attributes
+        /// <summary>
+        /// The built-in shaders of Uniray
+        /// </summary>
+        private UShaders shaders;
         /// <summary>
         /// 3D model of the skybox
         /// </summary>
@@ -157,12 +159,12 @@ namespace Uniray
             mouseRay = new Ray();
             goCollision = new RayCollision();
 
-            // Instanciate all the assets lists of filepath
-            modelsPathList = new List<string>();
-            texturesPathList = new List<string>();
-            soundsPathList = new List<string>();
-            animationsPathList = new List<string>();
-            scriptPathList = new List<string>();
+            // Intitialize all the assets lists of filepath
+            modelsPathList = new List<UFile>();
+            texturesPathList = new List<UFile>();
+            soundsPathList = new List<UFile>();
+            animationsPathList = new List<UFile>();
+            scriptPathList = new List<UFile>();
 
             // Load the Uniray camera model and apply its texture
             cameraModel = LoadModel("data/camera.m3d");
@@ -334,6 +336,7 @@ namespace Uniray
             string new_File = "";
             new_File = ((Container)UI.Components["fileManager"]).GetLastFile();
             new_File = new_File.Replace('\\', '/');
+            UFile file = new UFile(new_File);
             if (new_File != "" && Data.CurrentProject is not null)
             {
                 switch (new_File.Split('.').Last())
@@ -341,22 +344,22 @@ namespace Uniray
                     case "m3d":
                         if (modelsPathList.Count == 0)
                         {
-                            modelsPathList.Add(new_File);
+                            modelsPathList.Add(file);
                         }
-                        else if (modelsPathList.Last() != new_File)
+                        else if (modelsPathList.Last() != file)
                         {
-                            modelsPathList.Add(new_File);
+                            modelsPathList.Add(file);
                         }
                         break;
                     case "png":
                         if (texturesPathList.Count == 0)
                         {
-                            texturesPathList.Add(new_File);
+                            texturesPathList.Add(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
-                        else if (texturesPathList.Last() != new_File)
+                        else if (texturesPathList.Last() != file)
                         {
-                            texturesPathList.Add(new_File);
+                            texturesPathList.Add(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
                         break;
@@ -435,23 +438,23 @@ namespace Uniray
         /// Draw and manage the files in the bottom container
         /// </summary>
         /// <param name="files">All the files in the asset directory</param>
-        public void DrawManagerFiles(ref List<string> files)
+        public void DrawManagerFiles(ref List<UFile> files)
         {
             if (files.Count != 0)
             {
                 string directory = ((Container)UI.Components["fileManager"]).GetLastFile().Split("\\")[0];
-                string aimedDirectory = files[0].Split("\\")[0];
+                string aimedDirectory = files[0].Path.Split("\\")[0];
                 string name = ((Container)UI.Components["fileManager"]).GetLastFile().Split("\\").Last();
 
                 // Check if there needs to be a recheck for the files
                 if (directory == aimedDirectory)
                 {
-                    if (!files.Exists(e => e.EndsWith(name)))
+                    if (!files.Exists(e => e.Path.EndsWith(name)))
                     {
                         string extension = ((Container)UI.Components["fileManager"]).GetLastFile().Split('.').Last();
                         if (extension == ((Container)UI.Components["fileManager"]).ExtensionFile)
                         {
-                            files.Add(((Container)UI.Components["fileManager"]).GetLastFile());
+                            files.Add(new UFile(((Container)UI.Components["fileManager"]).GetLastFile()));
                         }
                     }
                 }
@@ -463,7 +466,7 @@ namespace Uniray
                     int xPos = UI.Components["fileManager"].X + 150 * (i + 1) - 100;
                     int yPos = UI.Components["fileManager"].Y + 60;
                     DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
-                    string[] pathArryBySlash = files[i].Split('/');
+                    string[] pathArryBySlash = files[i].Path.Split('/');
                     DrawLabel(new Label(xPos, yPos + fileTex.Height + 20, pathArryBySlash.Last()), UI.Font);
 
                     Vector2 mouse = GetMousePosition();
@@ -471,12 +474,12 @@ namespace Uniray
                     {
                         if (IsMouseButtonDown(MouseButton.Left))
                         {
-                            Data.SelectedFile = files[i];
+                            Data.SelectedFile = files[i].Path;
                             SetMouseCursor(MouseCursor.PointingHand);
                         }
                         if (IsMouseButtonPressed(MouseButton.Middle))
                         {
-                            File.Delete(files[i]);
+                            File.Delete(files[i].Path);
                             File.Delete("..\\..\\..\\" + files[i]);
                             files.Remove(files[i]);
                         }
@@ -840,18 +843,19 @@ namespace Uniray
                     {
                         string path = new((sbyte*)pathList.Paths[j]);
                         path = path.Replace("\\", "/");
+                        UFile file = new UFile(path);
                         switch (i)
                         {
                             case 0:
-                                modelsPathList.Add(path); break;
+                                modelsPathList.Add(file); break;
                             case 1:
-                                texturesPathList.Add(path); break;
+                                texturesPathList.Add(file); break;
                             case 2:
-                                soundsPathList.Add(path); break;
+                                soundsPathList.Add(file); break;
                             case 3:
-                                animationsPathList.Add(path); break;
+                                animationsPathList.Add(file); break;
                             case 4:
-                                scriptPathList.Add(path); break;
+                                scriptPathList.Add(file); break;
                         }
                     }
                 }

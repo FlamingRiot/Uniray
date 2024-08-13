@@ -8,7 +8,6 @@ namespace Uniray
         /// Dictionary containing the currently loaded textures
         /// </summary>
         private Dictionary<string, Texture2D> _textures;
-
         /// <summary>
         /// Dictionary containing the currently loaded sounds
         /// </summary>
@@ -17,7 +16,7 @@ namespace Uniray
         /// Dictionary containing the currently loaded models
         /// </summary>
         private Dictionary<string, Model> _models;
-        public Ressource(List<string> _textures, List<string> _sounds, List<string> _models)
+        public Ressource(List<UFile> _textures, List<UFile> _sounds, List<UFile> _models)
         {
             this._textures = new Dictionary<string, Texture2D>();
             this._sounds = new Dictionary<string, Sound>();
@@ -26,22 +25,22 @@ namespace Uniray
             // Load textures
             for (int i = 0; i < _textures.Count; i++)
             {
-                this._textures.Add(_textures[i].Split('/').Last().Split('.')[0] ,Raylib.LoadTexture(_textures[i]));
+                this._textures.Add(_textures[i].Path.Split('/').Last().Split('.')[0] ,Raylib.LoadTexture(_textures[i].Path));
             }
             // Load sounds
             for (int i = 0; i < _sounds.Count; i++)
             {
-                this._sounds.Add(_sounds[i].Split('/').Last().Split('.')[0], Raylib.LoadSound(_sounds[i]));
+                this._sounds.Add(_sounds[i].Path.Split('/').Last().Split('.')[0], Raylib.LoadSound(_sounds[i].Path));
             }
             // Load models
             for (int i = 0; i < _models.Count; i++)
             {
-                Model m = Raylib.LoadModel(_models[i]);
+                Model m = Raylib.LoadModel(_models[i].Path);
                 for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
                     m.Meshes[0].Colors[j] = 255;
                 Raylib.UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
 
-                this._models.Add(_models[i].Split('/').Last().Split('.')[0], m);
+                this._models.Add(_models[i].Path.Split('/').Last().Split('.')[0], m);
             }
         }
         /// <summary>
