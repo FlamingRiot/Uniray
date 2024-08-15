@@ -64,6 +64,7 @@ namespace Uniray
             fileManager.Type = ContainerType.FileDropper;
             fileManager.ExtensionFile = "m3d";
             fileManager.OutputFilePath = "/assets/models";
+            Uniray.Data.CurrentFolder = Uniray.modelFolder;
             Components.Add("fileManager", fileManager);
 
             // GameManager

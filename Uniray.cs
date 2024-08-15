@@ -449,12 +449,17 @@ namespace Uniray
                         }
                     }
                 }
-
+                // Check if shortcut is used to create folder
+                if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.N))
+                {
+                    UFolder folder = new UFolder(Data.CurrentFolder.Path + "/new", new List<UStorage>());
+                    folder.UpstreamFolder = Data.CurrentFolder;
+                    files.Add(folder);
+                    Directory.CreateDirectory(Data.CurrentFolder.Path + "/new");
+                }
                 for (int i = 0; i < files.Count; i++)
                 {
-                    // Check if the passed unit storage is a folder or not
-                    int positionX = (i + 9) % 8;
-                    if (positionX == 0) _ = 8;
+                    // Define the drawing position
                     int xPos = UI.Components["fileManager"].X + 150 * (i + 1) - 100;
                     int yPos = UI.Components["fileManager"].Y + 60;
 
@@ -462,6 +467,7 @@ namespace Uniray
                     string lbl = "";
                     if (files[i].Name.Length >= 10) { lbl = files[i].Name.Remove(5) + "..."; }
                     else lbl = files[i].Name;
+                    // Draw the appropriate element
                     if (files[i] is UFile)
                     {
                         DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
@@ -473,26 +479,37 @@ namespace Uniray
                         DrawLabel(new Label(xPos + 10 + files[i].Name.Length / 3, yPos + fileTex.Height + 20, lbl), UI.Font);
                     }
 
-                    Vector2 mouse = GetMousePosition();
-                    if (mouse.X < xPos + fileTex.Width && mouse.X > xPos && mouse.Y < yPos + fileTex.Height && mouse.Y > yPos)
+                    // Check interactions
+                    // Check if mouse left button is hold to drag file
+                    if (IsMouseButtonDown(MouseButton.Left))
                     {
-                        if (IsMouseButtonDown(MouseButton.Left))
+                        if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
                         {
                             Data.SelectedFile = files[i].Path;
                             SetMouseCursor(MouseCursor.PointingHand);
                         }
-                        if (IsMouseButtonPressedRepeat(MouseButton.Left))
+                    }
+                    // Check is mouse left button is double pressed to enter folder
+                    if (IsMouseButtonPressedRepeat(MouseButton.Left))
+                    {
+                        if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
                         {
                             if (files[i] is UFolder)
                             {
                                 // Set the new selected folder
                                 Data.CurrentFolder = (UFolder)files[i];
                                 ((Container)UI.Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Data.CurrentProject.Path) + "/assets" + files[i].Path.Split("assets").Last();
-                            }                        
+                            }
                         }
-                        if (IsMouseButtonPressed(MouseButton.Middle))
+                    }
+                    // Check if mouse wheel is pressed to delete a file
+                    if (IsMouseButtonPressed(MouseButton.Middle))
+                    {
+                        if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
                         {
+                            // Delete the physical file from the folder
                             File.Delete(files[i].Path);
+                            // Delete the loaded ressource of the file
                             switch (files[i].Path.Split('.').Last())
                             {
                                 case "m3d":
@@ -507,13 +524,16 @@ namespace Uniray
                                 case "cs":
                                     break;
                             }
+                            // Remove the file from the virtual folder
                             files.Remove(files[i]);
                         }
                     }
+                    // Check if mouse left button is released to drop file
                     if (Data.SelectedFile is not null)
                     {
                         if (IsMouseButtonReleased(MouseButton.Left))
                         {
+                            Vector2 mouse = GetMousePosition();
                             // Import model into the scene
                             if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && Data.SelectedFile.Split('.').Last() == "m3d")
                             {
@@ -577,6 +597,13 @@ namespace Uniray
                 // Load assets from the given project's assets folder
                 if (directory is not null) LoadAssets(directory);
                 else throw new Exception($"Could not load the assets of project {path}");
+
+                // Set assets folder paths
+                modelFolder.Path = directory + "/assets/models";
+                textureFolder.Path = directory + "/assets/textures";
+                soundFolder.Path = directory + "/assets/sounds";
+                animationFolder.Path = directory + "/assets/animations";
+                scriptFolder.Path = directory + "/assets/scripts";
 
                 // Change to default assets page of the manager container
                 ((Container)UI.Components["fileManager"]).ExtensionFile = "m3d";
@@ -1119,9 +1146,10 @@ namespace Uniray
                     lastTimeButtonPressed = 0.0;
                     return true;
                 }
-                lastTimeButtonPressed = currentFrame;
                 return false;
             }
+            if (IsMouseButtonReleased(button)) lastTimeButtonPressed = currentFrame;
+
             return false;
         }
     }
