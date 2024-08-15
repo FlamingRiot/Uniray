@@ -450,7 +450,7 @@ namespace Uniray
                     }
                 }
                 // Check if shortcut is used to create folder
-                if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.N))
+                if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
                 {
                     UFolder folder = new UFolder(Data.CurrentFolder.Path + "/new", new List<UStorage>());
                     folder.UpstreamFolder = Data.CurrentFolder;
