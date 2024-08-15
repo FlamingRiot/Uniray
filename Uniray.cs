@@ -490,7 +490,7 @@ namespace Uniray
                         }
                     }
                     // Check is mouse left button is double pressed to enter folder
-                    if (IsMouseButtonPressedRepeat(MouseButton.Left))
+                    if (IsMouseButtonPressed(MouseButton.Left))
                     {
                         if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
                         {
@@ -507,22 +507,30 @@ namespace Uniray
                     {
                         if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
                         {
-                            // Delete the physical file from the folder
-                            File.Delete(files[i].Path);
-                            // Delete the loaded ressource of the file
-                            switch (files[i].Path.Split('.').Last())
+                            if (files[i] is UFolder)
                             {
-                                case "m3d":
-                                    Ressource.DeleteModel(files[i].Name);
-                                    break;
-                                case "png":
-                                    Ressource.DeleteTexture(files[i].Name);
-                                    break;
-                                case "wav":
-                                    Ressource.DeleteSound(files[i].Name);
-                                    break;
-                                case "cs":
-                                    break;
+                                // Delte the folder along with all its content
+                                Directory.Delete(files[i].Path, true);
+                            }
+                            else
+                            {
+                                // Delete the physical file from the folder
+                                File.Delete(files[i].Path);
+                                // Delete the loaded ressource of the file
+                                switch (files[i].Path.Split('.').Last())
+                                {
+                                    case "m3d":
+                                        Ressource.DeleteModel(files[i].Name);
+                                        break;
+                                    case "png":
+                                        Ressource.DeleteTexture(files[i].Name);
+                                        break;
+                                    case "wav":
+                                        Ressource.DeleteSound(files[i].Name);
+                                        break;
+                                    case "cs":
+                                        break;
+                                }
                             }
                             // Remove the file from the virtual folder
                             files.Remove(files[i]);
@@ -1129,28 +1137,6 @@ namespace Uniray
             camera.Transform = nm;
             // Set the camera Target according to the rotation matrix
 
-        }
-        /// <summary>
-        /// Check if a mouse button has been pressed repeateadly
-        /// </summary>
-        /// <param name="button"></param>
-        /// <returns></returns>
-        public bool IsMouseButtonPressedRepeat(MouseButton button)
-        {
-            double currentFrame = GetTime();
-
-            if (IsMouseButtonPressed(button))
-            {
-                if ((currentFrame - lastTimeButtonPressed) <= 0.25)
-                {
-                    lastTimeButtonPressed = 0.0;
-                    return true;
-                }
-                return false;
-            }
-            if (IsMouseButtonReleased(button)) lastTimeButtonPressed = currentFrame;
-
-            return false;
         }
     }
 }
