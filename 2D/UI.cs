@@ -119,6 +119,11 @@ namespace Uniray
             playButton.Event = BuildProject;
             Components.Add("playButton", playButton);
 
+            // Upstream folder button
+            Button returnButton = new Button("<", fileManager.X + 10, fileManager.Y + 40, 20, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            returnButton.Event = BackFolder;
+            Components.Add("returnButton", returnButton);
+
             // Labels
             // Ressource info label
             Label ressourceInfoLabel = new Label(Components["fileManager"].X + Components["fileManager"].Width / 2, Components["fileManager"].Y + Components["fileManager"].Height / 2, "");
@@ -308,6 +313,14 @@ namespace Uniray
                 string commmand = "/C cd " + projectPath + " && dotnet run --project uniray_Project.csproj";
                 System.Diagnostics.Process.Start("CMD.exe", commmand);
             }
+        }
+        /// <summary>
+        /// Go the upstream folder of another folder
+        /// </summary>
+        public void BackFolder()
+        {
+            if (Uniray.Data.CurrentFolder.UpstreamFolder is not null) Uniray.Data.CurrentFolder = Uniray.Data.CurrentFolder.UpstreamFolder;
+
         }
         /// <summary>
         /// Send exit code for positive response on open project modal

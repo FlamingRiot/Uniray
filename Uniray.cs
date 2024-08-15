@@ -485,6 +485,7 @@ namespace Uniray
                         {
                             if (files[i] is UFolder)
                             {
+                                // Set the new selected folder
                                 Data.CurrentFolder = (UFolder)files[i];
                                 ((Container)UI.Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Data.CurrentProject.Path) + "/assets" + files[i].Path.Split("assets").Last();
                             }                        
@@ -552,7 +553,6 @@ namespace Uniray
                 }
             }
         }
-
         /// <summary>
         /// Load project from .uproj file
         /// </summary>
@@ -872,7 +872,15 @@ namespace Uniray
                         // Pre-create the storage unit
                         UStorage storage;
                         if (path.Split('.').Length > 1) storage = new UFile(path);
-                        else storage = new UFolder(path, LoadFolderArchitecture(path));
+                        else 
+                        {
+                            // Set upstream folder for folders
+                            storage = new UFolder(path, LoadFolderArchitecture(path));
+                            foreach (UFolder folder in ((UFolder)storage).Files.Where(x => x is UFolder))
+                            {
+                                folder.UpstreamFolder = (UFolder)storage;
+                            }
+                        }
                         switch (i)
                         {
                             case 0:
@@ -886,6 +894,40 @@ namespace Uniray
                             case 4:
                                 scriptFolder.AddFile(storage); break;
                         }
+                    }
+                    // Set upstream folder for folders
+                    switch (i)
+                    {
+                        case 0:
+                            foreach (UFolder folder in modelFolder.Files.Where(x => x is UFolder))
+                            {
+                                folder.UpstreamFolder = modelFolder;
+                            }
+                            break;
+                        case 1:
+                            foreach (UFolder folder in textureFolder.Files.Where(x => x is UFolder))
+                            {
+                                folder.UpstreamFolder = textureFolder;
+                            }
+                            break;
+                        case 2:
+                            foreach (UFolder folder in soundFolder.Files.Where(x => x is UFolder))
+                            {
+                                folder.UpstreamFolder = soundFolder;
+                            }
+                            break;
+                        case 3:
+                            foreach (UFolder folder in animationFolder.Files.Where(x => x is UFolder))
+                            {
+                                folder.UpstreamFolder = animationFolder;
+                            }
+                            break;
+                        case 4:
+                            foreach (UFolder folder in scriptFolder.Files.Where(x => x is UFolder))
+                            {
+                                folder.UpstreamFolder = scriptFolder;
+                            }
+                            break;
                     }
                     UnloadDirectoryFiles(pathList);
                 }
@@ -923,7 +965,14 @@ namespace Uniray
                 // Pre-create the storage unit
                 UStorage storage;
                 if (filePath.Split('.').Length > 1) storage = new UFile(filePath);
-                else storage = new UFolder(filePath, LoadFolderArchitecture(filePath));
+                else
+                {
+                    storage = new UFolder(filePath, LoadFolderArchitecture(filePath));
+                    foreach (UFolder folder in ((UFolder)storage).Files.Where(x => x is UFolder))
+                    {
+                        folder.UpstreamFolder = (UFolder)storage;
+                    }
+                }
                 files.Add(storage);
             }
             UnloadDirectoryFiles(list);

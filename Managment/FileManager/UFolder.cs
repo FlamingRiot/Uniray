@@ -1,4 +1,7 @@
-﻿namespace Uniray
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Text.RegularExpressions;
+
+namespace Uniray
 {
     public class UFolder : UStorage, IRenamable
     {
@@ -6,6 +9,14 @@
         /// The files contained inside of the folder
         /// </summary>
         public List<UStorage> Files;
+        /// <summary>
+        /// The upstream folder according to this one
+        /// </summary>
+        private UFolder? upstreamFolder;
+        /// <summary>
+        /// The upstream folder according to this one
+        /// </summary>
+        public UFolder? UpstreamFolder { get { return upstreamFolder; } set { upstreamFolder = value; } }
         /// <summary>
         /// UFolder constructor
         /// </summary>
