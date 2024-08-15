@@ -378,25 +378,25 @@ namespace Uniray
                 ((Container)UI.Components["fileManager"]).LastFile = "";
             }
             // Draw the files along with their name in the file manager
-            int index = 0;
             switch (UI.Components["fileManager"].Tag)
             {
                 case "models":
-                    DrawManagerFiles(ref modelFolder.Files, ref index);
+                    Data.CurrentFolder = modelFolder;
                     break;
                 case "textures":
-                    DrawManagerFiles(ref textureFolder.Files, ref index);
+                    Data.CurrentFolder = textureFolder;
                     break;
                 case "sounds":
-                    DrawManagerFiles(ref soundFolder.Files, ref index);
+                    Data.CurrentFolder = soundFolder;
                     break;
                 case "animations":
-                    DrawManagerFiles(ref animationFolder.Files, ref index);
+                    Data.CurrentFolder = animationFolder;
                     break;
                 case "scripts":
-                    DrawManagerFiles(ref scriptFolder.Files, ref index);
+                    Data.CurrentFolder = scriptFolder;
                     break;
             }
+            DrawManagerFiles(ref Data.CurrentFolder.Files);
 
             // Render the selected camera POV to the top right corner of the screen
             if (selectedElement is UCamera)
@@ -447,7 +447,7 @@ namespace Uniray
         /// Draw and manage the files in the bottom container
         /// </summary>
         /// <param name="files">All the files in the asset directory</param>
-        public void DrawManagerFiles(ref List<UStorage> files, ref int index)
+        public void DrawManagerFiles(ref List<UStorage> files)
         {
             if (files.Count != 0)
             {
@@ -473,7 +473,7 @@ namespace Uniray
                     // Check if the passed unit storage is a folder or not
                     int positionX = (i + 9) % 8;
                     if (positionX == 0) _ = 8;
-                    int xPos = UI.Components["fileManager"].X + 150 * (index + 1) - 100;
+                    int xPos = UI.Components["fileManager"].X + 150 * (i + 1) - 100;
                     int yPos = UI.Components["fileManager"].Y + 60;
 
                     // Shorten the text
@@ -563,7 +563,6 @@ namespace Uniray
                             Data.SelectedFile = null;
                         }
                     }
-                    index++;
                 }
             }
         }

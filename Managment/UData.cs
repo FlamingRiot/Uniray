@@ -21,7 +21,7 @@
         /// <summary>
         /// The currently displayed folder
         /// </summary>
-        private UFolder currentFolder;
+        public UFolder CurrentFolder;
         /// <summary>
         /// Currently loaded project in the application
         /// </summary>
@@ -39,16 +39,12 @@
         /// </summary>
         public int? LastModalExitCode { get { return lastModalExitCode; } set { lastModalExitCode = value; } }
         /// <summary>
-        /// The currently displayed folder
-        /// </summary>
-        public UFolder CurrentFolder { get { return currentFolder; } set { currentFolder = value; } }
-        /// <summary>
         /// UData constructor
         /// </summary>
         /// <param name="folder">The default folder to display from the assets</param>
         public UData(UFolder folder) 
         {
-            currentFolder = folder;
+            CurrentFolder = folder;
         }
     }
 }
