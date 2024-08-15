@@ -58,15 +58,15 @@ namespace Uniray
         /// </summary>
         private Texture2D folderTex;
 
-        private UFolder modelFolder;
+        public static UFolder? modelFolder;
 
-        private UFolder textureFolder;
+        public static UFolder? textureFolder;
 
-        private UFolder soundFolder;
+        public static UFolder? soundFolder;
 
-        private UFolder animationFolder;
+        public static UFolder? animationFolder;
 
-        private UFolder scriptFolder;
+        public static UFolder? scriptFolder;
 
         // 3D related attributes
         /// <summary>
@@ -350,22 +350,22 @@ namespace Uniray
                     case "m3d":
                         if (modelFolder.Files.Count == 0)
                         {
-                            modelFolder.AddFile(file);
+                            Data.CurrentFolder.AddFile(file);
                         }
                         else if (modelFolder.Files.Last().Name != file.Name)
                         {
-                            modelFolder.AddFile(file);
+                            Data.CurrentFolder.AddFile(file);
                         }
                         break;
                     case "png":
                         if (textureFolder.Files.Count == 0)
                         {
-                            textureFolder.AddFile(file);
+                            Data.CurrentFolder.AddFile(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
                         else if (textureFolder.Files.Last().Name != file.Name)
                         {
-                            textureFolder.AddFile(file);
+                            Data.CurrentFolder.AddFile(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
                         break;
@@ -378,24 +378,6 @@ namespace Uniray
                 ((Container)UI.Components["fileManager"]).LastFile = "";
             }
             // Draw the files along with their name in the file manager
-            switch (UI.Components["fileManager"].Tag)
-            {
-                case "models":
-                    Data.CurrentFolder = modelFolder;
-                    break;
-                case "textures":
-                    Data.CurrentFolder = textureFolder;
-                    break;
-                case "sounds":
-                    Data.CurrentFolder = soundFolder;
-                    break;
-                case "animations":
-                    Data.CurrentFolder = animationFolder;
-                    break;
-                case "scripts":
-                    Data.CurrentFolder = scriptFolder;
-                    break;
-            }
             DrawManagerFiles(ref Data.CurrentFolder.Files);
 
             // Render the selected camera POV to the top right corner of the screen
@@ -501,7 +483,11 @@ namespace Uniray
                         }
                         if (IsMouseButtonPressedRepeat(MouseButton.Left))
                         {
-                            if (files[i] is UFolder) Console.WriteLine("Hey you have won.. greate haha");
+                            if (files[i] is UFolder)
+                            {
+                                Data.CurrentFolder = (UFolder)files[i];
+                                ((Container)UI.Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Data.CurrentProject.Path) + "/assets" + files[i].Path.Split("assets").Last();
+                            }                        
                         }
                         if (IsMouseButtonPressed(MouseButton.Middle))
                         {

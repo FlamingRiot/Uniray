@@ -237,7 +237,10 @@ namespace Uniray
             ((Container)Components["fileManager"]).ExtensionFile = "m3d";
             ((Container)Components["fileManager"]).Tag = "models";
             if (Uniray.Data.CurrentProject is not null) 
+            {
                 ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/models";
+                Uniray.Data.CurrentFolder = Uniray.modelFolder;
+            }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .m3d";
         }
         /// <summary>
@@ -248,7 +251,10 @@ namespace Uniray
             ((Container)Components["fileManager"]).ExtensionFile = "png";
             ((Container)Components["fileManager"]).Tag = "textures";
             if (Uniray.Data.CurrentProject is not null)
+            {
                 ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/textures";
+                Uniray.Data.CurrentFolder = Uniray.textureFolder;
+            }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .png";
         }
         /// <summary>
@@ -259,7 +265,10 @@ namespace Uniray
             ((Container)Components["fileManager"]).ExtensionFile = "wav";
             ((Container)Components["fileManager"]).Tag = "sounds";
             if (Uniray.Data.CurrentProject is not null)
+            {
                 ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/sounds";
+                Uniray.Data.CurrentFolder = Uniray.soundFolder;
+            }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .wav";
         }
         /// <summary>
@@ -270,7 +279,10 @@ namespace Uniray
             ((Container)Components["fileManager"]).ExtensionFile = "m3d";
             ((Container)Components["fileManager"]).Tag = "animations";
             if (Uniray.Data.CurrentProject is not null)
+            {
                 ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/animations";
+                Uniray.Data.CurrentFolder = Uniray.animationFolder;
+            }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .m3d";
         }
         /// <summary>
@@ -281,7 +293,10 @@ namespace Uniray
             ((Container)Components["fileManager"]).ExtensionFile = "cs";
             ((Container)Components["fileManager"]).Tag = "scripts";
             if (Uniray.Data.CurrentProject is not null)
+            {
                 ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/scripts";
+                Uniray.Data.CurrentFolder = Uniray.scriptFolder;
+            }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .cs";
         }
         private void BuildProject()
