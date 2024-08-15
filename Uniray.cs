@@ -7,7 +7,6 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
-using System.Windows.Input;
 
 namespace Uniray
 {
@@ -59,15 +58,15 @@ namespace Uniray
         /// </summary>
         private Texture2D folderTex;
 
-        private List<UStorage> modelsPathList;
+        private UFolder modelFolder;
 
-        private List<UStorage> texturesPathList;
+        private UFolder textureFolder;
 
-        private List<UStorage> soundsPathList;
+        private UFolder soundFolder;
 
-        private List<UStorage> animationsPathList;
+        private UFolder animationFolder;
 
-        private List<UStorage> scriptPathList;
+        private UFolder scriptFolder;
 
         // 3D related attributes
         /// <summary>
@@ -166,11 +165,11 @@ namespace Uniray
             goCollision = new RayCollision();
 
             // Intitialize all the assets lists of filepath
-            modelsPathList = new List<UStorage>();
-            texturesPathList = new List<UStorage>();
-            soundsPathList = new List<UStorage>();
-            animationsPathList = new List<UStorage>();
-            scriptPathList = new List<UStorage>();
+            modelFolder = new UFolder("", new List<UStorage>());
+            textureFolder = new UFolder("", new List<UStorage>());
+            soundFolder = new UFolder("", new List<UStorage>());
+            animationFolder = new UFolder("", new List<UStorage>());
+            scriptFolder = new UFolder("", new List<UStorage>());
 
             // Load the Uniray camera model and apply its texture
             cameraModel = LoadModel("data/camera.m3d");
@@ -183,7 +182,7 @@ namespace Uniray
             skybox = GenMeshCube(1.0f, 1.0f, 1.0f);
 
             // Initialize the Data
-            Data = new UData();
+            Data = new UData(modelFolder);
             // Intitialize UI
             UI = new UI(WWindow, HWindow, font);
             // Initialize the error handler
@@ -349,24 +348,24 @@ namespace Uniray
                 switch (new_File.Split('.').Last())
                 {
                     case "m3d":
-                        if (modelsPathList.Count == 0)
+                        if (modelFolder.Files.Count == 0)
                         {
-                            modelsPathList.Add(file);
+                            modelFolder.AddFile(file);
                         }
-                        else if (modelsPathList.Last().Name != file.Name)
+                        else if (modelFolder.Files.Last().Name != file.Name)
                         {
-                            modelsPathList.Add(file);
+                            modelFolder.AddFile(file);
                         }
                         break;
                     case "png":
-                        if (texturesPathList.Count == 0)
+                        if (textureFolder.Files.Count == 0)
                         {
-                            texturesPathList.Add(file);
+                            textureFolder.AddFile(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
-                        else if (texturesPathList.Last().Name != file.Name)
+                        else if (textureFolder.Files.Last().Name != file.Name)
                         {
-                            texturesPathList.Add(file);
+                            textureFolder.AddFile(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
                         break;
@@ -383,19 +382,19 @@ namespace Uniray
             switch (UI.Components["fileManager"].Tag)
             {
                 case "models":
-                    DrawManagerFiles(ref modelsPathList, ref index);
+                    DrawManagerFiles(ref modelFolder.Files, ref index);
                     break;
                 case "textures":
-                    DrawManagerFiles(ref texturesPathList, ref index);
+                    DrawManagerFiles(ref textureFolder.Files, ref index);
                     break;
                 case "sounds":
-                    DrawManagerFiles(ref soundsPathList, ref index);
+                    DrawManagerFiles(ref soundFolder.Files, ref index);
                     break;
                 case "animations":
-                    DrawManagerFiles(ref animationsPathList, ref index);
+                    DrawManagerFiles(ref animationFolder.Files, ref index);
                     break;
                 case "scripts":
-                    DrawManagerFiles(ref scriptPathList, ref index);
+                    DrawManagerFiles(ref scriptFolder.Files, ref index);
                     break;
             }
 
@@ -892,23 +891,23 @@ namespace Uniray
                         switch (i)
                         {
                             case 0:
-                                modelsPathList.Add(storage); break;
+                                modelFolder.AddFile(storage); break;
                             case 1:
-                                texturesPathList.Add(storage); break;
+                                textureFolder.AddFile(storage); break;
                             case 2:
-                                soundsPathList.Add(storage); break;
+                                soundFolder.AddFile(storage); break;
                             case 3:
-                                animationsPathList.Add(storage); break;
+                                animationFolder.AddFile(storage); break;
                             case 4:
-                                scriptPathList.Add(storage); break;
+                                scriptFolder.AddFile(storage); break;
                         }
                     }
                     UnloadDirectoryFiles(pathList);
                 }
                 Ressource = new Ressource(
-                    texturesPathList,
-                    soundsPathList,
-                    modelsPathList
+                    textureFolder.Files,
+                    soundFolder.Files,
+                    modelFolder.Files
                     );
             }
             Console.WriteLine(Ressource.ToString());
@@ -1081,7 +1080,7 @@ namespace Uniray
 
             if (IsMouseButtonPressed(button))
             {
-                if ((currentFrame - lastTimeButtonPressed) <= 0.3)
+                if ((currentFrame - lastTimeButtonPressed) <= 0.25)
                 {
                     lastTimeButtonPressed = 0.0;
                     return true;

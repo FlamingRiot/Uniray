@@ -19,6 +19,10 @@
         /// </summary>
         private int? lastModalExitCode;
         /// <summary>
+        /// The currently displayed folder
+        /// </summary>
+        private UFolder currentFolder;
+        /// <summary>
         /// Currently loaded project in the application
         /// </summary>
         public Project? CurrentProject { get { return currentProject; } set { currentProject = value; } }
@@ -34,9 +38,17 @@
         /// Last exit code of the modal
         /// </summary>
         public int? LastModalExitCode { get { return lastModalExitCode; } set { lastModalExitCode = value; } }
-        public UData() 
+        /// <summary>
+        /// The currently displayed folder
+        /// </summary>
+        public UFolder CurrentFolder { get { return currentFolder; } set { currentFolder = value; } }
+        /// <summary>
+        /// UData constructor
+        /// </summary>
+        /// <param name="folder">The default folder to display from the assets</param>
+        public UData(UFolder folder) 
         {
-            // Code here..
+            currentFolder = folder;
         }
     }
 }
