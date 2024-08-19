@@ -80,7 +80,7 @@ namespace Uniray
                     // Add the model
                     _models.Add(models[i].Path.Split('/').Last().Split('.')[0], m);
                 }
-                else LoadTextures(((UFolder)models[i]).Files);
+                else LoadModels(((UFolder)models[i]).Files);
             }
         }
         /// <summary>
@@ -93,9 +93,12 @@ namespace Uniray
             for (int i = 0; i < sounds.Count; i++)
             {
                 if (sounds[i] is UFile) _sounds.Add(sounds[i].Path.Split('/').Last().Split('.')[0], Raylib.LoadSound(sounds[i].Path));
-                else LoadTextures(((UFolder)sounds[i]).Files);
+                else LoadSounds(((UFolder)sounds[i]).Files);
             }
         }
+        /// <summary>
+        /// Unload all the loaded ressources in RAM
+        /// </summary>
         public void UnloadRessources()
         {
             foreach (Model m in this._models.Values)
