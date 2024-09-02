@@ -287,12 +287,14 @@ namespace Uniray
                     {
                         UModel go = new UModel(
                             clipboard[i].Name,
-                            envCamera.Position + GetCameraForward(ref envCamera) - clipboard[i].Position,
+                            clipboard[i].Position,
                             Ressource.GetModel(((UModel)clipboard[i]).ModelID).Meshes[0],
                             ((UModel)clipboard[i]).ModelID,
                             ((UModel)clipboard[i]).TextureID);
                         // Set the rotations of the model
                         go.SetRotation(((UModel)clipboard[i]).Pitch, ((UModel)clipboard[i]).Yaw, ((UModel)clipboard[i]).Roll);
+                        // Set final position of the model
+
                         // Add the copied object to the list
                         currentScene.AddGameObject(go);
                     }
@@ -305,10 +307,13 @@ namespace Uniray
                     // Translate the currently selected object, indpendently of its type
                     if (IsKeyDown(KeyboardKey.G))
                     {
+                        // Translate a neutral vector for selection uniformity
+                        Vector3 newPos = TranslateObject(Vector3.Zero);
                         foreach (GameObject3D go in selection)
                         {
-                            Vector3 newPos = TranslateObject(go.Position);
-                            currentScene.SetGameObjectPosition(currentScene.GameObjects.IndexOf(go), newPos);
+                            // Add the position of the current object
+                            Vector3 finalPos = Vector3Add(newPos, go.Position);
+                            currentScene.SetGameObjectPosition(currentScene.GameObjects.IndexOf(go), finalPos);
                         }
                     }
                     // Rotate the currently selected game object
