@@ -283,6 +283,7 @@ namespace Uniray
                 // Paste action on the active selection of game objects
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.V))
                 {
+                    Vector3 dir = GetCameraForward(ref envCamera) * 5f;
                     for (int i = 0; i < clipboard.Count; i++)
                     {
                         UModel go = new UModel(
@@ -294,7 +295,7 @@ namespace Uniray
                         // Set the rotations of the model
                         go.SetRotation(((UModel)clipboard[i]).Pitch, ((UModel)clipboard[i]).Yaw, ((UModel)clipboard[i]).Roll);
                         // Set final position of the model
-
+                        go.Position -= dir;
                         // Add the copied object to the list
                         currentScene.AddGameObject(go);
                     }
