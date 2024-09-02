@@ -156,6 +156,10 @@ namespace Uniray
         public void SetRotation(float pitch, float yaw, float roll)
         {
             // Set the camera model Transform
+            this.pitch = pitch;
+            this.yaw = yaw;
+            this.roll = roll;
+            // Calculate matrix rotation
             Matrix4x4 nm = Raymath.MatrixRotateXYZ(new Vector3(pitch / Raylib.RAD2DEG, yaw / Raylib.RAD2DEG, roll / Raylib.RAD2DEG));
 
             nm.M14 = Position.X;
