@@ -1,5 +1,4 @@
-﻿using System.Net.WebSockets;
-using System.Numerics;
+﻿using System.Numerics;
 using Raylib_cs;
 
 namespace Uniray
@@ -134,6 +133,8 @@ namespace Uniray
             this.transform.M24 = position.Y;
             this.transform.M34 = position.Z;
             Material = Raylib.LoadMaterialDefault();
+            // Set the texture to the mesh
+            SetTexture(textureID, Uniray.Ressource.GetTexture(textureID));
         }
         /// <summary>
         /// Set the model texture by giving on of the ressource's texture
@@ -148,6 +149,20 @@ namespace Uniray
         public override string ToString()
         {
             return "Name: " + Name + " Position: " + Position + " Rotation: < " + Yaw + "; " + Pitch + "; " + Roll + " >";  
+        }
+        /// <summary>
+        /// Rotate the object
+        /// </summary>
+        public void SetRotation(float pitch, float yaw, float roll)
+        {
+            // Set the camera model Transform
+            Matrix4x4 nm = Raymath.MatrixRotateXYZ(new Vector3(pitch / Raylib.RAD2DEG, yaw / Raylib.RAD2DEG, roll / Raylib.RAD2DEG));
+
+            nm.M14 = Position.X;
+            nm.M24 = Position.Y;
+            nm.M34 = Position.Z;
+
+            Transform = nm;
         }
     }
 }

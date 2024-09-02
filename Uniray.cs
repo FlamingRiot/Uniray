@@ -74,9 +74,13 @@ namespace Uniray
         /// </summary>
         private Scene currentScene;
         /// <summary>
-        /// The currently selected GameObject
+        /// The currently selected Game Objects
         /// </summary>
-        private GameObject3D? selectedElement;
+        private List<GameObject3D> selection;
+        /// <summary>
+        /// The clipboard of the Game Objects
+        /// </summary>
+        private List<GameObject3D> clipboard;
         /// <summary>
         /// The used camera for rendering the 3D of the application
         /// </summary>
@@ -155,12 +159,16 @@ namespace Uniray
             currentScene = scene;
             envCamera = new Camera3D();
 
+            // Init the clipboard list
+            clipboard = new List<GameObject3D>();
+            // Init the selection list
+            selection = new List<GameObject3D>();
+
             // Create the render texture for preview of a camera's POV
             cameraView = LoadRenderTexture(WWindow / 2, HWindow / 2);
             cameraViewRec = new Rectangle(0, 0, WWindow / 2, -(HWindow / 2));
 
             // 3D-2D Collision variables
-            selectedElement = null;
             mouseRay = new Ray();
             goCollision = new RayCollision();
 
@@ -196,22 +204,25 @@ namespace Uniray
             // =========================================================================================================================================================
 
             // Update the selected element from the reference list
-            if (selectedElement != null) { selectedElement = currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)); }
+            // if (selectedElement != null) { selectedElement = currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)); }
 
             // Define a mouse ray for collision check
             Vector2 mousePos = GetMousePosition();
             mouseRay = GetMouseRay(mousePos, EnvCamera);
 
-            // Render the outlined selected GameObject and deactive the Raylib culling to make it possible
+            // Render the outlined selected GameObjects and deactivate the Raylib culling to make it possible
             SetCullFace(ZERO);
-            switch (selectedElement)
+            foreach (GameObject3D go in selection)
             {
-                case UModel model:
-                    DrawMesh(model.Mesh, shaders.OutlineMaterial, model.Transform);
-                    break;
-                case UCamera camera:
-                    DrawMesh(cameraModel.Meshes[0], shaders.OutlineMaterial, camera.Transform);
-                    break;
+                switch (go)
+                {
+                    case UModel model:
+                        DrawMesh(model.Mesh, shaders.OutlineMaterial, model.Transform);
+                        break;
+                    case UCamera camera:
+                        DrawMesh(cameraModel.Meshes[0], shaders.OutlineMaterial, camera.Transform);
+                        break;
+                }
             }
             SetCullFace(ONE);
 
@@ -235,44 +246,87 @@ namespace Uniray
             // Assign the newly selected object to the according variable
             if (index != -1)
             {
-                selectedElement = currentScene.GetGameObject(index);
+                if (IsKeyDown(KeyboardKey.LeftShift))
+                {
+                    selection.Add(currentScene.GetGameObject(index));
+                }
+                else
+                {
+                    selection.Clear();
+                    selection.Add(currentScene.GetGameObject(index));
+                }
             }
             
             // Manage GameObjects interaction
-            if (selectedElement != null) 
+            if (selection.Count != 0) 
             {
+                // Deletion action on the active selection of game objects
                 if (IsKeyPressed(KeyboardKey.Delete))
                 {
-                    currentScene.GameObjects.Remove(selectedElement);
-                    selectedElement = null;
+                    foreach (GameObject3D go in selection)
+                    {
+                        currentScene.GameObjects.Remove(go);
+                        selection.Clear();
+                        break;
+                    }
                 }
+                // Escape action on the active selection of game objects
                 if (IsKeyPressed(KeyboardKey.Escape))
                 {
-                    selectedElement = null;
+                    selection.Clear();
+                }
+                // Copy action on the active selection of game objects
+                if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.C))
+                {
+                    clipboard = selection;
+                }
+                // Paste action on the active selection of game objects
+                if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.V))
+                {
+                    for (int i = 0; i < clipboard.Count; i++)
+                    {
+                        UModel go = new UModel(
+                            clipboard[i].Name,
+                            envCamera.Position + GetCameraForward(ref envCamera) - clipboard[i].Position,
+                            Ressource.GetModel(((UModel)clipboard[i]).ModelID).Meshes[0],
+                            ((UModel)clipboard[i]).ModelID,
+                            ((UModel)clipboard[i]).TextureID);
+                        // Set the rotations of the model
+                        go.SetRotation(((UModel)clipboard[i]).Pitch, ((UModel)clipboard[i]).Yaw, ((UModel)clipboard[i]).Roll);
+                        // Add the copied object to the list
+                        currentScene.AddGameObject(go);
+                    }
+                    selection.Clear();
                 }
 
                 // Manage GameObjects transformations effects
-                if (selectedElement is not null)
+                if (selection.Count != 0)
                 {
                     // Translate the currently selected object, indpendently of its type
                     if (IsKeyDown(KeyboardKey.G))
                     {
-                        Vector3 newPos = TranslateObject(selectedElement.Position);
-                        currentScene.SetGameObjectPosition(currentScene.GameObjects.IndexOf(selectedElement), newPos);
+                        foreach (GameObject3D go in selection)
+                        {
+                            Vector3 newPos = TranslateObject(go.Position);
+                            currentScene.SetGameObjectPosition(currentScene.GameObjects.IndexOf(go), newPos);
+                        }
                     }
                     // Rotate the currently selected game object
                     else if (IsKeyDown(KeyboardKey.R))
                     {
-                        // Cast the object to apply the appropriate rotation effects
-                        if (selectedElement is UModel)
+                        foreach (GameObject3D go in selection)
                         {
-                            UModel model = (UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement));
-                            RotateObject(ref model);                            
-                        }
-                        else if (selectedElement is UCamera)
-                        {
-                            UCamera camera = (UCamera)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement));
-                            RotateObject(ref camera);
+                            // Cast the object to apply the appropriate rotation effects
+                            if (go is UModel)
+                            {
+                                UModel model = (UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(go));
+                                RotateObject(ref model);
+                            }
+                            else if (go is UCamera)
+                            {
+                                UCamera camera = (UCamera)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(go));
+                                RotateObject(ref camera);
+                            }
                         }
                         HideCursor();
                     }
@@ -281,7 +335,7 @@ namespace Uniray
             }
 
             // Draw the scene all over again for the camera render, if activated
-            if (selectedElement is UCamera cam)
+            if (selection.Count == 1 && selection.First() is UCamera cam)
             {
                 EndMode3D();
 
@@ -381,7 +435,7 @@ namespace Uniray
             DrawManagerFiles(ref Data.CurrentFolder.Files);
 
             // Render the selected camera POV to the top right corner of the screen
-            if (selectedElement is UCamera)
+            if (selection.Count == 1 && selection.First() is UCamera cam)
             {
                 DrawRectangleLinesEx(new Rectangle(UI.Width - UI.Width / 5 - 11, 9, UI.Width / 5 + 2, UI.Height / 5 + 2), 2, Color.White);
                 DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(UI.Width - UI.Width / 5 - 10, 10, UI.Width / 5, UI.Height / 5), Vector2.Zero, 0, Color.White);
@@ -561,7 +615,9 @@ namespace Uniray
                                     Ressource.AddModel(m, modelKey);
                                     currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
                                 }
-                                selectedElement = currentScene.GameObjects.Last();
+                                // Clear the selection to add the newly inserted object
+                                selection.Clear();
+                                selection.Add(currentScene.GameObjects.Last());
                             }
                             // Import texture in game object attributes
                             else if (mouse.X > UI.Components["gameManager"].X + 100 && mouse.X < UI.Components["gameManager"].X + 350 &&
@@ -569,10 +625,10 @@ namespace Uniray
                                 && mouse.Y < UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 320
                                 && Data.SelectedFile.Split('.').Last() == "png")
                             {
-                                if (selectedElement != null)
+                                if (selection.Count == 1)
                                 {
                                     string dictionaryKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
-                                    ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement))).SetTexture(dictionaryKey, Ressource.GetTexture(dictionaryKey));
+                                    ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selection.First()))).SetTexture(dictionaryKey, Ressource.GetTexture(dictionaryKey));
                                 }
                             }
                             Data.SelectedFile = null;
@@ -739,7 +795,7 @@ namespace Uniray
                 Data.CurrentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
                 Ressource = new Ressource();
                 currentScene = Data.CurrentProject.GetScene(0);
-                selectedElement = null;
+                selection.Clear();
 
                 TraceLog(TraceLogLevel.Warning, "Project \"" + name + "\" has been created");
             }
