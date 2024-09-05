@@ -2,7 +2,6 @@
 using static RayGUI_cs.RayGUI;
 using Raylib_cs;
 using System.Numerics;
-using System.Text;
 using System.Globalization;
 
 namespace Uniray
@@ -17,20 +16,19 @@ namespace Uniray
             InitWindow(1800, 900, "Uniray - New Project");
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
+            
+            // Init the GUI library with the two main colors of the application
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
 
-            // Change culture info to enable parsing float values in json
-            var clone = Thread.CurrentThread.CurrentCulture.Clone() as CultureInfo;
-            clone.NumberFormat.NumberDecimalSeparator = ".";
-            Thread.CurrentThread.CurrentCulture = clone;
-            Thread.CurrentThread.CurrentUICulture = clone;
-            
+            // Change CultureInfo
+            ChangeCultureInfo();
+
             // Load font
             Font font = LoadFont("data/font/Ubuntu-Regular.ttf");
 
             // Get Window size
-            int wWindow = GetScreenWidth();
-            int hWindow = GetScreenHeight();
+            int width = GetScreenWidth();
+            int height = GetScreenHeight();
 
             // Set 3D camera for the default scene
             Camera3D camera = new Camera3D();
@@ -39,17 +37,18 @@ namespace Uniray
             camera.Target = Vector3.Zero;
             camera.Up = Vector3.UnitY;
             camera.FovY = 90f;
-            float camYOffset = 0f;
-            float camDistance = 2f;
-            Vector2 mousePos = new Vector2(wWindow / 2, hWindow / 2);
-            Vector2 mouseMovementOrigin = Vector2.Zero;
-            Vector2 fakePos = Vector2.Zero;
+
+            // Set camera motion object
+            CameraMotion motion = new CameraMotion(2f, (short)width, (short)height);
 
             // Set UI and application default
             Scene scene = new Scene(new List<GameObject3D>());
-            Uniray uniray = new Uniray(wWindow, hWindow, font, scene);
-            //SetTargetFPS(30);
+            Uniray uniray = new Uniray(width, height, font, scene);
+#if !DEBUG
+          SetTargetFPS(60);
+#endif
             SetWindowState(ConfigFlags.MaximizedWindow);
+            // Game Loop
             while (!WindowShouldClose())
             {
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.S))
@@ -62,20 +61,20 @@ namespace Uniray
                 // =========================================================================================================================================================
                 
                 if (Hover(uniray.UI.Components["gameManager"].X + uniray.UI.Components["gameManager"].Width + 
-                    10, 0, wWindow - uniray.UI.Components["gameManager"].Width - 20, hWindow - uniray.UI.Components["fileManager"].Height - 20))
+                    10, 0, width - uniray.UI.Components["gameManager"].Width - 20, height - uniray.UI.Components["fileManager"].Height - 20))
                 {
                     if (IsMouseButtonReleased(MouseButton.Middle))
                     {
-                        mousePos = fakePos;
-                        mouseMovementOrigin = Vector2.Zero;
+                        motion.Mouse = motion.FakePosition;
+                        motion.MouseOrigin = Vector2.Zero;
                     }
                     if (IsMouseButtonDown(MouseButton.Middle))
                     {
 
                         if (IsKeyDown(KeyboardKey.LeftShift))
                         {
-                            Vector3 movX = GetCameraRight(ref camera) * GetMouseDelta().X * (camDistance / 200);
-                            Vector3 movY = GetCameraUp(ref camera) * GetMouseDelta().Y * (camDistance / 200);
+                            Vector3 movX = GetCameraRight(ref camera) * GetMouseDelta().X * (motion.Distance / 200);
+                            Vector3 movY = GetCameraUp(ref camera) * GetMouseDelta().Y * (motion.Distance / 200);
 
                             camera.Position -= movX;
                             camera.Target -= movX;
@@ -85,14 +84,14 @@ namespace Uniray
                         }
                         else
                         {
-                            if (mouseMovementOrigin == Vector2.Zero) { mouseMovementOrigin = GetMousePosition(); }
-                            fakePos = MoveCamera(camDistance, ref camera, camera.Target, camYOffset, false, mousePos, mouseMovementOrigin);
+                            if (motion.MouseOrigin == Vector2.Zero) { motion.MouseOrigin = GetMousePosition(); }
+                            motion.FakePosition = MoveCamera(motion.Distance, ref camera, camera.Target, motion.YOffset, false, motion.Mouse, motion.MouseOrigin);
                         }
                     }
                     else
                     {
-                        camDistance -= GetMouseWheelMove() * 2f * Raymath.Vector3Distance(camera.Position, camera.Target) / 10;
-                        MoveCamera(camDistance, ref camera, camera.Target, camYOffset, true, mousePos, mouseMovementOrigin);
+                        motion.Distance -= GetMouseWheelMove() * 2f * Raymath.Vector3Distance(camera.Position, camera.Target) / 10;
+                        MoveCamera(motion.Distance, ref camera, camera.Target, motion.YOffset, true, motion.Mouse, motion.MouseOrigin);
                     }
                     uniray.EnvCamera = camera;
                 }
@@ -206,6 +205,23 @@ namespace Uniray
             float posX = targetPosition.X + offsetX;
             float posZ = targetPosition.Z + offsetZ;
             return new Vector2(posX, posZ); 
+        }
+        /// <summary>
+        /// Switch from . to , for decimal separator when parsing into a file
+        /// </summary>
+        static void ChangeCultureInfo()
+        {
+            // Create a clone of the current thread's culture info
+            CultureInfo? clone = Thread.CurrentThread.CurrentCulture.Clone() as CultureInfo;
+            // Test if the returned clone is null
+            if (clone is not null)
+            {
+                // Set the decimal separator to . instead of ,
+                clone.NumberFormat.NumberDecimalSeparator = ".";
+                // Set new CultureInfo
+                Thread.CurrentThread.CurrentCulture = clone;
+                Thread.CurrentThread.CurrentUICulture = clone;
+            }
         }
     }
 }
