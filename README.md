@@ -7,7 +7,7 @@ find below a guide to build the engine yourself, as it hasn't officially release
 
 ## Build
 
-- [ ] [Install](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) the **Net6.0 Framework** (minimum required) if you don't have it already.
+- [ ] [Install](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) the **Net7.0 Framework** (minimum required) if you don't have it already.
 - [ ] Run the following command in the project directory:
 
 ```

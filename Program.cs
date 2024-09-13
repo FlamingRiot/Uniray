@@ -45,7 +45,7 @@ namespace Uniray
             Scene scene = new Scene(new List<GameObject3D>());
             Uniray uniray = new Uniray(width, height, font, scene);
 #if !DEBUG
-          SetTargetFPS(60);
+            SetTargetFPS(60);
 #endif
             SetWindowState(ConfigFlags.MaximizedWindow);
             // Game Loop
