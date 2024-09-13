@@ -7,6 +7,7 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
+using System;
 
 namespace Uniray
 {
@@ -189,7 +190,7 @@ namespace Uniray
             // Load the skybox model
             skybox = GenMeshCube(1.0f, 1.0f, 1.0f);
 
-            // Initialize the Data
+            // Initialize the volatile Data
             Data = new UData(modelFolder);
             // Intitialize UI
             UI = new UI(WWindow, HWindow, font);
@@ -202,9 +203,6 @@ namespace Uniray
             // =========================================================================================================================================================
             // ================================================================ MANAGE 3D DRAWING ======================================================================
             // =========================================================================================================================================================
-
-            // Update the selected element from the reference list
-            // if (selectedElement != null) { selectedElement = currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selectedElement)); }
 
             // Define a mouse ray for collision check
             Vector2 mousePos = GetMousePosition();
@@ -227,19 +225,21 @@ namespace Uniray
             SetCullFace(ONE);
 
             // Draw 3-Dimensional models of the current scene and check for a hypothetical new selected object
-            int index = -1;
+            short index = -1;
             foreach (GameObject3D go in currentScene.GameObjects)
             {
                 // Manage objects drawing + object selection (according to the object type)
                 if (go is UModel)
                 {
                     DrawMesh(((UModel)go).Mesh, ((UModel)go).Material, ((UModel)go).Transform);
-                    if (index == -1) index = CheckCollisionScreenToWorld(go, ((UModel)go).Mesh, mousePos, ((UModel)go).Transform);
+                    short i = (short)CheckCollisionScreenToWorld(go, ((UModel)go).Mesh, mousePos, ((UModel)go).Transform);
+                    index = CheckDistance(index, i);
                 }
                 else if (go is UCamera)
                 {
                     DrawMesh(cameraModel.Meshes[0], cameraMaterial, ((UCamera)go).Transform);
-                    if (index == -1) index = CheckCollisionScreenToWorld(go, cameraModel.Meshes[0], mousePos, ((UCamera)go).Transform);
+                    short i = (short)CheckCollisionScreenToWorld(go, cameraModel.Meshes[0], mousePos, ((UCamera)go).Transform);
+                    index = CheckDistance(index, i);
                 }
             }
 
@@ -1114,12 +1114,13 @@ namespace Uniray
             System.Diagnostics.Process.Start("CMD.exe", commmand);
         }
         /// <summary>
-        /// Check if a collision occurs between the mouse (screen) and an object of the world (Game object)
+        /// Check if a collision occurs between the mouse (screen) and an object of the world (Game object) and 
+        /// returns the index of the selected object
         /// </summary>
         /// <param name="go">Game object</param>
         /// <param name="mesh">Mesh</param>
         /// <param name="mousePos">2-Dimensional position of the mouse</param>
-        /// <returns></returns>
+        /// <returns>Selected object index (-1 if nothing found)</returns>
         public int CheckCollisionScreenToWorld(GameObject3D go, Mesh mesh, Vector2 mousePos, Matrix4x4 transform)
         {
             if (mousePos.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width && mousePos.Y < UI.Components["fileManager"].Y - 10 && IsMouseButtonPressed(MouseButton.Left))
@@ -1139,6 +1140,38 @@ namespace Uniray
             {
                 return -1;
             }
+        }
+        /// <summary>
+        /// Check distance from camera between two game objects
+        /// </summary>
+        /// <param name="index1">Index of the first object</param>
+        /// <param name="index2">Index of the second object</param>
+        /// <returns>The index to change or keep</returns>
+        public short CheckDistance(short index1, short index2)
+        {
+            if (index2 != -1)
+            {
+                if (index1 != -1)
+                {
+                    // Retrive the position data of the conflicted game objects
+                    Vector3 iPos1 = currentScene.GameObjects[index1].Position;
+                    Vector3 iPos2 = currentScene.GameObjects[index2].Position;
+
+                    if (Vector3Distance(iPos1, envCamera.Position) > Vector3Distance(iPos2, envCamera.Position))
+                    {
+                        // Set the new selected game object as closer
+                        return index2;
+                    }
+                    else
+                    {
+                        return index1;
+                    }
+                }
+                // Set the first potential selected element
+                return index2;
+            }
+            // Keep the old one 
+            return index1;
         }
         /// <summary>
         /// Rotate a model according to the mouse delta
