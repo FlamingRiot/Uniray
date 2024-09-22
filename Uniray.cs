@@ -519,9 +519,12 @@ namespace Uniray
                 }
                 for (int i = 0; i < files.Count; i++)
                 {
+                    // Define file row
+                    short row = (short)(i / 10);
+
                     // Define the drawing position
-                    int xPos = UI.Components["fileManager"].X + 150 * (i + 1) - 100;
-                    int yPos = UI.Components["fileManager"].Y + 60;
+                    int xPos = UI.Components["fileManager"].X + 150 * (i % 10 + 1) - 100;
+                    int yPos = UI.Components["fileManager"].Y + 60 + row * 120;
 
                     // Shorten the text
                     string lbl = "";
