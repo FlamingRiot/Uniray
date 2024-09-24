@@ -30,3 +30,4 @@ contains the needed files including the framework ones. You can now run it on an
 ## Contact
 
 The project is still in development and reviews and advices are welcome. If you have any question, consider contacting me at Evan.Comtesse@rpn.ch
+To report bugs to the administrator, go take a look in [bugs](BUGS.md)
