@@ -8,13 +8,13 @@ of every field of application and their corresponding acronym.
 
 ## List of acronyms
 
-- [ ] UT - Uniray-Three-Dimension
+- `UT` - Uniray-Three-Dimension
     : Relative to the 3D rendering of the application
-- [ ] UU - Uniray-UI
+- `UU` - Uniray-UI
     : Relative to the 2D UI of the application (e.g buttons, textboxes, etc.)
-- [ ] UB - Uniray-Build
+- `UB` - Uniray-Build
     : Relative to the build of the application 
-- [ ] UP - Uniray-Project
+- `UP` - Uniray-Project
     : Relative to the project managment of the application
 
 The above acronyms represent the main categorys present in the engine.
