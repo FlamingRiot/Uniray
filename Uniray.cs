@@ -146,7 +146,7 @@ namespace Uniray
         /// <param name="HWindow">The height of the window</param>
         /// <param name="font">The base font that will be used for the application UI</param>
         /// <param name="scene">A default scene to be used until the user loads/create a project</param>
-        public Uniray(int WWindow, int HWindow, Font font, Scene scene)
+        public Uniray(int WWindow, int HWindow, Scene scene, Font font)
         {
             // Intitialize the Uniray shaders
             shaders = new UShaders();
@@ -193,7 +193,7 @@ namespace Uniray
             // Initialize the volatile Data
             Data = new UData(modelFolder);
             // Intitialize UI
-            UI = new UI(WWindow, HWindow, font);
+            UI = new UI(WWindow, HWindow);
             // Initialize the error handler
             errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), font);
 
@@ -387,7 +387,7 @@ namespace Uniray
             // Check if the window has been resized to adjust the size of the UI
             if (IsWindowResized())
             {
-                UI = new UI(GetScreenWidth(), GetScreenHeight(), UI.Font);   
+                UI = new UI(GetScreenWidth(), GetScreenHeight());   
             }
             // Draw the outline rectangles that appear behind the main panels
             DrawRectangle(0, 0, (int)(UI.Width - UI.Width / 1.25f), UI.Height, new Color(20, 20, 20, 255));
@@ -534,12 +534,12 @@ namespace Uniray
                     if (files[i] is UFile)
                     {
                         DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
-                        DrawLabel(new Label(xPos + 10 - lbl.Length / 2, yPos + fileTex.Height + 20, lbl), UI.Font);
+                        DrawLabel(new Label(xPos + 10 - lbl.Length / 2, yPos + fileTex.Height + 20, lbl));
                     }
                     else if (files[i] is UFolder)
                     {
                         DrawPanel(new Panel(xPos, yPos, 1, 0, folderTex, ""));
-                        DrawLabel(new Label(xPos + 10 + files[i].Name.Length / 3, yPos + fileTex.Height + 20, lbl), UI.Font);
+                        DrawLabel(new Label(xPos + 10 + files[i].Name.Length / 3, yPos + fileTex.Height + 20, lbl));
                     }
 
                     // Check interactions

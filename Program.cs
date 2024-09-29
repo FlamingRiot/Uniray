@@ -16,15 +16,15 @@ namespace Uniray
             InitWindow(1800, 900, "Uniray - New Project");
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
-            
-            // Init the GUI library with the two main colors of the application
-            InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
 
             // Change CultureInfo
             ChangeCultureInfo();
 
             // Load font
             Font font = LoadFont("data/font/Ubuntu-Regular.ttf");
+
+            // Init the GUI library with the two main colors of the application
+            InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, font);
 
             // Get Window size
             int width = GetScreenWidth();
@@ -43,7 +43,7 @@ namespace Uniray
 
             // Set UI and application default
             Scene scene = new Scene(new List<GameObject3D>());
-            Uniray uniray = new Uniray(width, height, font, scene);
+            Uniray uniray = new Uniray(width, height, scene, font);
 #if !DEBUG
             SetTargetFPS(60);
 #endif

@@ -44,14 +44,13 @@ namespace Uniray
         /// <param name="width">Window width</param>
         /// <param name="height">Window height</param>
         /// <param name="font">Font</param>
-        public UI(int width, int height, Font font)
+        public UI(int width, int height)
         {
             // Instanciate the components dictionary
             Components = new Dictionary<string, Component>();
             // Instanciate the modals dictionary
             Modals = new Dictionary<string, Modal>();
             // Instanciate font and size of the UI
-            this.font = font;
             this.width = width;
             this.height = height;
 
@@ -60,7 +59,7 @@ namespace Uniray
             int cont1Y = (int)(height - height / 3f);
             // Containers
             // FileManager
-            Container fileManager = new Container(cont1X, cont1Y, width - cont1X - 10, height - cont1Y - 10, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "models");
+            Container fileManager = new Container(cont1X, cont1Y, width - cont1X - 10, height - cont1Y - 10, "models");
             fileManager.Type = ContainerType.FileDropper;
             fileManager.ExtensionFile = "m3d";
             fileManager.OutputFilePath = "/assets/models";
@@ -68,60 +67,60 @@ namespace Uniray
             Components.Add("fileManager", fileManager);
 
             // GameManager
-            Container gameManager = new Container(10, 10, cont1X - 20, height - 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "gameManager");
+            Container gameManager = new Container(10, 10, cont1X - 20, height - 20, "gameManager");
             Components.Add("gameManager", gameManager);
 
             // Modal Template
-            Container modalTemplate = new Container(width / 2 - width / 6, height / 2 - height / 6, width / 3, height / 3, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "modal");
+            Container modalTemplate = new Container(width / 2 - width / 6, height / 2 - height / 6, width / 3, height / 3, "modal");
             Components.Add("modalTemplate", modalTemplate);
 
             // Buttons
             // Models section
-            Button modelButton = new Button("Models", fileManager.X + 48, fileManager.Y, 60, 25, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "modelsSection");
+            Button modelButton = new Button("Models", fileManager.X + 48, fileManager.Y, 60, 25, "modelsSection");
             modelButton.Event = UpdateToModel;
             Components.Add("modelsButton", modelButton);
 
             // Textures section
-            Button texturesButton = new Button("Textures", fileManager.X + 164, fileManager.Y, 60, 25, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "texturesSection");
+            Button texturesButton = new Button("Textures", fileManager.X + 164, fileManager.Y, 60, 25, "texturesSection");
             texturesButton.Event = UpdateToTexture;
             Components.Add("texturesButton", texturesButton);
 
             // Sounds section
-            Button soundsButton = new Button("Sounds", fileManager.X + 260, fileManager.Y, 60, 25, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "soundsSection");
+            Button soundsButton = new Button("Sounds", fileManager.X + 260, fileManager.Y, 60, 25, "soundsSection");
             soundsButton.Event = UpdateToSound;
             Components.Add("soundsButton", soundsButton);
 
             // Animations section
-            Button animationsButton = new Button("Animations", fileManager.X + 392, fileManager.Y, 60, 25, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "animationsSections");
+            Button animationsButton = new Button("Animations", fileManager.X + 392, fileManager.Y, 60, 25, "animationsSections");
             animationsButton.Event = UpdateToAnimation;
             Components.Add("animationsButton", animationsButton);
 
             // Scripts section
-            Button scriptsButton = new Button("Scripts", fileManager.X + 492, fileManager.Y, 60, 25, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "scriptsSections");
+            Button scriptsButton = new Button("Scripts", fileManager.X + 492, fileManager.Y, 60, 25, "scriptsSections");
             scriptsButton.Event = UpdateToScript;
             Components.Add("scriptsButton", scriptsButton);
 
             // Open File button
-            Button openFileButton = new Button("Open", fileManager.X + fileManager.Width - 38, fileManager.Y + 5, 40, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "openExplorer") { Type = ButtonType.PathFinder };
+            Button openFileButton = new Button("Open", fileManager.X + fileManager.Width - 38, fileManager.Y + 5, 40, 20, "openExplorer") { Type = ButtonType.PathFinder };
             Components.Add("openFileButton", openFileButton);
 
             // Open project button
-            Button openProjectButton = new Button("Open project", fileManager.X + fileManager.Width - 175, fileManager.Y + 5, 125, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "openProject");
+            Button openProjectButton = new Button("Open project", fileManager.X + fileManager.Width - 175, fileManager.Y + 5, 125, 20, "openProject");
             openProjectButton.Event = OpenProject;
             Components.Add("openProjectButton", openProjectButton);
 
             // New project button
-            Button newProjectButton = new Button("New project", fileManager.X + fileManager.Width - 303, fileManager.Y + 5, 50, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "newProject");
+            Button newProjectButton = new Button("New project", fileManager.X + fileManager.Width - 303, fileManager.Y + 5, 50, 20, "newProject");
             newProjectButton.Event = NewProject;
             Components.Add("newProjectButton", newProjectButton);
 
             // Play/Build button
-            Button playButton = new Button("Play", (width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, "play");
+            Button playButton = new Button("Play", (width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, "play");
             playButton.Event = BuildProject;
             Components.Add("playButton", playButton);
 
             // Upstream folder button
-            Button returnButton = new Button("<", fileManager.X + 10, fileManager.Y + 40, 20, 20, Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            Button returnButton = new Button("<", fileManager.X + 10, fileManager.Y + 40, 20, 20);
             returnButton.Event = BackFolder;
             Components.Add("returnButton", returnButton);
 
@@ -145,19 +144,21 @@ namespace Uniray
 
             // Textboxes
             // Texture field textbox
-            Textbox txb = new Textbox(Components["gameManager"].X + 100, Components["gameManager"].Y + Components["gameManager"].Height / 2 + 290, Components["gameManager"].Width - 120, 40, "", Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            Textbox txb = new Textbox(Components["gameManager"].X + 100, Components["gameManager"].Y + Components["gameManager"].Height / 2 + 290, Components["gameManager"].Width - 120, 40, "");
             Components.Add("textureTextbox", txb);
 
             // Modals
-            Button okModalButton = new Button("Proceed", Components["modalTemplate"].X + Components["modalTemplate"].Width - 70, Components["modalTemplate"].Y + Components["modalTemplate"].Height - 30, 60, 20, Color.Lime, Uniray.FOCUS_COLOR);
+            Button okModalButton = new Button("Proceed", Components["modalTemplate"].X + Components["modalTemplate"].Width - 70, Components["modalTemplate"].Y + Components["modalTemplate"].Height - 30, 60, 20);
+            okModalButton.BaseColor = Color.Lime;
             okModalButton.Event = OkModal;
-            Button closeModalButton = new Button("x", Components["modalTemplate"].X + Components["modalTemplate"].Width - 30, Components["modalTemplate"].Y + 10, 20, 20, Color.Red, Uniray.FOCUS_COLOR);
+            Button closeModalButton = new Button("x", Components["modalTemplate"].X + Components["modalTemplate"].Width - 30, Components["modalTemplate"].Y + 10, 20, 20);
+            closeModalButton.BaseColor = Color.Red;
             closeModalButton.Event = CloseModal;
             // Open project modal
             Dictionary<string, Component> openProjModalComponents = new Dictionary<string, Component>();
             Label openProjectLabel = new Label(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 50, "Copy .uproj link");
             openProjModalComponents.Add("openProjectLabel", openProjectLabel);
-            Textbox openProjectTextbox = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 70, 250, 20, "", Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            Textbox openProjectTextbox = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 70, 250, 20, "");
             openProjModalComponents.Add("openProjectTextbox", openProjectTextbox);
             openProjModalComponents.Add("closeModalButton", closeModalButton);
             openProjModalComponents.Add("okModalButton", okModalButton);
@@ -170,9 +171,9 @@ namespace Uniray
             newProjModalComponents.Add("newProjectLabel1", newProjectLabel1);
             Label newProjectLabel2 = new Label(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 100, "Choose your project name");
             newProjModalComponents.Add("newProjectLabel2", newProjectLabel2);
-            Textbox newProjectTextbox1 = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 70, 250, 20, "", Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            Textbox newProjectTextbox1 = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 70, 250, 20, "");
             newProjModalComponents.Add("newProjectTextbox1", newProjectTextbox1);
-            Textbox newProjectTextbox2 = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 120, 250, 20, "", Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR);
+            Textbox newProjectTextbox2 = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 120, 250, 20, "");
             newProjModalComponents.Add("newProjectTextbox2", newProjectTextbox2);
             newProjModalComponents.Add("closeModalButton", closeModalButton);
             newProjModalComponents.Add("okModalButton", okModalButton);
@@ -196,16 +197,16 @@ namespace Uniray
                 switch (component.Value)
                 {
                     case Button button:
-                        RayGUI.DrawButton(button, Font);
+                        RayGUI.DrawButton(button);
                         if (RayGUI.Hover(button.X, button.Y, button.Width, button.Height)) { focus = true; }
                         break;
                     case Textbox textbox:
-                        RayGUI.DrawTextbox(ref textbox, Font);
+                        RayGUI.DrawTextbox(ref textbox);
                         components[component.Key] = textbox;
                         if (RayGUI.Hover(textbox.X, textbox.Y, textbox.Width, textbox.Height)) { focus = true; }
                         break;
                     case Label label:
-                        RayGUI.DrawLabel(label, Font);
+                        RayGUI.DrawLabel(label);
                         break;
                     case Panel panel:
                         RayGUI.DrawPanel(panel);
@@ -213,9 +214,6 @@ namespace Uniray
                     case Tickbox tickbox:
                         RayGUI.DrawTickbox(ref tickbox);
                         Components[component.Key] = tickbox;
-                        break;
-                    case DragDropBox dragDropBox:
-                        RayGUI.DrawDragDropBox(dragDropBox);
                         break;
                     case Container container:
                         if (container.Tag != "modal") RayGUI.DrawContainer(ref container);
