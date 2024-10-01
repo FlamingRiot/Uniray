@@ -3,6 +3,7 @@ using static RayGUI_cs.RayGUI;
 using Raylib_cs;
 using System.Numerics;
 using System.Globalization;
+using Uniray.Managment;
 
 namespace Uniray
 {
@@ -17,6 +18,9 @@ namespace Uniray
     /// <summary>Represents an instance of the running program.</summary>
     public class Program
     {
+        internal static int Width;
+        internal static int Height;
+
         /// <summary>Enters the entrypoint of the program.</summary>
         /// <param name="args">Passed arguments from the outside.</param>
         unsafe static void Main(string[] args)
@@ -28,38 +32,30 @@ namespace Uniray
             // Set program state
             Uniray.State = ProgramState.Loading;
 
+            Width = GetScreenWidth();
+            Height = GetScreenHeight();
+
             // Change CultureInfo
             ChangeCultureInfo();
 
-            // Load font
-            Font font = LoadFont("data/font/Ubuntu-Regular.ttf");
-
             // Init the GUI library with the two main colors of the application
-            InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, font);
-
-            // Get Window size
-            int width = GetScreenWidth();
-            int height = GetScreenHeight();
+            InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, LoadFont("data/font/Ubuntu-Regular.ttf"));
 
             // Set 3D camera for the default scene
-            Camera3D camera = new Camera3D();
-            camera.Projection = CameraProjection.Perspective;
-            camera.Position = new Vector3(5, 5, 0);
-            camera.Target = Vector3.Zero;
-            camera.Up = Vector3.UnitY;
-            camera.FovY = 90f;
-
+            Camera3D camera = RLoading.LoadCamera();
+            
             // Set camera motion object
-            CameraMotion motion = new CameraMotion(2f, (short)width, (short)height);
+            CameraMotion motion = new(2f, (short)Width, (short)Height);
 
-            // Set UI and application default
-            Scene scene = new Scene(new List<GameObject3D>());
-            Uniray uniray = new Uniray(width, height, scene, font);
+            // Set UI and application default scene
+            Scene scene = new(new List<GameObject3D>());
+            Uniray uniray = new(scene);
+
+            // Maximize window
+            SetWindowState(ConfigFlags.MaximizedWindow);
 #if !DEBUG
             SetTargetFPS(60);
 #endif
-            SetWindowState(ConfigFlags.MaximizedWindow);
-            // Game Loop
             while (!WindowShouldClose())
             {
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.S))
@@ -72,7 +68,7 @@ namespace Uniray
                 // =========================================================================================================================================================
                 
                 if (Hover(uniray.UI.Components["gameManager"].X + uniray.UI.Components["gameManager"].Width + 
-                    10, 0, width - uniray.UI.Components["gameManager"].Width - 20, height - uniray.UI.Components["fileManager"].Height - 20))
+                    10, 0, Width - uniray.UI.Components["gameManager"].Width - 20, Height - uniray.UI.Components["fileManager"].Height - 20))
                 {
                     if (IsMouseButtonReleased(MouseButton.Middle))
                     {

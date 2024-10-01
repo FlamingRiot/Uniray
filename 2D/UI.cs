@@ -7,14 +7,6 @@ namespace Uniray
     public class UI
     {
         /// <summary>
-        /// Width of the UI
-        /// </summary>
-        private int width;
-        /// <summary>
-        /// Height of the UI 
-        /// </summary>
-        private int height;
-        /// <summary>
         /// The list of every components in the UI
         /// </summary>
         public Dictionary<string, Component> Components;
@@ -31,35 +23,24 @@ namespace Uniray
         /// </summary>
         public Font Font { get { return font; } set { font = value; } }
         /// <summary>
-        /// Width of the UI
-        /// </summary>
-        public int Width { get { return width; } set { width = value; } }
-        /// <summary>
-        /// Height of the UI
-        /// </summary>
-        public int Height { get { return height; } set { height = value; } }
-        /// <summary>
         /// UI Constructor
         /// </summary>
         /// <param name="width">Window width</param>
         /// <param name="height">Window height</param>
         /// <param name="font">Font</param>
-        public UI(int width, int height)
+        public UI()
         {
             // Instanciate the components dictionary
             Components = new Dictionary<string, Component>();
             // Instanciate the modals dictionary
             Modals = new Dictionary<string, Modal>();
-            // Instanciate font and size of the UI
-            this.width = width;
-            this.height = height;
 
             // Create the UI components
-            int cont1X = (int)(width - width / 1.25f);
-            int cont1Y = (int)(height - height / 3f);
+            int cont1X = (int)(Program.Width - Program.Width / 1.25f);
+            int cont1Y = (int)(Program.Height - Program.Height / 3f);
             // Containers
             // FileManager
-            Container fileManager = new Container(cont1X, cont1Y, width - cont1X - 10, height - cont1Y - 10, "models");
+            Container fileManager = new Container(cont1X, cont1Y, Program.Width - cont1X - 10, Program.Height - cont1Y - 10, "models");
             fileManager.Type = ContainerType.FileDropper;
             fileManager.ExtensionFile = "m3d";
             fileManager.OutputFilePath = "/assets/models";
@@ -67,11 +48,11 @@ namespace Uniray
             Components.Add("fileManager", fileManager);
 
             // GameManager
-            Container gameManager = new Container(10, 10, cont1X - 20, height - 20, "gameManager");
+            Container gameManager = new Container(10, 10, cont1X - 20, Program.Height - 20, "gameManager");
             Components.Add("gameManager", gameManager);
 
             // Modal Template
-            Container modalTemplate = new Container(width / 2 - width / 6, height / 2 - height / 6, width / 3, height / 3, "modal");
+            Container modalTemplate = new Container(Program.Width / 2 - Program.Width / 6, Program.Height / 2 - Program.Height / 6, Program.Width / 3, Program.Height / 3, "modal");
             Components.Add("modalTemplate", modalTemplate);
 
             // Buttons
@@ -115,7 +96,7 @@ namespace Uniray
             Components.Add("newProjectButton", newProjectButton);
 
             // Play/Build button
-            Button playButton = new Button("Play", (width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, "play");
+            Button playButton = new Button("Play", (Program.Width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, "play");
             playButton.Event = BuildProject;
             Components.Add("playButton", playButton);
 
@@ -139,7 +120,7 @@ namespace Uniray
             Components.Add("textureLabel", goTextureLabel);
 
             // Game object label
-            Label gameObjectLabel = new Label(Components["gameManager"].X + 10, Components["gameManager"].Y + height / 2, "Game Object");
+            Label gameObjectLabel = new Label(Components["gameManager"].X + 10, Components["gameManager"].Y + Program.Height / 2, "Game Object");
             Components.Add("gameObjectLabel", gameObjectLabel);
 
             // Textboxes
@@ -229,7 +210,7 @@ namespace Uniray
         /// <param name="key">Key of the modal to draw</param>
         public void DrawModal(string key, ref bool focus)
         {
-            Raylib.DrawRectangle(0, 0, width, height, new Color(0, 0, 0, 75));
+            Raylib.DrawRectangle(0, 0, Program.Width, Program.Height, new Color(0, 0, 0, 75));
             RayGUI.DrawContainer((Container)Components["modalTemplate"]);
             DrawComponents(Modals[key].Components, ref focus);
         }

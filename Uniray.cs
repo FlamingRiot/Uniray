@@ -1,9 +1,12 @@
-﻿using static Raylib_cs.Raylib;
+﻿// Raylib
+using static Raylib_cs.Raylib;
 using static Raylib_cs.Raymath;
 using static Raylib_cs.Rlgl;
 using Raylib_cs;
+// RayGUI
 using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
+// Other
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
@@ -12,14 +15,17 @@ namespace Uniray
 {
     /// <summary>Represents an instance of the Uniray application.</summary>
     public unsafe struct Uniray
-    {
+    { 
+        /// <summary>Base FOV of the environment camera.</summary>
+        internal const int CAMERA_FOV = 90;
+
         /// <summary>Current state of the program.</summary>
         internal static ProgramState State;
 
         /// <summary>Primary color of the application.</summary>
-        public static readonly Color APPLICATION_COLOR = new Color(30, 30, 30, 255);
+        public static readonly Color APPLICATION_COLOR = new(30, 30, 30, 255);
         /// <summary>Secondary color of the application.</summary>
-        public static readonly Color FOCUS_COLOR = new Color(60, 60, 60, 255);
+        public static readonly Color FOCUS_COLOR = new(60, 60, 60, 255);
 
         /// <summary>
         /// The object containing all the assets that have been loaded in the RAM
@@ -143,15 +149,15 @@ namespace Uniray
         /// </summary>
         /// <param name="WWindow">The width of the window</param>
         /// <param name="HWindow">The height of the window</param>
-        /// <param name="font">The base font that will be used for the application UI</param>
         /// <param name="scene">A default scene to be used until the user loads/create a project</param>
-        public Uniray(int WWindow, int HWindow, Scene scene, Font font)
+        public Uniray(Scene scene)
         {
             // Intitialize the Uniray shaders
             shaders = new UShaders();
             panorama = LoadTexture("data/shaders/skyboxes/industrial.hdr");
             cubemap = shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
             shaders.SetCubemap(cubemap);
+
             // Unload useless texture
             UnloadTexture(panorama);
 
@@ -165,8 +171,8 @@ namespace Uniray
             selection = new List<GameObject3D>();
 
             // Create the render texture for preview of a camera's POV
-            cameraView = LoadRenderTexture(WWindow / 2, HWindow / 2);
-            cameraViewRec = new Rectangle(0, 0, WWindow / 2, -(HWindow / 2));
+            cameraView = LoadRenderTexture(Program.Width / 2, Program.Height / 2);
+            cameraViewRec = new Rectangle(0, 0, Program.Width / 2, -(Program.Height / 2));
 
             // 3D-2D Collision variables
             mouseRay = new Ray();
@@ -192,9 +198,9 @@ namespace Uniray
             // Initialize the volatile Data
             Data = new UData(modelFolder);
             // Intitialize UI
-            UI = new UI(WWindow, HWindow);
+            UI = new UI();
             // Initialize the error handler
-            errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), font);
+            errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), RayGUI.Font);
 
         }
         public void DrawScene()
@@ -386,11 +392,13 @@ namespace Uniray
             // Check if the window has been resized to adjust the size of the UI
             if (IsWindowResized())
             {
-                UI = new UI(GetScreenWidth(), GetScreenHeight());   
+                Program.Width = GetScreenWidth();
+                Program.Height = GetScreenHeight();
+                UI = new UI();   
             }
             // Draw the outline rectangles that appear behind the main panels
-            DrawRectangle(0, 0, (int)(UI.Width - UI.Width / 1.25f), UI.Height, new Color(20, 20, 20, 255));
-            DrawRectangle(0, UI.Height - UI.Height / 3 - 10, UI.Width, UI.Height - (UI.Height - UI.Height / 3) + 10, new Color(20, 20, 20, 255));
+            DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.25f), Program.Height, new Color(20, 20, 20, 255));
+            DrawRectangle(0, Program.Height - Program.Height / 3 - 10, Program.Width, Program.Height - (Program.Height - Program.Height / 3) + 10, new Color(20, 20, 20, 255));
 
             // Draw the entire UI and handle the events related to it
             UI.Draw();
@@ -442,8 +450,8 @@ namespace Uniray
             // Render the selected camera POV to the top right corner of the screen
             if (selection.Count == 1 && selection.First() is UCamera cam)
             {
-                DrawRectangleLinesEx(new Rectangle(UI.Width - UI.Width / 5 - 11, 9, UI.Width / 5 + 2, UI.Height / 5 + 2), 2, Color.White);
-                DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(UI.Width - UI.Width / 5 - 10, 10, UI.Width / 5, UI.Height / 5), Vector2.Zero, 0, Color.White);
+                DrawRectangleLinesEx(new Rectangle(Program.Width - Program.Width / 5 - 11, 9, Program.Width / 5 + 2, Program.Height / 5 + 2), 2, Color.White);
+                DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(Program.Width - Program.Width / 5 - 10, 10, Program.Width / 5, Program.Height / 5), Vector2.Zero, 0, Color.White);
             }
 
             // Draw the currently displayed modal and define its state
