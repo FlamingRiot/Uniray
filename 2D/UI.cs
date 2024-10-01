@@ -1,33 +1,18 @@
 ﻿using RayGUI_cs;
 using Raylib_cs;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Uniray
 {
+    /// <summary>Represents an instance of the application's <see cref="UI"/>.</summary>
     public class UI
     {
-        /// <summary>
-        /// The list of every components in the UI
-        /// </summary>
+        /// <summary>The list of every components in the UI</summary>
         public Dictionary<string, Component> Components;
-        /// <summary>
-        /// The list of every modals in the UI that are accessible
-        /// </summary>
+
+        /// <summary>The list of every modal in the UI</summary>
         public Dictionary<string, Modal> Modals;
-        /// <summary>
-        /// UI Font
-        /// </summary>
-        private Font font;
-        /// <summary>
-        /// UI Font
-        /// </summary>
-        public Font Font { get { return font; } set { font = value; } }
-        /// <summary>
-        /// UI Constructor
-        /// </summary>
-        /// <param name="width">Window width</param>
-        /// <param name="height">Window height</param>
-        /// <param name="font">Font</param>
+
+        /// <summary>Creates an instance of a <see cref="UI"/>.</summary>
         public UI()
         {
             // Instanciate the components dictionary

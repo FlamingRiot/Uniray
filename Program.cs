@@ -148,13 +148,11 @@ namespace Uniray
             uniray.Shaders.UnloadShaders();
         }
 
-        /// <summary>
-        /// Move the conceptor's camera
-        /// </summary>
-        /// <param name="distance">Distance from the target</param>
-        /// <param name="camera">3D camera (conceptor's)</param>
-        /// <param name="targetPosition">Target of the camera</param>
-        /// <param name="yOffset">Well I don't even remember what this is</param>
+        /// <summary>Moves the editor's camera.</summary>
+        /// <param name="distance">Distance from the target.</param>
+        /// <param name="camera">3D camera of the editor.</param>
+        /// <param name="targetPosition">Target of the camera.</param>
+        /// <param name="yOffset">Well I don't even remember what this is.</param>
         /// <param name="zoom">Is zoom possible ?</param>
         /// <param name="mousePos">Last position of the mouse</param>
         /// <param name="mouseOrigin">First position of the mouse when interacting with movement</param>
