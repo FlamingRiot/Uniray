@@ -6,16 +6,27 @@ using System.Globalization;
 
 namespace Uniray
 {
+    /// <summary>Represents the current state of the program.</summary>
+    internal enum ProgramState
+    {
+        Loading,
+        Running,
+        Reduced
+    }
+
+    /// <summary>Represents an instance of the running program.</summary>
     public class Program
     {
-        public float CameraDistance;
-
+        /// <summary>Enters the entrypoint of the program.</summary>
+        /// <param name="args">Passed arguments from the outside.</param>
         unsafe static void Main(string[] args)
         {
             // Initialize window and set mode
             InitWindow(1800, 900, "Uniray - New Project");
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
+            // Set program state
+            Uniray.State = ProgramState.Loading;
 
             // Change CultureInfo
             ChangeCultureInfo();

@@ -7,19 +7,18 @@ using RayGUI_cs;
 using System.Numerics;
 using System.Text;
 using Newtonsoft.Json;
-using System;
 
 namespace Uniray
 {
+    /// <summary>Represents an instance of the Uniray application.</summary>
     public unsafe struct Uniray
     {
-        /// <summary>
-        /// Public application main color
-        /// </summary>
+        /// <summary>Current state of the program.</summary>
+        internal static ProgramState State;
+
+        /// <summary>Primary color of the application.</summary>
         public static readonly Color APPLICATION_COLOR = new Color(30, 30, 30, 255);
-        /// <summary>
-        /// Public application secondary color
-        /// </summary>
+        /// <summary>Secondary color of the application.</summary>
         public static readonly Color FOCUS_COLOR = new Color(60, 60, 60, 255);
 
         /// <summary>
