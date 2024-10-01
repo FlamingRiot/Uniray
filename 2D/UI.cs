@@ -29,7 +29,7 @@ namespace Uniray
             fileManager.Type = ContainerType.FileDropper;
             fileManager.ExtensionFile = "m3d";
             fileManager.OutputFilePath = "/assets/models";
-            Uniray.Data.CurrentFolder = Uniray.modelFolder;
+            UData.CurrentFolder = Uniray.modelFolder;
             Components.Add("fileManager", fileManager);
 
             // GameManager
@@ -153,8 +153,8 @@ namespace Uniray
         {
             bool focus = false;
             DrawComponents(Components, ref focus);
-            if (Uniray.Data.CurrentModal is not null) DrawModal(Uniray.Data.CurrentModal, ref focus);
-            if (!focus && Uniray.Data.SelectedFile is null) { Raylib.SetMouseCursor(MouseCursor.Default); }
+            if (UData.CurrentModal is not null) DrawModal(UData.CurrentModal, ref focus);
+            if (!focus && UData.SelectedFile is null) { Raylib.SetMouseCursor(MouseCursor.Default); }
         }
         private void DrawComponents(Dictionary<string, Component> components, ref bool focus)
         {
@@ -206,10 +206,10 @@ namespace Uniray
         {
             ((Container)Components["fileManager"]).ExtensionFile = "m3d";
             ((Container)Components["fileManager"]).Tag = "models";
-            if (Uniray.Data.CurrentProject is not null) 
+            if (UData.CurrentProject is not null) 
             {
-                ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/models";
-                Uniray.Data.CurrentFolder = Uniray.modelFolder;
+                ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(UData.CurrentProject.Path) + "/assets/models";
+                UData.CurrentFolder = Uniray.modelFolder;
             }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .m3d";
         }
@@ -220,10 +220,10 @@ namespace Uniray
         {
             ((Container)Components["fileManager"]).ExtensionFile = "png";
             ((Container)Components["fileManager"]).Tag = "textures";
-            if (Uniray.Data.CurrentProject is not null)
+            if (UData.CurrentProject is not null)
             {
-                ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/textures";
-                Uniray.Data.CurrentFolder = Uniray.textureFolder;
+                ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(UData.CurrentProject.Path) + "/assets/textures";
+                UData.CurrentFolder = Uniray.textureFolder;
             }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .png";
         }
@@ -234,10 +234,10 @@ namespace Uniray
         {
             ((Container)Components["fileManager"]).ExtensionFile = "wav";
             ((Container)Components["fileManager"]).Tag = "sounds";
-            if (Uniray.Data.CurrentProject is not null)
+            if (UData.CurrentProject is not null)
             {
-                ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/sounds";
-                Uniray.Data.CurrentFolder = Uniray.soundFolder;
+                ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(UData.CurrentProject.Path) + "/assets/sounds";
+                UData.CurrentFolder = Uniray.soundFolder;
             }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .wav";
         }
@@ -248,10 +248,10 @@ namespace Uniray
         {
             ((Container)Components["fileManager"]).ExtensionFile = "m3d";
             ((Container)Components["fileManager"]).Tag = "animations";
-            if (Uniray.Data.CurrentProject is not null)
+            if (UData.CurrentProject is not null)
             {
-                ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/animations";
-                Uniray.Data.CurrentFolder = Uniray.animationFolder;
+                ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(UData.CurrentProject.Path) + "/assets/animations";
+                UData.CurrentFolder = Uniray.animationFolder;
             }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .m3d";
         }
@@ -262,19 +262,19 @@ namespace Uniray
         {
             ((Container)Components["fileManager"]).ExtensionFile = "cs";
             ((Container)Components["fileManager"]).Tag = "scripts";
-            if (Uniray.Data.CurrentProject is not null)
+            if (UData.CurrentProject is not null)
             {
-                ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path) + "/assets/scripts";
-                Uniray.Data.CurrentFolder = Uniray.scriptFolder;
+                ((Container)Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(UData.CurrentProject.Path) + "/assets/scripts";
+                UData.CurrentFolder = Uniray.scriptFolder;
             }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .cs";
         }
         private void BuildProject()
         {
-            if (Uniray.Data.CurrentProject is not null)
+            if (UData.CurrentProject is not null)
             {
                 // Build and run project here...
-                string? projectPath = Path.GetDirectoryName(Uniray.Data.CurrentProject.Path);
+                string? projectPath = Path.GetDirectoryName(UData.CurrentProject.Path);
                 string commmand = "/C cd " + projectPath + " && dotnet run --project uniray_Project.csproj";
                 System.Diagnostics.Process.Start("CMD.exe", commmand);
             }
@@ -284,7 +284,7 @@ namespace Uniray
         /// </summary>
         public void BackFolder()
         {
-            if (Uniray.Data.CurrentFolder.UpstreamFolder is not null) Uniray.Data.CurrentFolder = Uniray.Data.CurrentFolder.UpstreamFolder;
+            if (UData.CurrentFolder.UpstreamFolder is not null) UData.CurrentFolder = UData.CurrentFolder.UpstreamFolder;
 
         }
         /// <summary>
@@ -292,28 +292,28 @@ namespace Uniray
         /// </summary>
         private void CloseModal()
         {
-            Uniray.Data.LastModalExitCode = 0;
+            UData.LastModalExitCode = 0;
         }
         /// <summary>
         /// Send exit code for negative response on new project modal
         /// </summary>
         private void OkModal()
         {
-            Uniray.Data.LastModalExitCode = 1;
+            UData.LastModalExitCode = 1;
         }
         /// <summary>
         /// Open the 'new project' modal
         /// </summary>
         private void OpenProject()
         {
-            Uniray.Data.CurrentModal = "openProjectModal";
+            UData.CurrentModal = "openProjectModal";
         }
         /// <summary>
         /// Open the 'open project' modal
         /// </summary>
         private void NewProject()
         {
-            Uniray.Data.CurrentModal = "newProjectModal";
+            UData.CurrentModal = "newProjectModal";
         }
     }
 }

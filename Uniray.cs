@@ -31,10 +31,6 @@ namespace Uniray
         /// The object containing all the assets that have been loaded in the RAM
         /// </summary>
         public static Ressource Ressource;
-        /// <summary>
-        /// The object containing all the short-life/interactive informations of the application
-        /// </summary>
-        public static UData Data;
 
         // 2D related attributes
         /// <summary>
@@ -196,7 +192,7 @@ namespace Uniray
             skybox = GenMeshCube(1.0f, 1.0f, 1.0f);
 
             // Initialize the volatile Data
-            Data = new UData(modelFolder);
+            UData.CurrentFolder = modelFolder;
             // Intitialize UI
             UI = new UI();
             // Initialize the error handler
@@ -410,29 +406,29 @@ namespace Uniray
             new_File = ((Container)UI.Components["fileManager"]).GetLastFile();
             new_File = new_File.Replace('\\', '/');
             UFile file = new UFile(new_File);
-            if (((Container)UI.Components["fileManager"]).GetLastFile() != ((Container)UI.Components["fileManager"]).LastFile && Data.CurrentProject is not null)
+            if (((Container)UI.Components["fileManager"]).GetLastFile() != ((Container)UI.Components["fileManager"]).LastFile && UData.CurrentProject is not null)
             {
                 switch (new_File.Split('.').Last())
                 {
                     case "m3d":
                         if (modelFolder.Files.Count == 0)
                         {
-                            Data.CurrentFolder.AddFile(file);
+                            UData.CurrentFolder.AddFile(file);
                         }
                         else if (modelFolder.Files.Last().Name != file.Name)
                         {
-                            Data.CurrentFolder.AddFile(file);
+                            UData.CurrentFolder.AddFile(file);
                         }
                         break;
                     case "png":
                         if (textureFolder.Files.Count == 0)
                         {
-                            Data.CurrentFolder.AddFile(file);
+                            UData.CurrentFolder.AddFile(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
                         else if (textureFolder.Files.Last().Name != file.Name)
                         {
-                            Data.CurrentFolder.AddFile(file);
+                            UData.CurrentFolder.AddFile(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
                         break;
@@ -445,7 +441,7 @@ namespace Uniray
                 ((Container)UI.Components["fileManager"]).LastFile = "";
             }
             // Draw the files along with their name in the file manager
-            DrawManagerFiles(ref Data.CurrentFolder.Files);
+            DrawManagerFiles(ref UData.CurrentFolder.Files);
 
             // Render the selected camera POV to the top right corner of the screen
             if (selection.Count == 1 && selection.First() is UCamera cam)
@@ -455,40 +451,40 @@ namespace Uniray
             }
 
             // Draw the currently displayed modal and define its state
-            if (Data.CurrentModal is not null)
+            if (UData.CurrentModal is not null)
             {
                 // If the user closed the modal without proceeding
-                if (Data.LastModalExitCode == 0)
+                if (UData.LastModalExitCode == 0)
                 {
-                    Data.CurrentModal = null;
-                    Data.LastModalExitCode = null;
+                    UData.CurrentModal = null;
+                    UData.LastModalExitCode = null;
                 }
                 // If the user closed the modal by proceeding
-                else if (Data.LastModalExitCode == 1)
+                else if (UData.LastModalExitCode == 1)
                 {
-                    switch (Data.CurrentModal)
+                    switch (UData.CurrentModal)
                     {
                         // Open project modal
                         case "openProjectModal":
-                            LoadProject(((Textbox)UI.Modals[Data.CurrentModal].Components["openProjectTextbox"]).Text);
-                            Data.CurrentModal = null;
-                            Data.LastModalExitCode = null;
+                            LoadProject(((Textbox)UI.Modals[UData.CurrentModal].Components["openProjectTextbox"]).Text);
+                            UData.CurrentModal = null;
+                            UData.LastModalExitCode = null;
                             break;
                         // Create project modal
                         case "newProjectModal":
-                            string path = ((Textbox)UI.Modals[Data.CurrentModal].Components["newProjectTextbox1"]).Text;
-                            string name = ((Textbox)UI.Modals[Data.CurrentModal].Components["newProjectTextbox2"]).Text;
+                            string path = ((Textbox)UI.Modals[UData.CurrentModal].Components["newProjectTextbox1"]).Text;
+                            string name = ((Textbox)UI.Modals[UData.CurrentModal].Components["newProjectTextbox2"]).Text;
                             CreateProject(path, name);
-                            Data.CurrentModal = null;
-                            Data.LastModalExitCode = null;
+                            UData.CurrentModal = null;
+                            UData.LastModalExitCode = null;
                             break;
                     }
                 }
             }
             // Check the shortcut for game building
-            if (IsKeyPressed(KeyboardKey.F5) && Data.CurrentProject is not null)
+            if (IsKeyPressed(KeyboardKey.F5) && UData.CurrentProject is not null)
             {
-                BuildProject(Data.CurrentProject.Path);
+                BuildProject(UData.CurrentProject.Path);
             }
         }
 
@@ -519,10 +515,10 @@ namespace Uniray
                 // Check if shortcut is used to create folder
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
                 {
-                    UFolder folder = new UFolder(Data.CurrentFolder.Path + "/new", new List<UStorage>());
-                    folder.UpstreamFolder = Data.CurrentFolder;
+                    UFolder folder = new UFolder(UData.CurrentFolder.Path + "/new", new List<UStorage>());
+                    folder.UpstreamFolder = UData.CurrentFolder;
                     files.Add(folder);
-                    Directory.CreateDirectory(Data.CurrentFolder.Path + "/new");
+                    Directory.CreateDirectory(UData.CurrentFolder.Path + "/new");
                 }
                 for (int i = 0; i < files.Count; i++)
                 {
@@ -555,7 +551,7 @@ namespace Uniray
                     {
                         if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
                         {
-                            Data.SelectedFile = files[i].Path;
+                            UData.SelectedFile = files[i].Path;
                             SetMouseCursor(MouseCursor.PointingHand);
                         }
                     }
@@ -567,8 +563,8 @@ namespace Uniray
                             if (files[i] is UFolder)
                             {
                                 // Set the new selected folder
-                                Data.CurrentFolder = (UFolder)files[i];
-                                ((Container)UI.Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(Data.CurrentProject.Path) + "/assets" + files[i].Path.Split("assets").Last();
+                                UData.CurrentFolder = (UFolder)files[i];
+                                ((Container)UI.Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(UData.CurrentProject.Path) + "/assets" + files[i].Path.Split("assets").Last();
                             }
                         }
                     }
@@ -607,15 +603,15 @@ namespace Uniray
                         }
                     }
                     // Check if mouse left button is released to drop file
-                    if (Data.SelectedFile is not null)
+                    if (UData.SelectedFile is not null)
                     {
                         if (IsMouseButtonReleased(MouseButton.Left))
                         {
                             Vector2 mouse = GetMousePosition();
                             // Import model into the scene
-                            if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && Data.SelectedFile.Split('.').Last() == "m3d")
+                            if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && UData.SelectedFile.Split('.').Last() == "m3d")
                             {
-                                string modelKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
+                                string modelKey = UData.SelectedFile.Split('/').Last().Split('.')[0];
 
                                 if (Ressource.ModelExists(modelKey))
                                 {
@@ -623,7 +619,7 @@ namespace Uniray
                                 }
                                 else
                                 {
-                                    Model m = LoadModel(Data.SelectedFile);
+                                    Model m = LoadModel(UData.SelectedFile);
                                     for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
                                         m.Meshes[0].Colors[j] = 255;
                                     UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
@@ -639,15 +635,15 @@ namespace Uniray
                             else if (mouse.X > UI.Components["gameManager"].X + 100 && mouse.X < UI.Components["gameManager"].X + 350 &&
                                 mouse.Y > UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 300
                                 && mouse.Y < UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 320
-                                && Data.SelectedFile.Split('.').Last() == "png")
+                                && UData.SelectedFile.Split('.').Last() == "png")
                             {
                                 if (selection.Count == 1)
                                 {
-                                    string dictionaryKey = Data.SelectedFile.Split('/').Last().Split('.')[0];
+                                    string dictionaryKey = UData.SelectedFile.Split('/').Last().Split('.')[0];
                                     ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selection.First()))).SetTexture(dictionaryKey, Ressource.GetTexture(dictionaryKey));
                                 }
                             }
-                            Data.SelectedFile = null;
+                            UData.SelectedFile = null;
                         }
                     }
                 }
@@ -692,8 +688,8 @@ namespace Uniray
                 ((Label)UI.Components["ressourceInfoLabel"]).Text = "File type : .m3d";
 
                 // Load scenes along with their game objects
-                Data.CurrentProject = new Project(project_name, path, LoadScenes(directory));
-                currentScene = Data.CurrentProject.GetScene(0);
+                UData.CurrentProject = new Project(project_name, path, LoadScenes(directory));
+                currentScene = UData.CurrentProject.GetScene(0);
                 SetWindowTitle("Uniray - " + project_name);
 
                 TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
@@ -709,17 +705,17 @@ namespace Uniray
         /// </summary>
         public void SaveProject()
         {
-            if (Data.CurrentProject != null)
+            if (UData.CurrentProject != null)
             {
                 string[] jsons = JsonfyGos(currentScene.GameObjects);
                 string? path;
-                if (Data.CurrentProject.Path.Contains('.'))
+                if (UData.CurrentProject.Path.Contains('.'))
                 {
-                    path = Path.GetDirectoryName(Data.CurrentProject.Path);
+                    path = Path.GetDirectoryName(UData.CurrentProject.Path);
                 }
                 else
                 {
-                    path = Data.CurrentProject.Path;
+                    path = UData.CurrentProject.Path;
                 }
                 
                 StreamWriter stream = new (path + "/scenes/new_scene/locs.json", false);
@@ -735,7 +731,7 @@ namespace Uniray
             else
             {
                 // Open modal for the user to create a new project
-                Data.CurrentModal = "newProjectModal";
+                UData.CurrentModal = "newProjectModal";
             }
         }
 
@@ -808,9 +804,9 @@ namespace Uniray
 
                 Scene defaultScene = new(new List<GameObject3D> { ucamera });
                 List<Scene> scenes = new() { defaultScene };
-                Data.CurrentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
+                UData.CurrentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
                 Ressource = new Ressource();
-                currentScene = Data.CurrentProject.GetScene(0);
+                currentScene = UData.CurrentProject.GetScene(0);
                 selection.Clear();
 
                 TraceLog(TraceLogLevel.Warning, "Project \"" + name + "\" has been created");

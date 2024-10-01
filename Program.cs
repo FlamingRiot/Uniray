@@ -121,7 +121,7 @@ namespace Uniray
                 Rlgl.EnableBackfaceCulling();
                 Rlgl.EnableDepthMask();
 
-                if (Uniray.Data.CurrentProject is not null) uniray.DrawScene();
+                if (UData.CurrentProject is not null) uniray.DrawScene();
 
                 EndMode3D();
 
@@ -134,7 +134,7 @@ namespace Uniray
             // Close window
             CloseWindow();
 
-            if (Uniray.Data.CurrentProject is not null)
+            if (UData.CurrentProject is not null)
             {
                 // Unload all used ressources
                 Uniray.Ressource.UnloadRessources();
