@@ -67,7 +67,7 @@ namespace Uniray
             Components.Add("scriptsButton", scriptsButton);
 
             // Open File button
-            Button openFileButton = new Button("Open", fileManager.X + fileManager.Width - 38, fileManager.Y + 5, 40, 20, "openExplorer") { Type = ButtonType.PathFinder };
+            Button openFileButton = new Button("Open", fileManager.X + fileManager.Width - 38, fileManager.Y + 5, 40, 20, "openExplorer"); //{ Type = ButtonType.PathFinder };
             Components.Add("openFileButton", openFileButton);
 
             // Open project button

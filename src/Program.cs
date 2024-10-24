@@ -29,6 +29,11 @@ namespace Uniray
             InitWindow(1800, 900, "Uniray - New Project");
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
+
+            sbyte* sbytew = GetWorkingDirectory();
+            string workdir = new string(sbytew);
+            Console.WriteLine(workdir);
+
             // Set program state
             Uniray.State = ProgramState.Loading;
 
