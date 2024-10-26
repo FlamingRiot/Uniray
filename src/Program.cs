@@ -30,10 +30,6 @@ namespace Uniray
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
 
-            sbyte* sbytew = GetWorkingDirectory();
-            string workdir = new string(sbytew);
-            Console.WriteLine(workdir);
-
             // Set program state
             Uniray.State = ProgramState.Loading;
 
@@ -58,6 +54,9 @@ namespace Uniray
 
             // Maximize window
             SetWindowState(ConfigFlags.MaximizedWindow);
+
+            // Disable exit key
+            SetExitKey(KeyboardKey.Null);
 #if !DEBUG
             SetTargetFPS(60);
 #endif
