@@ -497,17 +497,18 @@ namespace Uniray
                         }
                     }
                 }
-                // Check if shortcut is used to create folder
+                
+                /*// Check if shortcut is used to create folder
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
                 {
                     UFolder folder = new UFolder(FileManager.CurrentFolder.Path + "/new", new List<UStorage>());
                     folder.UpstreamFolder = FileManager.CurrentFolder;
                     files.Add(folder);
                     Directory.CreateDirectory(FileManager.CurrentFolder.Path + "/new");
-                }
+                }*/
                 for (int i = 0; i < files.Count; i++)
                 {
-                    // Define file row
+                    /*// Define file row
                     short row = (short)(i / 10);
 
                     // Define the drawing position
@@ -529,21 +530,21 @@ namespace Uniray
                         DrawPanel(new Panel(xPos, yPos, 1, 0, folderTex, ""));
                         DrawLabel(new Label(xPos + 10 + files[i].Name.Length / 3, yPos + fileTex.Height + 20, lbl));
                     }
-
+                    
                     // Check interactions
                     // Check if mouse left button is hold to drag file
                     if (IsMouseButtonDown(MouseButton.Left))
                     {
-                        if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
+                        //if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
                         {
                             UData.SelectedFile = files[i].Path;
                             SetMouseCursor(MouseCursor.PointingHand);
                         }
-                    }
+                    }*/
                     // Check is mouse left button is double pressed to enter folder
                     if (IsMouseButtonPressed(MouseButton.Left))
                     {
-                        if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
+                        //if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
                         {
                             if (files[i] is UFolder)
                             {
@@ -553,7 +554,7 @@ namespace Uniray
                             }
                         }
                     }
-                    // Check if mouse wheel is pressed to delete a file
+                    /*// Check if mouse wheel is pressed to delete a file
                     if (IsMouseButtonPressed(MouseButton.Middle))
                     {
                         if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
@@ -586,7 +587,7 @@ namespace Uniray
                             // Remove the file from the virtual folder
                             files.Remove(files[i]);
                         }
-                    }
+                    }*/
                     // Check if mouse left button is released to drop file
                     if (UData.SelectedFile is not null)
                     {
@@ -1059,6 +1060,34 @@ namespace Uniray
             camera.Transform = nm;
             // Set the camera Target according to the rotation matrix
 
+        }
+    }
+}
+
+namespace Raylib_cs.Complements
+{
+    public static class RaylibComplements
+    {
+        private static double _lastTimeButtonPressed;
+
+        /// <summary>Checks if a mouse button is double-clicked.</summary>
+        /// <param name="button">Mouse button to check.</param>
+        /// <returns><see langword="true"/> if the button is double-clicked. <see langword="false"/> otherwise.</returns>
+        public static bool IsMouseButtonPressedRepeat(MouseButton button)
+        {
+            double currentFrame = GetTime();
+
+            if (IsMouseButtonPressed(button))
+            {
+                if ((currentFrame - _lastTimeButtonPressed) <= 0.25)
+                {
+                    _lastTimeButtonPressed = 0.0;
+                    return true;
+                }
+                _lastTimeButtonPressed = currentFrame;
+                return false;
+            }
+            return false;
         }
     }
 }

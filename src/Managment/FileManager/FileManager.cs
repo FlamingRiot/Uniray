@@ -3,8 +3,7 @@ using static RayGUI_cs.RayGUI;
 using Raylib_cs;
 using System.Text;
 using static Raylib_cs.Raylib;
-using System;
-using System.Numerics;
+using Raylib_cs.Complements;
 
 namespace Uniray
 {
@@ -49,6 +48,15 @@ namespace Uniray
 
                 DrawStorageUnit(_units[i], xPos, yPos, i);
                 UpdateStorageUnit(_units[i], xPos, yPos);
+            }
+
+            // Creates folder action
+            if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
+            {
+                UFolder folder = new UFolder(CurrentFolder.Path + "/new", new List<UStorage>());
+                folder.UpstreamFolder = CurrentFolder;
+                CurrentFolder.Files.Add(folder);
+                Directory.CreateDirectory(CurrentFolder.Path + "/new");
             }
         }
 
@@ -109,6 +117,30 @@ namespace Uniray
                     }
                     // Remove virtual storage unit from current folder
                     CurrentFolder.Files.Remove(unit);
+                }
+            }
+
+            // Drag & Drop action
+            if (IsMouseButtonDown(MouseButton.Left))
+            {
+                if (Hover(x, y, HardRessource.Textures["file"].Width, HardRessource.Textures["file"].Height))
+                {
+                    UData.SelectedFile = unit.Path;
+                    SetMouseCursor(MouseCursor.PointingHand);
+                }
+            }
+
+            // Folder entering action
+            if (RaylibComplements.IsMouseButtonPressedRepeat(MouseButton.Left))
+            {
+                if (Hover(x, y, HardRessource.Textures["file"].Width, HardRessource.Textures["file"].Height))
+                {
+                    if (unit is UFolder)
+                    {
+                        // Set the new selected folder
+                        CurrentFolder = (UFolder)unit;
+                        ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(UData.CurrentProject.Path) + "/assets" + unit.Path.Split("assets").Last();
+                    }
                 }
             }
         }
