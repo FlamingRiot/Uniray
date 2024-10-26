@@ -2,9 +2,6 @@
 {
     public static class UData
     {
-        /// <summary>The currently displayed <see cref="UFolder"/>.</summary>
-        internal static UFolder? CurrentFolder;
-
         /// <summary>The currently loaded <see cref="Project"/>.</summary>
         internal static Project? CurrentProject;
 

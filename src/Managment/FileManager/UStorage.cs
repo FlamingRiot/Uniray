@@ -29,16 +29,23 @@
         /// The displayed name in the file manager
         /// </summary>
         public string Name { get { return name; } set { name = value; } }
-        /// <summary>
-        /// UStorage constructor
-        /// </summary>
+
+        /// <summary>Creates an empty instance of <see cref="UStorage"/>.</summary>
+        public UStorage()
+        {
+            path = "";
+            name = "";
+        }
+
+        /// <summary>Creates an instance of <see cref="UStorage"/>.</summary>
         /// <param name="path">Path to the storage unit</param>
         public UStorage(string path) 
         { 
             this.path = path;
             // Wait for a specific constructor to correctly cut the name out of the path
-            this.name = "";
+            name = "";
         }
+
         /// <summary>
         /// Stringed storage unit
         /// </summary>

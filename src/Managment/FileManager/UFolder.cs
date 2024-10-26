@@ -14,15 +14,22 @@
         /// The upstream folder according to this one
         /// </summary>
         public UFolder? UpstreamFolder { get { return upstreamFolder; } set { upstreamFolder = value; } }
-        /// <summary>
-        /// UFolder constructor
-        /// </summary>
+
+        /// <summary>Creates an empty instance of <see cref="UFolder"/>.</summary>
+        public UFolder()
+        {
+            Name = "";
+            Files = new List<UStorage>();
+        }
+
+        /// <summary>Creates an instance of <see cref="UFolder"/>.</summary>
         /// <param name="path">The absolute path to the folder</param>
         public UFolder(string path, List<UStorage> files) : base(path)
         {
             Name = path.Split('/').Last();
-            this.Files = files;
+            Files = files;
         }
+
         /// <summary>
         /// Add a file to the folder
         /// </summary>

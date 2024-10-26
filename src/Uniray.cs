@@ -33,10 +33,10 @@ namespace Uniray
         public static Ressource Ressource;
 
         // 2D related attributes
-        /// <summary>
-        /// The UI of the application
-        /// </summary>
-        public UI UI;
+        /// <summary>Global UI of the application.</summary>
+        public static UI UI = new UI();
+
+
         /// <summary>
         /// RenderTexture used for the selected camera's POV
         /// </summary>
@@ -59,16 +59,6 @@ namespace Uniray
         /// The texture used for rendering folders in the file manager
         /// </summary>
         private Texture2D folderTex;
-
-        public static UFolder? modelFolder;
-
-        public static UFolder? textureFolder;
-
-        public static UFolder? soundFolder;
-
-        public static UFolder? animationFolder;
-
-        public static UFolder? scriptFolder;
 
         // 3D related attributes
         /// <summary>
@@ -154,6 +144,9 @@ namespace Uniray
             cubemap = shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
             shaders.SetCubemap(cubemap);
 
+            // Load hard ressources
+            HardRessource.Init();
+
             // Unload useless texture
             UnloadTexture(panorama);
 
@@ -174,13 +167,6 @@ namespace Uniray
             mouseRay = new Ray();
             goCollision = new RayCollision();
 
-            // Intitialize all the assets lists of filepath
-            modelFolder = new UFolder("", new List<UStorage>());
-            textureFolder = new UFolder("", new List<UStorage>());
-            soundFolder = new UFolder("", new List<UStorage>());
-            animationFolder = new UFolder("", new List<UStorage>());
-            scriptFolder = new UFolder("", new List<UStorage>());
-
             // Load the Uniray camera model and apply its texture
             cameraModel = LoadModel("data/camera.m3d");
             cameraMaterial = LoadMaterialDefault();
@@ -192,9 +178,7 @@ namespace Uniray
             skybox = GenMeshCube(1.0f, 1.0f, 1.0f);
 
             // Initialize the volatile Data
-            UData.CurrentFolder = modelFolder;
-            // Intitialize UI
-            UI = new UI();
+            FileManager.CurrentFolder = FileManager.ModelFolder;
             // Initialize the error handler
             errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), RayGUI.Font);
 
@@ -402,7 +386,7 @@ namespace Uniray
             // Tick the error handler for the errors to potentially disappear
             errorHandler.Tick();
 
-            string new_File = "";
+            /*string new_File = "";
             new_File = ((Container)UI.Components["fileManager"]).GetLastFile();
             new_File = new_File.Replace('\\', '/');
             UFile file = new UFile(new_File);
@@ -413,22 +397,22 @@ namespace Uniray
                     case "m3d":
                         if (modelFolder.Files.Count == 0)
                         {
-                            UData.CurrentFolder.AddFile(file);
+                            FileManager.CurrentFolder.AddFile(file);
                         }
                         else if (modelFolder.Files.Last().Name != file.Name)
                         {
-                            UData.CurrentFolder.AddFile(file);
+                            FileManager.CurrentFolder.AddFile(file);
                         }
                         break;
                     case "png":
                         if (textureFolder.Files.Count == 0)
                         {
-                            UData.CurrentFolder.AddFile(file);
+                            FileManager.CurrentFolder.AddFile(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
                         else if (textureFolder.Files.Last().Name != file.Name)
                         {
-                            UData.CurrentFolder.AddFile(file);
+                            FileManager.CurrentFolder.AddFile(file);
                             Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
                         }
                         break;
@@ -439,9 +423,10 @@ namespace Uniray
                 }
                 ((Container)UI.Components["fileManager"]).ClearFiles();
                 ((Container)UI.Components["fileManager"]).LastFile = "";
-            }
+            }*/
             // Draw the files along with their name in the file manager
-            DrawManagerFiles(ref UData.CurrentFolder.Files);
+            //DrawManagerFiles(ref FileManager.CurrentFolder.Files);
+            FileManager.Draw();
 
             // Render the selected camera POV to the top right corner of the screen
             if (selection.Count == 1 && selection.First() is UCamera cam)
@@ -515,10 +500,10 @@ namespace Uniray
                 // Check if shortcut is used to create folder
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
                 {
-                    UFolder folder = new UFolder(UData.CurrentFolder.Path + "/new", new List<UStorage>());
-                    folder.UpstreamFolder = UData.CurrentFolder;
+                    UFolder folder = new UFolder(FileManager.CurrentFolder.Path + "/new", new List<UStorage>());
+                    folder.UpstreamFolder = FileManager.CurrentFolder;
                     files.Add(folder);
-                    Directory.CreateDirectory(UData.CurrentFolder.Path + "/new");
+                    Directory.CreateDirectory(FileManager.CurrentFolder.Path + "/new");
                 }
                 for (int i = 0; i < files.Count; i++)
                 {
@@ -563,7 +548,7 @@ namespace Uniray
                             if (files[i] is UFolder)
                             {
                                 // Set the new selected folder
-                                UData.CurrentFolder = (UFolder)files[i];
+                                FileManager.CurrentFolder = (UFolder)files[i];
                                 ((Container)UI.Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(UData.CurrentProject.Path) + "/assets" + files[i].Path.Split("assets").Last();
                             }
                         }
@@ -671,15 +656,8 @@ namespace Uniray
                 string? directory = Path.GetDirectoryName(path);
 
                 // Load assets from the given project's assets folder
-                if (directory is not null) LoadAssets(directory);
+                if (directory is not null) FileManager.Init(directory);
                 else throw new Exception($"Could not load the assets of project {path}");
-
-                // Set assets folder paths
-                modelFolder.Path = directory + "/assets/models";
-                textureFolder.Path = directory + "/assets/textures";
-                soundFolder.Path = directory + "/assets/sounds";
-                animationFolder.Path = directory + "/assets/animations";
-                scriptFolder.Path = directory + "/assets/scripts";
 
                 // Change to default assets page of the manager container
                 ((Container)UI.Components["fileManager"]).ExtensionFile = "m3d";
@@ -923,164 +901,7 @@ namespace Uniray
             }
             return scenes;
         }
-        /// <summary>
-        /// Load assets from given project file path (Textures and sounds to the ressource dictionary, and the models as a string path list)
-        /// </summary>
-        /// <param name="projectPath">File path to the project</param>
-        public void LoadAssets(string projectPath)
-        {
-            // Load data paths from directories
-            byte[] modelPath = Encoding.UTF8.GetBytes(projectPath + "/assets/models");
-            byte[] texturePath = Encoding.UTF8.GetBytes(projectPath + "/assets/textures");
-            byte[] soundPath = Encoding.UTF8.GetBytes(projectPath + "/assets/sounds");
-            byte[] animationPath = Encoding.UTF8.GetBytes(projectPath + "/assets/animations");
-            byte[] scriptPath = Encoding.UTF8.GetBytes(projectPath + "/assets/scripts");
-            int maxFiles = 30;
-            unsafe
-            {
-                sbyte*[] paths = new sbyte*[5];
-                fixed (byte* p = modelPath)
-                {
-                    sbyte* sp = (sbyte*)p;
-                    paths[0] = sp;
-                }
-                fixed (byte* p = texturePath)
-                {
-                    sbyte* sp = (sbyte*)p;
-                    paths[1] = sp;
-                }
-                fixed (byte* p = soundPath)
-                {
-                    sbyte* sp = (sbyte*)p;
-                    paths[2] = sp;
-                }
-                fixed (byte* p = animationPath)
-                {
-                    sbyte* sp = (sbyte*)p;
-                    paths[3] = sp;
-                }
-                fixed (byte* p = scriptPath)
-                {
-                    sbyte* sp = (sbyte*)p;
-                    paths[4] = sp;
-                }
-                for (int i = 0; i < paths.Length; i++)
-                {
-                    FilePathList pathList = LoadDirectoryFiles(paths[i], (int*)maxFiles);
-                    for (int j = 0; j < pathList.Count; j++)
-                    {
-                        string path = new((sbyte*)pathList.Paths[j]);
-                        path = path.Replace('\\', '/');
-
-                        // Pre-create the storage unit
-                        UStorage storage;
-                        if (path.Split('.').Length > 1) storage = new UFile(path);
-                        else 
-                        {
-                            // Set upstream folder for folders
-                            storage = new UFolder(path, LoadFolderArchitecture(path));
-                            foreach (UFolder folder in ((UFolder)storage).Files.Where(x => x is UFolder))
-                            {
-                                folder.UpstreamFolder = (UFolder)storage;
-                            }
-                        }
-                        switch (i)
-                        {
-                            case 0:
-                                modelFolder.AddFile(storage); break;
-                            case 1:
-                                textureFolder.AddFile(storage); break;
-                            case 2:
-                                soundFolder.AddFile(storage); break;
-                            case 3:
-                                animationFolder.AddFile(storage); break;
-                            case 4:
-                                scriptFolder.AddFile(storage); break;
-                        }
-                    }
-                    // Set upstream folder for folders
-                    switch (i)
-                    {
-                        case 0:
-                            foreach (UFolder folder in modelFolder.Files.Where(x => x is UFolder))
-                            {
-                                folder.UpstreamFolder = modelFolder;
-                            }
-                            break;
-                        case 1:
-                            foreach (UFolder folder in textureFolder.Files.Where(x => x is UFolder))
-                            {
-                                folder.UpstreamFolder = textureFolder;
-                            }
-                            break;
-                        case 2:
-                            foreach (UFolder folder in soundFolder.Files.Where(x => x is UFolder))
-                            {
-                                folder.UpstreamFolder = soundFolder;
-                            }
-                            break;
-                        case 3:
-                            foreach (UFolder folder in animationFolder.Files.Where(x => x is UFolder))
-                            {
-                                folder.UpstreamFolder = animationFolder;
-                            }
-                            break;
-                        case 4:
-                            foreach (UFolder folder in scriptFolder.Files.Where(x => x is UFolder))
-                            {
-                                folder.UpstreamFolder = scriptFolder;
-                            }
-                            break;
-                    }
-                    UnloadDirectoryFiles(pathList);
-                }
-                Ressource = new Ressource(
-                    textureFolder.Files,
-                    soundFolder.Files,
-                    modelFolder.Files
-                    );
-            }
-            Console.WriteLine(Ressource.ToString());
-        }
-        /// <summary>
-        /// Load files complete architecture of a specified directory
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public List<UStorage> LoadFolderArchitecture(string path)
-        {
-            List<UStorage> files = new List<UStorage>();
-            // Convert to sbyte*
-            sbyte* sPath;
-            byte[] bytes = Encoding.UTF8.GetBytes(path);
-            fixed (byte* p = bytes)
-            {
-                sbyte* sp = (sbyte*)p;
-                sPath = sp;
-            }
-            // Load directory files
-            FilePathList list = LoadDirectoryFiles(sPath, (int*)30);
-            for (int i = 0; i < list.Count; i++)
-            {
-                string filePath = new((sbyte*)list.Paths[i]);
-                filePath = filePath.Replace('\\', '/');
-
-                // Pre-create the storage unit
-                UStorage storage;
-                if (filePath.Split('.').Length > 1) storage = new UFile(filePath);
-                else
-                {
-                    storage = new UFolder(filePath, LoadFolderArchitecture(filePath));
-                    foreach (UFolder folder in ((UFolder)storage).Files.Where(x => x is UFolder))
-                    {
-                        folder.UpstreamFolder = (UFolder)storage;
-                    }
-                }
-                files.Add(storage);
-            }
-            UnloadDirectoryFiles(list);
-            return files;
-        }
+        
         /// <summary>
         /// Translate a 3-Dimensional vector according to the application standards in Dev environement
         /// </summary>

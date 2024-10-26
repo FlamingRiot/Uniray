@@ -28,15 +28,7 @@ namespace Uniray
             // Load sounds
             LoadSounds(_sounds);
             // Load models
-            for (int i = 0; i < _models.Count; i++)
-            {
-                Model m = Raylib.LoadModel(_models[i].Path);
-                for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                    m.Meshes[0].Colors[j] = 255;
-                Raylib.UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-
-                this._models.Add(_models[i].Path.Split('/').Last().Split('.')[0], m);
-            }
+            LoadModels(_models);
         }
 
 
