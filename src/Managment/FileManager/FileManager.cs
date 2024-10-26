@@ -4,6 +4,7 @@ using Raylib_cs;
 using System.Text;
 using static Raylib_cs.Raylib;
 using Raylib_cs.Complements;
+using System.Numerics;
 
 namespace Uniray
 {
@@ -58,6 +59,8 @@ namespace Uniray
                 CurrentFolder.Files.Add(folder);
                 Directory.CreateDirectory(CurrentFolder.Path + "/new");
             }
+
+            DropStorageUnit();
         }
 
         /// <summary>Draws a single storage unit to the file manager, according to its place in the list.</summary>
@@ -120,12 +123,12 @@ namespace Uniray
                 }
             }
 
-            // Drag & Drop action
+            // Drag action
             if (IsMouseButtonDown(MouseButton.Left))
             {
                 if (Hover(x, y, HardRessource.Textures["file"].Width, HardRessource.Textures["file"].Height))
                 {
-                    UData.SelectedFile = unit.Path;
+                    UData.SelectedFile = unit;
                     SetMouseCursor(MouseCursor.PointingHand);
                 }
             }
@@ -139,8 +142,68 @@ namespace Uniray
                     {
                         // Set the new selected folder
                         CurrentFolder = (UFolder)unit;
-                        ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(UData.CurrentProject.Path) + "/assets" + unit.Path.Split("assets").Last();
+                        ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath += unit.Path.Split("assets").Last();
                     }
+                }
+            }
+        }
+
+        private static void DropStorageUnit()
+        {
+            if (IsMouseButtonReleased(MouseButton.Left))
+            {
+                if (UData.SelectedFile is not null)
+                {
+                    // Get mouse position
+                    Vector2 mouse = GetMousePosition();
+                    // Check if in 3D conceptor
+                    if (mouse.X > Uniray.UI.Components["gameManager"].Width + 20 && mouse.Y < Uniray.UI.Components["fileManager"].Y - 10)
+                    {
+                        // Check if model
+                        if (UData.SelectedFile.Path.Split('.').Last() == "m3d")
+                        {
+                            string modelKey = UData.SelectedFile.Name;
+                            // Import model into the scene
+                            if (Uniray.Ressource.ModelExists(modelKey))
+                            {
+                                UData.CurrentScene.AddGameObject(new UModel(
+                                    "[New model]",
+                                    Uniray.EnvCamera.Position + GetCameraForward(ref Uniray.EnvCamera) * 5,
+                                    Uniray.Ressource.GetModel(modelKey).Meshes[0],
+                                    modelKey));
+                            }
+                            else
+                            {
+                                // Reset materials
+                                Model m = LoadModel(UData.SelectedFile.Path);
+                                for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                                    m.Meshes[0].Colors[j] = 255;
+                                UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+                                // Add model
+                                Uniray.Ressource.AddModel(m, modelKey);
+                                UData.CurrentScene.AddGameObject(new UModel(
+                                    "[New model]",
+                                    Uniray.EnvCamera.Position + GetCameraForward(ref Uniray.EnvCamera) * 5,
+                                    Uniray.Ressource.GetModel(modelKey).Meshes[0],
+                                    modelKey));
+                            }
+                        }
+                    }
+                    // Check if component field
+                    Component box = Uniray.UI.Components["textureTextbox"];
+                    if (Hover(box.X, box.Y, box.Width, box.Height))
+                    {
+                        // Check if texture
+                        if (UData.SelectedFile.Path.Split('.').Last() == "png") 
+                        {
+                            if (UData.Selection.Count == 1 && UData.Selection.First() is UModel)
+                            {
+                                ((UModel)UData.Selection.First()).SetTexture(UData.SelectedFile.Name, Uniray.Ressource.GetTexture(UData.SelectedFile.Name));
+                            }
+                        }
+                    }
+                    // Clear file selection
+                    UData.SelectedFile = null;
                 }
             }
         }
@@ -164,9 +227,10 @@ namespace Uniray
                     CurrentFolder.AddFile(file);
                     switch (newFile.Split('.').Last())
                     {
+                        /*
                         case "m3d":
                             Uniray.Ressource.AddModel(LoadModel(newFile), file.Name);
-                            break;
+                            break;*/
                         case "png":
                             Uniray.Ressource.AddTexture(LoadTexture(newFile), file.Name);
                             break;

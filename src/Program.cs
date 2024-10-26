@@ -104,7 +104,7 @@ namespace Uniray
                         motion.Distance -= GetMouseWheelMove() * 2f * Raymath.Vector3Distance(camera.Position, camera.Target) / 10;
                         MoveCamera(motion.Distance, ref camera, camera.Target, motion.YOffset, true, motion.Mouse, motion.MouseOrigin);
                     }
-                    uniray.EnvCamera = camera;
+                    Uniray.EnvCamera = camera;
                 }
                 // =========================================================================================================================================================
                 // ============================================================= MANAGE OVERALL DRAWING ====================================================================
@@ -143,7 +143,7 @@ namespace Uniray
                 // Unload all used ressources
                 Uniray.Ressource.UnloadRessources();
                 // Unload materials
-                foreach (GameObject3D go in uniray.CurrentScene.GameObjects)
+                foreach (GameObject3D go in UData.CurrentScene.GameObjects)
                 {
                     if (go is UModel m) UnloadMaterial(m.Material);
                 }

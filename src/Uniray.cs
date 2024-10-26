@@ -8,8 +8,8 @@ using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
 // Other
 using System.Numerics;
-using System.Text;
 using Newtonsoft.Json;
+using static Uniray.UData;
 
 namespace Uniray
 {
@@ -32,10 +32,10 @@ namespace Uniray
         /// </summary>
         public static Ressource Ressource;
 
-        // 2D related attributes
         /// <summary>Global UI of the application.</summary>
         public static UI UI = new UI();
 
+        public static Camera3D EnvCamera;
 
         /// <summary>
         /// RenderTexture used for the selected camera's POV
@@ -62,21 +62,9 @@ namespace Uniray
 
         // 3D related attributes
         /// <summary>
-        /// The currently displayed scene
-        /// </summary>
-        private Scene currentScene;
-        /// <summary>
-        /// The currently selected Game Objects
-        /// </summary>
-        private List<GameObject3D> selection;
-        /// <summary>
         /// The clipboard of the Game Objects
         /// </summary>
         private List<GameObject3D> clipboard;
-        /// <summary>
-        /// The used camera for rendering the 3D of the application
-        /// </summary>
-        private Camera3D envCamera;
         /// <summary>
         /// The Ray used to check collisions between the 2D and 3D world
         /// </summary>
@@ -117,15 +105,10 @@ namespace Uniray
         private double lastTimeButtonPressed;
 
         // Properties
-        public Camera3D EnvCamera { get { return envCamera; } set { envCamera = value; } }
         /// <summary>
         /// 3D model of the skybox
         /// </summary>
         public Mesh Skybox { get { return skybox; } set { skybox = value; } }
-        /// <summary>
-        /// The currently used scene
-        /// </summary>
-        public Scene CurrentScene { get { return currentScene; } }
         /// <summary>
         /// The built-in shaders of Uniray
         /// </summary>
@@ -151,13 +134,11 @@ namespace Uniray
             UnloadTexture(panorama);
 
             // Intitialize the default scene and the render camera for Uniray
-            currentScene = scene;
-            envCamera = new Camera3D();
+            CurrentScene = scene;
+            EnvCamera = new Camera3D();
 
             // Init the clipboard list
             clipboard = new List<GameObject3D>();
-            // Init the selection list
-            selection = new List<GameObject3D>();
 
             // Create the render texture for preview of a camera's POV
             cameraView = LoadRenderTexture(Program.Width / 2, Program.Height / 2);
@@ -195,7 +176,7 @@ namespace Uniray
 
             // Render the outlined selected GameObjects and deactivate the Raylib culling to make it possible
             SetCullFace(ZERO);
-            foreach (GameObject3D go in selection)
+            foreach (GameObject3D go in Selection)
             {
                 switch (go)
                 {
@@ -211,7 +192,7 @@ namespace Uniray
 
             // Draw 3-Dimensional models of the current scene and check for a hypothetical new selected object
             short index = -1;
-            foreach (GameObject3D go in currentScene.GameObjects)
+            foreach (GameObject3D go in CurrentScene.GameObjects)
             {
                 // Manage objects drawing + object selection (according to the object type)
                 if (go is UModel)
@@ -233,42 +214,42 @@ namespace Uniray
             {
                 if (IsKeyDown(KeyboardKey.LeftShift))
                 {
-                    selection.Add(currentScene.GetGameObject(index));
+                    Selection.Add(CurrentScene.GetGameObject(index));
                 }
                 else
                 {
-                    selection.Clear();
-                    selection.Add(currentScene.GetGameObject(index));
+                    Selection.Clear();
+                    Selection.Add(CurrentScene.GetGameObject(index));
                 }
             }
             
             // Manage GameObjects interaction
-            if (selection.Count != 0) 
+            if (Selection.Count != 0) 
             {
                 // Deletion action on the active selection of game objects
                 if (IsKeyPressed(KeyboardKey.Delete))
                 {
-                    foreach (GameObject3D go in selection)
+                    foreach (GameObject3D go in Selection)
                     {
-                        currentScene.GameObjects.Remove(go);
-                        selection.Clear();
+                        CurrentScene.GameObjects.Remove(go);
+                        Selection.Clear();
                         break;
                     }
                 }
                 // Escape action on the active selection of game objects
                 if (IsKeyPressed(KeyboardKey.Escape))
                 {
-                    selection.Clear();
+                    Selection.Clear();
                 }
                 // Copy action on the active selection of game objects
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.C))
                 {
-                    clipboard = selection;
+                    clipboard = Selection;
                 }
                 // Paste action on the active selection of game objects
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.V))
                 {
-                    Vector3 dir = GetCameraForward(ref envCamera) * 5f;
+                    Vector3 dir = GetCameraForward(ref EnvCamera) * 5f;
                     for (int i = 0; i < clipboard.Count; i++)
                     {
                         UModel go = new UModel(
@@ -282,40 +263,40 @@ namespace Uniray
                         // Set final position of the model
                         go.Position -= dir;
                         // Add the copied object to the list
-                        currentScene.AddGameObject(go);
+                        CurrentScene.AddGameObject(go);
                     }
-                    selection.Clear();
+                    Selection.Clear();
                 }
 
                 // Manage GameObjects transformations effects
-                if (selection.Count != 0)
+                if (Selection.Count != 0)
                 {
                     // Translate the currently selected object, indpendently of its type
                     if (IsKeyDown(KeyboardKey.G))
                     {
                         // Translate a neutral vector for selection uniformity
                         Vector3 newPos = TranslateObject(Vector3.Zero);
-                        foreach (GameObject3D go in selection)
+                        foreach (GameObject3D go in Selection)
                         {
                             // Add the position of the current object
                             Vector3 finalPos = Vector3Add(newPos, go.Position);
-                            currentScene.SetGameObjectPosition(currentScene.GameObjects.IndexOf(go), finalPos);
+                            CurrentScene.SetGameObjectPosition(CurrentScene.GameObjects.IndexOf(go), finalPos);
                         }
                     }
                     // Rotate the currently selected game object
                     else if (IsKeyDown(KeyboardKey.R))
                     {
-                        foreach (GameObject3D go in selection)
+                        foreach (GameObject3D go in Selection)
                         {
                             // Cast the object to apply the appropriate rotation effects
                             if (go is UModel)
                             {
-                                UModel model = (UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(go));
+                                UModel model = (UModel)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
                                 RotateObject(ref model);
                             }
                             else if (go is UCamera)
                             {
-                                UCamera camera = (UCamera)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(go));
+                                UCamera camera = (UCamera)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
                                 RotateObject(ref camera);
                             }
                         }
@@ -326,7 +307,7 @@ namespace Uniray
             }
 
             // Draw the scene all over again for the camera render, if activated
-            if (selection.Count == 1 && selection.First() is UCamera cam)
+            if (Selection.Count == 1 && Selection.First() is UCamera cam)
             {
                 EndMode3D();
 
@@ -345,7 +326,7 @@ namespace Uniray
                 EnableBackfaceCulling();
                 EnableDepthMask();
 
-                foreach (GameObject3D go in currentScene.GameObjects)
+                foreach (GameObject3D go in CurrentScene.GameObjects)
                 {
                     // Manage objects drawing + object selection (according to the object type)
                     if (go is UModel)
@@ -358,7 +339,7 @@ namespace Uniray
                 
                 EndTextureMode();
 
-                BeginMode3D(envCamera);
+                BeginMode3D(EnvCamera);
             }
         }
         /// <summary>
@@ -386,255 +367,54 @@ namespace Uniray
             // Tick the error handler for the errors to potentially disappear
             errorHandler.Tick();
 
-            /*string new_File = "";
-            new_File = ((Container)UI.Components["fileManager"]).GetLastFile();
-            new_File = new_File.Replace('\\', '/');
-            UFile file = new UFile(new_File);
-            if (((Container)UI.Components["fileManager"]).GetLastFile() != ((Container)UI.Components["fileManager"]).LastFile && UData.CurrentProject is not null)
-            {
-                switch (new_File.Split('.').Last())
-                {
-                    case "m3d":
-                        if (modelFolder.Files.Count == 0)
-                        {
-                            FileManager.CurrentFolder.AddFile(file);
-                        }
-                        else if (modelFolder.Files.Last().Name != file.Name)
-                        {
-                            FileManager.CurrentFolder.AddFile(file);
-                        }
-                        break;
-                    case "png":
-                        if (textureFolder.Files.Count == 0)
-                        {
-                            FileManager.CurrentFolder.AddFile(file);
-                            Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
-                        }
-                        else if (textureFolder.Files.Last().Name != file.Name)
-                        {
-                            FileManager.CurrentFolder.AddFile(file);
-                            Ressource.AddTexture(LoadTexture(new_File), new_File.Split('/').Last().Split('.')[0]);
-                        }
-                        break;
-                    case "wav":
-                        break;
-                    case "cs":
-                        break;
-                }
-                ((Container)UI.Components["fileManager"]).ClearFiles();
-                ((Container)UI.Components["fileManager"]).LastFile = "";
-            }*/
-            // Draw the files along with their name in the file manager
-            //DrawManagerFiles(ref FileManager.CurrentFolder.Files);
+            // Draw and update file manager
             FileManager.Draw();
 
             // Render the selected camera POV to the top right corner of the screen
-            if (selection.Count == 1 && selection.First() is UCamera cam)
+            if (Selection.Count == 1 && Selection.First() is UCamera cam)
             {
                 DrawRectangleLinesEx(new Rectangle(Program.Width - Program.Width / 5 - 11, 9, Program.Width / 5 + 2, Program.Height / 5 + 2), 2, Color.White);
                 DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(Program.Width - Program.Width / 5 - 10, 10, Program.Width / 5, Program.Height / 5), Vector2.Zero, 0, Color.White);
             }
 
             // Draw the currently displayed modal and define its state
-            if (UData.CurrentModal is not null)
+            if (CurrentModal is not null)
             {
                 // If the user closed the modal without proceeding
-                if (UData.LastModalExitCode == 0)
+                if (LastModalExitCode == 0)
                 {
-                    UData.CurrentModal = null;
-                    UData.LastModalExitCode = null;
+                    CurrentModal = null;
+                    LastModalExitCode = null;
                 }
                 // If the user closed the modal by proceeding
-                else if (UData.LastModalExitCode == 1)
+                else if (LastModalExitCode == 1)
                 {
-                    switch (UData.CurrentModal)
+                    switch (CurrentModal)
                     {
                         // Open project modal
                         case "openProjectModal":
-                            LoadProject(((Textbox)UI.Modals[UData.CurrentModal].Components["openProjectTextbox"]).Text);
-                            UData.CurrentModal = null;
-                            UData.LastModalExitCode = null;
+                            LoadProject(((Textbox)UI.Modals[CurrentModal].Components["openProjectTextbox"]).Text);
+                            CurrentModal = null;
+                            LastModalExitCode = null;
                             break;
                         // Create project modal
                         case "newProjectModal":
-                            string path = ((Textbox)UI.Modals[UData.CurrentModal].Components["newProjectTextbox1"]).Text;
-                            string name = ((Textbox)UI.Modals[UData.CurrentModal].Components["newProjectTextbox2"]).Text;
+                            string path = ((Textbox)UI.Modals[CurrentModal].Components["newProjectTextbox1"]).Text;
+                            string name = ((Textbox)UI.Modals[CurrentModal].Components["newProjectTextbox2"]).Text;
                             CreateProject(path, name);
-                            UData.CurrentModal = null;
-                            UData.LastModalExitCode = null;
+                            CurrentModal = null;
+                            LastModalExitCode = null;
                             break;
                     }
                 }
             }
             // Check the shortcut for game building
-            if (IsKeyPressed(KeyboardKey.F5) && UData.CurrentProject is not null)
+            if (IsKeyPressed(KeyboardKey.F5) && CurrentProject is not null)
             {
-                BuildProject(UData.CurrentProject.Path);
+                BuildProject(CurrentProject.Path);
             }
         }
 
-        /// <summary>
-        /// Draw and manage the files in the bottom container
-        /// </summary>
-        /// <param name="files">All the files in the asset directory</param>
-        public void DrawManagerFiles(ref List<UStorage> files)
-        {
-            if (files.Count != 0)
-            {
-                string directory = ((Container)UI.Components["fileManager"]).GetLastFile().Split("\\")[0];
-                string aimedDirectory = files[0].Path.Split("\\")[0];
-                string name = ((Container)UI.Components["fileManager"]).GetLastFile().Split("\\").Last();
-
-                // Check if there needs to be a recheck for the files
-                if (directory == aimedDirectory)
-                {
-                    if (!files.Exists(e => e.Path.EndsWith(name)))
-                    {
-                        string extension = ((Container)UI.Components["fileManager"]).GetLastFile().Split('.').Last();
-                        if (extension == ((Container)UI.Components["fileManager"]).ExtensionFile)
-                        {
-                            files.Add(new UFile(((Container)UI.Components["fileManager"]).GetLastFile()));
-                        }
-                    }
-                }
-                
-                /*// Check if shortcut is used to create folder
-                if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
-                {
-                    UFolder folder = new UFolder(FileManager.CurrentFolder.Path + "/new", new List<UStorage>());
-                    folder.UpstreamFolder = FileManager.CurrentFolder;
-                    files.Add(folder);
-                    Directory.CreateDirectory(FileManager.CurrentFolder.Path + "/new");
-                }*/
-                for (int i = 0; i < files.Count; i++)
-                {
-                    /*// Define file row
-                    short row = (short)(i / 10);
-
-                    // Define the drawing position
-                    int xPos = UI.Components["fileManager"].X + 150 * (i % 10 + 1) - 100;
-                    int yPos = UI.Components["fileManager"].Y + 60 + row * 120;
-
-                    // Shorten the text
-                    string lbl = "";
-                    if (files[i].Name.Length >= 10) { lbl = files[i].Name.Remove(5) + "..."; }
-                    else lbl = files[i].Name;
-                    // Draw the appropriate element
-                    if (files[i] is UFile)
-                    {
-                        DrawPanel(new Panel(xPos, yPos, 1, 0, fileTex, ""));
-                        DrawLabel(new Label(xPos + 10 - lbl.Length / 2, yPos + fileTex.Height + 20, lbl));
-                    }
-                    else if (files[i] is UFolder)
-                    {
-                        DrawPanel(new Panel(xPos, yPos, 1, 0, folderTex, ""));
-                        DrawLabel(new Label(xPos + 10 + files[i].Name.Length / 3, yPos + fileTex.Height + 20, lbl));
-                    }
-                    
-                    // Check interactions
-                    // Check if mouse left button is hold to drag file
-                    if (IsMouseButtonDown(MouseButton.Left))
-                    {
-                        //if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
-                        {
-                            UData.SelectedFile = files[i].Path;
-                            SetMouseCursor(MouseCursor.PointingHand);
-                        }
-                    }*/
-                    // Check is mouse left button is double pressed to enter folder
-                    if (IsMouseButtonPressed(MouseButton.Left))
-                    {
-                        //if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
-                        {
-                            if (files[i] is UFolder)
-                            {
-                                // Set the new selected folder
-                                FileManager.CurrentFolder = (UFolder)files[i];
-                                ((Container)UI.Components["fileManager"]).OutputFilePath = Path.GetDirectoryName(UData.CurrentProject.Path) + "/assets" + files[i].Path.Split("assets").Last();
-                            }
-                        }
-                    }
-                    /*// Check if mouse wheel is pressed to delete a file
-                    if (IsMouseButtonPressed(MouseButton.Middle))
-                    {
-                        if (Hover(xPos, yPos, fileTex.Width, fileTex.Height))
-                        {
-                            if (files[i] is UFolder)
-                            {
-                                // Delte the folder along with all its content
-                                Directory.Delete(files[i].Path, true);
-                            }
-                            else
-                            {
-                                // Delete the physical file from the folder
-                                File.Delete(files[i].Path);
-                                // Delete the loaded ressource of the file
-                                switch (files[i].Path.Split('.').Last())
-                                {
-                                    case "m3d":
-                                        Ressource.DeleteModel(files[i].Name);
-                                        break;
-                                    case "png":
-                                        Ressource.DeleteTexture(files[i].Name);
-                                        break;
-                                    case "wav":
-                                        Ressource.DeleteSound(files[i].Name);
-                                        break;
-                                    case "cs":
-                                        break;
-                                }
-                            }
-                            // Remove the file from the virtual folder
-                            files.Remove(files[i]);
-                        }
-                    }*/
-                    // Check if mouse left button is released to drop file
-                    if (UData.SelectedFile is not null)
-                    {
-                        if (IsMouseButtonReleased(MouseButton.Left))
-                        {
-                            Vector2 mouse = GetMousePosition();
-                            // Import model into the scene
-                            if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width + 10 && mouse.Y < UI.Components["fileManager"].Y - 10 && UData.SelectedFile.Split('.').Last() == "m3d")
-                            {
-                                string modelKey = UData.SelectedFile.Split('/').Last().Split('.')[0];
-
-                                if (Ressource.ModelExists(modelKey))
-                                {
-                                    currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
-                                }
-                                else
-                                {
-                                    Model m = LoadModel(UData.SelectedFile);
-                                    for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                                        m.Meshes[0].Colors[j] = 255;
-                                    UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-
-                                    Ressource.AddModel(m, modelKey);
-                                    currentScene.AddGameObject(new UModel("[New model]", envCamera.Position + GetCameraForward(ref envCamera) * 5, Ressource.GetModel(modelKey).Meshes[0], modelKey));
-                                }
-                                // Clear the selection to add the newly inserted object
-                                selection.Clear();
-                                selection.Add(currentScene.GameObjects.Last());
-                            }
-                            // Import texture in game object attributes
-                            else if (mouse.X > UI.Components["gameManager"].X + 100 && mouse.X < UI.Components["gameManager"].X + 350 &&
-                                mouse.Y > UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 300
-                                && mouse.Y < UI.Components["gameManager"].Y + UI.Components["gameManager"].Height / 2 + 320
-                                && UData.SelectedFile.Split('.').Last() == "png")
-                            {
-                                if (selection.Count == 1)
-                                {
-                                    string dictionaryKey = UData.SelectedFile.Split('/').Last().Split('.')[0];
-                                    ((UModel)currentScene.GameObjects.ElementAt(currentScene.GameObjects.IndexOf(selection.First()))).SetTexture(dictionaryKey, Ressource.GetTexture(dictionaryKey));
-                                }
-                            }
-                            UData.SelectedFile = null;
-                        }
-                    }
-                }
-            }
-        }
         /// <summary>
         /// Load project from .uproj file
         /// </summary>
@@ -667,8 +447,8 @@ namespace Uniray
                 ((Label)UI.Components["ressourceInfoLabel"]).Text = "File type : .m3d";
 
                 // Load scenes along with their game objects
-                UData.CurrentProject = new Project(project_name, path, LoadScenes(directory));
-                currentScene = UData.CurrentProject.GetScene(0);
+                CurrentProject = new Project(project_name, path, LoadScenes(directory));
+                CurrentScene = CurrentProject.GetScene(0);
                 SetWindowTitle("Uniray - " + project_name);
 
                 TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
@@ -686,7 +466,7 @@ namespace Uniray
         {
             if (UData.CurrentProject != null)
             {
-                string[] jsons = JsonfyGos(currentScene.GameObjects);
+                string[] jsons = JsonfyGos(CurrentScene.GameObjects);
                 string? path;
                 if (UData.CurrentProject.Path.Contains('.'))
                 {
@@ -783,10 +563,10 @@ namespace Uniray
 
                 Scene defaultScene = new(new List<GameObject3D> { ucamera });
                 List<Scene> scenes = new() { defaultScene };
-                UData.CurrentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
+                CurrentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
                 Ressource = new Ressource();
-                currentScene = UData.CurrentProject.GetScene(0);
-                selection.Clear();
+                CurrentScene = CurrentProject.GetScene(0);
+                Selection.Clear();
 
                 TraceLog(TraceLogLevel.Warning, "Project \"" + name + "\" has been created");
             }
@@ -912,20 +692,20 @@ namespace Uniray
         {
             if (IsKeyDown(KeyboardKey.X))
             {
-                position.X += (GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, envCamera.Position)).X;
+                position.X += (GetCameraRight(ref EnvCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, EnvCamera.Position)).X;
             }
             else if (IsKeyDown(KeyboardKey.Y))
             {
-                position.Z += (GetCameraForward(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, envCamera.Position)).X;
+                position.Z += (GetCameraForward(ref EnvCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, EnvCamera.Position)).X;
             }
             else if (IsKeyDown(KeyboardKey.Z))
             {
-                position.Y -= (GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(position, envCamera.Position)).Y;
+                position.Y -= (GetCameraUp(ref EnvCamera) * GetMouseDelta().Y / 500 * Vector3Distance(position, EnvCamera.Position)).Y;
             }
             else
             {
-                position += GetCameraRight(ref envCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, envCamera.Position);
-                position -= GetCameraUp(ref envCamera) * GetMouseDelta().Y / 500 * Vector3Distance(position, envCamera.Position);
+                position += GetCameraRight(ref EnvCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, EnvCamera.Position);
+                position -= GetCameraUp(ref EnvCamera) * GetMouseDelta().Y / 500 * Vector3Distance(position, EnvCamera.Position);
             }
             HideCursor();
             return position;
@@ -957,7 +737,7 @@ namespace Uniray
                 goCollision = GetRayCollisionMesh(mouseRay, mesh, transform);
                 if (goCollision.Hit)
                 {
-                    return currentScene.GameObjects.IndexOf(go);
+                    return CurrentScene.GameObjects.IndexOf(go);
                 }
                 else
                 {
@@ -982,10 +762,10 @@ namespace Uniray
                 if (index1 != -1)
                 {
                     // Retrive the position data of the conflicted game objects
-                    Vector3 iPos1 = currentScene.GameObjects[index1].Position;
-                    Vector3 iPos2 = currentScene.GameObjects[index2].Position;
+                    Vector3 iPos1 = CurrentScene.GameObjects[index1].Position;
+                    Vector3 iPos2 = CurrentScene.GameObjects[index2].Position;
 
-                    if (Vector3Distance(iPos1, envCamera.Position) > Vector3Distance(iPos2, envCamera.Position))
+                    if (Vector3Distance(iPos1, EnvCamera.Position) > Vector3Distance(iPos2, EnvCamera.Position))
                     {
                         // Set the new selected game object as closer
                         return index2;
