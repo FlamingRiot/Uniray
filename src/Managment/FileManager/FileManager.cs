@@ -48,8 +48,16 @@ namespace Uniray
                 int xPos = Uniray.UI.Components["fileManager"].X + 150 * (i % 10 + 1) - 100;
                 int yPos = Uniray.UI.Components["fileManager"].Y + 60 + row * 120;
 
-                DrawStorageUnit(_units[i], xPos, yPos, i);
+                DrawStorageUnit(_units[i], xPos, yPos, 255);
                 UpdateStorageUnit(_units[i], xPos, yPos);
+
+                // Draw selected item
+                if (_units[i] == UData.SelectedFile)
+                {
+                    Vector2 mouse = GetMousePosition();
+                    if (UData.SelectedFile is not null && !Hover(xPos, yPos, 65, 65))
+                        DrawStorageUnit(UData.SelectedFile, (int)mouse.X, (int)mouse.Y, 122);
+                }
             }
 
             // Creates folder action
@@ -61,29 +69,44 @@ namespace Uniray
                 Directory.CreateDirectory(CurrentFolder.Path + "/new");
             }
 
+            // Update dropping action on selected item
             DropStorageUnit();
         }
 
         /// <summary>Draws a single storage unit to the file manager, according to its place in the list.</summary>
         /// <param name="unit">Storage unit to draw.</param>
         /// <param name="index">Index of the storage unit.</param>
-        private static void DrawStorageUnit(UStorage unit, int x, int y, int index)
+        private static void DrawStorageUnit(UStorage unit, int x, int y, int alpha)
         {
             // Shorten the text
-            string lbl = "";
+            string lbl;
             if (unit.Name.Length >= 10) { lbl = unit.Name.Remove(5) + "..."; }
             else lbl = unit.Name;
 
             // Draw the appropriate element
-            if (unit is UFile)
+            if (unit is UFile file)
             {
-                DrawPanel(new Panel(x, y, 1, 0, HardRessource.Textures["file"], ""));
-                DrawLabel(new Label(x + 10 - lbl.Length / 2, y + HardRessource.Textures["file"].Height + 20, lbl));
+                switch (((Container)Uniray.UI.Components["fileManager"]).ExtensionFile)
+                {
+                    case "m3d":
+                        DrawTexture(HardRessource.Textures["model_file"], x, y, new Color(255, 255, 255, alpha));
+                        DrawLabel(new Label(x + 10 - lbl.Length / 2, y + HardRessource.Textures["model_file"].Height + 20, lbl));
+                        break;
+                    case "png":
+                        // Prepare preview texture
+                        Texture2D previewTexture = Uniray.Ressource.GetTexture((file).Name);
+                        Rectangle srcRectangle = new Rectangle(0, 0, previewTexture.Width, previewTexture.Height);
+                        Rectangle destRectangle = new Rectangle(x, y, 65, 65);
+
+                        DrawTexturePro(previewTexture, srcRectangle, destRectangle, Vector2.Zero, 0, new Color(255, 255, 255, alpha));
+                        DrawLabel(new Label(x + 10 - lbl.Length / 2, y + HardRessource.Textures["model_file"].Height + 20, lbl));
+                        break;
+                }
             }
             else if (unit is UFolder)
             {
-                DrawPanel(new Panel(x, y, 1, 0, HardRessource.Textures["folder"], ""));
-                DrawLabel(new Label(x + 10 + unit.Name.Length / 3, y + HardRessource.Textures["file"].Height + 20, lbl));
+                DrawTexture(HardRessource.Textures["folder"], x, y, new Color(255, 255, 255, alpha));
+                DrawLabel(new Label(x + 10 + unit.Name.Length / 3, y + HardRessource.Textures["model_file"].Height + 20, lbl));
             }
         }
 
@@ -92,7 +115,7 @@ namespace Uniray
             // Delete action
             if (IsMouseButtonPressed(MouseButton.Middle))
             {
-                if (Hover(x, y, HardRessource.Textures["file"].Width, HardRessource.Textures["file"].Height))
+                if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
                     if (unit is UFolder)
                     {
@@ -127,7 +150,7 @@ namespace Uniray
             // Drag action
             if (IsMouseButtonDown(MouseButton.Left))
             {
-                if (Hover(x, y, HardRessource.Textures["file"].Width, HardRessource.Textures["file"].Height))
+                if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
                     UData.SelectedFile = unit;
                     SetMouseCursor(MouseCursor.PointingHand);
@@ -137,12 +160,12 @@ namespace Uniray
             // Folder entering action
             if (RaylibComplements.IsMouseButtonPressedRepeat(MouseButton.Left))
             {
-                if (Hover(x, y, HardRessource.Textures["file"].Width, HardRessource.Textures["file"].Height))
+                if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
-                    if (unit is UFolder)
+                    if (unit is UFolder folder)
                     {
                         // Set the new selected folder
-                        CurrentFolder = (UFolder)unit;
+                        CurrentFolder = folder;
                         ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath += '/' + unit.Path.Split('/').Last();
                     }
                 }

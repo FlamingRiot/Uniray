@@ -57,7 +57,7 @@ namespace Uniray
 
             // Disable exit key
             SetExitKey(KeyboardKey.Null);
-#if DEBUG
+#if !DEBUG
             SetTargetFPS(60);
 #endif
             while (!WindowShouldClose())

@@ -12,6 +12,7 @@ namespace Uniray
             Textures = new Dictionary<string, Texture2D>() 
             {
                 { "file", LoadTexture("data/img/file.png")},
+                { "model_file", LoadTexture("data/img/model_file.png")},
                 { "folder", LoadTexture("data/img/folder.png")}
             };
         }
