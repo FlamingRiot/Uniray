@@ -279,13 +279,20 @@ namespace Uniray
                 System.Diagnostics.Process.Start("CMD.exe", commmand);
             }
         }
-        /// <summary>
-        /// Go the upstream folder of another folder
-        /// </summary>
-        public void BackFolder()
-        {
-            if (FileManager.CurrentFolder.UpstreamFolder is not null) FileManager.CurrentFolder = FileManager.CurrentFolder.UpstreamFolder;
 
+        /// <summary>Goes up one folder from the current one</summary>
+        public static void BackFolder()
+        {
+            if (FileManager.CurrentFolder.UpstreamFolder is not null)
+            {
+                FileManager.CurrentFolder = FileManager.CurrentFolder.UpstreamFolder;
+
+                string? path = ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath;
+                int lastSlashIndex = path.LastIndexOf('/');
+                path = path.Substring(0, lastSlashIndex);
+
+                ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath = path;
+            }
         }
         /// <summary>
         /// Send exit code for positive response on open project modal

@@ -8,6 +8,7 @@ using System.Numerics;
 
 namespace Uniray
 {
+    /// <summary>Represents a <see cref="FileManager"/> instance.</summary>
     internal static unsafe class FileManager
     {
         public static UFolder ModelFolder = new UFolder();
@@ -142,7 +143,7 @@ namespace Uniray
                     {
                         // Set the new selected folder
                         CurrentFolder = (UFolder)unit;
-                        ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath += unit.Path.Split("assets").Last();
+                        ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath += '/' + unit.Path.Split('/').Last();
                     }
                 }
             }
