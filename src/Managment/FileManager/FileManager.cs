@@ -39,6 +39,9 @@ namespace Uniray
         {
             InjectFiles();
 
+            // Future static position
+            Vector2 staticSelectedPos = Vector2.Zero;
+
             List<UStorage> _units = CurrentFolder.Files;
             for (int i = 0; i < _units.Count; i++) 
             {
@@ -51,12 +54,10 @@ namespace Uniray
                 DrawStorageUnit(_units[i], xPos, yPos, 255);
                 UpdateStorageUnit(_units[i], xPos, yPos);
 
-                // Draw selected item
+                // Get selected item position
                 if (_units[i] == UData.SelectedFile)
                 {
-                    Vector2 mouse = GetMousePosition();
-                    if (UData.SelectedFile is not null && !Hover(xPos, yPos, 65, 65))
-                        DrawStorageUnit(UData.SelectedFile, (int)mouse.X, (int)mouse.Y, 122);
+                    staticSelectedPos = new Vector2(xPos, yPos);
                 }
             }
 
@@ -68,6 +69,11 @@ namespace Uniray
                 CurrentFolder.Files.Add(folder);
                 Directory.CreateDirectory(CurrentFolder.Path + "/new");
             }
+
+            // Draw selected item
+            Vector2 mouse = GetMousePosition();
+            if (UData.SelectedFile is not null && !Hover((int)staticSelectedPos.X, (int)staticSelectedPos.Y, 65, 65))
+                DrawStorageUnit(UData.SelectedFile, (int)mouse.X, (int)mouse.Y, 122);
 
             // Update dropping action on selected item
             DropStorageUnit();
@@ -152,8 +158,11 @@ namespace Uniray
             {
                 if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
-                    UData.SelectedFile = unit;
-                    SetMouseCursor(MouseCursor.PointingHand);
+                    if (UData.SelectedFile is null)
+                    {
+                        UData.SelectedFile = unit;
+                        SetMouseCursor(MouseCursor.PointingHand);
+                    }
                 }
             }
 
