@@ -2,14 +2,19 @@
 {
     public class UFile : UStorage, IRenamable
     {
-        /// <summary>
-        /// UFile constructor
-        /// </summary>
-        /// <param name="path">The absolute path to the file</param>
+        /// <summary>Extension of the file.</summary>
+        public string Extension;
+
+        /// <summary>Returns the full name (including extension of the file.</summary>
+        public string FullName { get { return Name + '.' + Extension; } }
+
+        /// <summary>Creates an instance of a <see cref="UFile"/> object.</summary>
+        /// <param name="path">The absolute path to the file.</param>
         public UFile(string path) : base(path)
         {
             string[] slashed = path.Split('/');
             Name = slashed.Last().Split('.').First();
+            Extension = path.Split('.').Last();
         }
         /// <summary>
         /// Rename the file

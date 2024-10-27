@@ -235,6 +235,35 @@ namespace Uniray
                             }
                         }
                     }
+                    // Check if over folder
+                    foreach (UFolder folder in CurrentFolder.Files.Where(x => x is UFolder))
+                    {
+                        // Define index
+                        int index = CurrentFolder.Files.IndexOf(folder);
+                        // Define file row
+                        short row = (short)(index / 10);
+                        // Define drawing position
+                        int xPos = Uniray.UI.Components["fileManager"].X + 150 * (index % 10 + 1) - 100;
+                        int yPos = Uniray.UI.Components["fileManager"].Y + 60 + row * 120;
+
+                        if (Hover(xPos, yPos, 65, 65))
+                        {
+                            // Move file
+                            if (UData.SelectedFile is UFile file)
+                            {
+                                // Move virtual file
+                                folder.AddFile(UData.SelectedFile);
+                                CurrentFolder.DeleteFile(UData.SelectedFile);
+                                File.Move(file.Path, folder.Path + '/' + file.FullName);
+                                file.Path = folder.Path + '/' + file.FullName;
+                            }
+
+                            // Move folder
+                            // To be continued...
+
+                            break;
+                        }
+                    }
                     // Clear file selection
                     UData.SelectedFile = null;
                 }
