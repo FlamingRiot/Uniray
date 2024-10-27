@@ -55,9 +55,16 @@ namespace Uniray
                 UpdateStorageUnit(_units[i], xPos, yPos);
 
                 // Get selected item position
-                if (_units[i] == UData.SelectedFile)
+                try
                 {
-                    staticSelectedPos = new Vector2(xPos, yPos);
+                    if (_units[i] == UData.SelectedFile)
+                    {
+                        staticSelectedPos = new Vector2(xPos, yPos);
+                    }
+                }
+                catch
+                {
+                    // dunno
                 }
             }
 
