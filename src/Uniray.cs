@@ -848,26 +848,33 @@ namespace Raylib_cs.Complements
 {
     public static class RaylibComplements
     {
-        private static double _lastTimeButtonPressed;
+        public static double LastTimeButtonPressed;
 
-        /// <summary>Checks if a mouse button is double-clicked.</summary>
-        /// <param name="button">Mouse button to check.</param>
-        /// <returns><see langword="true"/> if the button is double-clicked. <see langword="false"/> otherwise.</returns>
-        public static bool IsMouseButtonPressedRepeat(MouseButton button)
+        public static bool FirstLoopEntry = true;
+
+        // Fonction pour détecter un double-clic
+        public static bool IsMouseButtonDoubleClicked(MouseButton button, string source)
         {
             double currentFrame = GetTime();
 
             if (IsMouseButtonPressed(button))
             {
-                if ((currentFrame - _lastTimeButtonPressed) <= 0.25)
+                Console.WriteLine("Je viens de " + source);
+                Console.WriteLine("1: " + (currentFrame - LastTimeButtonPressed));
+                if (FirstLoopEntry && (currentFrame - LastTimeButtonPressed) >= 0.25)
                 {
-                    _lastTimeButtonPressed = 0.0;
+                    LastTimeButtonPressed = currentFrame;
+                    FirstLoopEntry = false;
+                }
+                Console.WriteLine("2: " + (currentFrame - LastTimeButtonPressed));
+                if ((currentFrame - LastTimeButtonPressed) <= 0.25 && (currentFrame - LastTimeButtonPressed) >= 0.05)
+                {
                     return true;
                 }
-                _lastTimeButtonPressed = currentFrame;
                 return false;
             }
             return false;
+
         }
     }
 }

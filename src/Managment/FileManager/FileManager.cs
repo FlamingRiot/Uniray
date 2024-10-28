@@ -68,6 +68,12 @@ namespace Uniray
                 }
             }
 
+            RaylibComplements.FirstLoopEntry = true;
+            if (RaylibComplements.IsMouseButtonDoubleClicked(MouseButton.Left, "Program.cs"))
+            {
+                RaylibComplements.LastTimeButtonPressed = 0.0;
+            }
+
             // Creates folder action
             if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
             {
@@ -174,7 +180,7 @@ namespace Uniray
             }
 
             // Folder entering action
-            if (RaylibComplements.IsMouseButtonPressedRepeat(MouseButton.Left))
+            if (RaylibComplements.IsMouseButtonDoubleClicked(MouseButton.Left, "FileManager"))
             {
                 if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
