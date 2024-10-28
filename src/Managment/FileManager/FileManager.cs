@@ -20,6 +20,9 @@ namespace Uniray
         /// <summary>The currently displayed <see cref="UFolder"/>.</summary>
         internal static UFolder CurrentFolder = new UFolder();
 
+        /// <summary>The currently clicked <see cref="UStorage"/> unit.</summary>
+        internal static List<UStorage> ClickedUnits = new List<UStorage>();
+
         /// <summary>Loads the entire folder architecture of the project.</summary>
         public static void Init(string directory)
         {
@@ -42,6 +45,7 @@ namespace Uniray
             // Future static position
             Vector2 staticSelectedPos = Vector2.Zero;
 
+            // Loop over files
             List<UStorage> _units = CurrentFolder.Files;
             for (int i = 0; i < _units.Count; i++) 
             {
@@ -54,25 +58,24 @@ namespace Uniray
                 DrawStorageUnit(_units[i], xPos, yPos, 255);
                 UpdateStorageUnit(_units[i], xPos, yPos);
 
+                
                 // Get selected item position
-                try
+                if (UData.SelectedFiles.Count != 0)
                 {
-                    if (_units[i] == UData.SelectedFile)
+                    if (_units[i] == UData.SelectedFiles[0])
                     {
                         staticSelectedPos = new Vector2(xPos, yPos);
                     }
                 }
-                catch
-                {
-                    // dunno
-                }
             }
 
+            // DON'T YOU DARE TOUCH THE CODE BELOW YOU PIECE OF SHIT!!!
             RaylibComplements.FirstLoopEntry = true;
             if (RaylibComplements.IsMouseButtonDoubleClicked(MouseButton.Left, "Program.cs"))
             {
                 RaylibComplements.LastTimeButtonPressed = 0.0;
             }
+            // now you can
 
             // Creates folder action
             if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
@@ -85,8 +88,13 @@ namespace Uniray
 
             // Draw selected item
             Vector2 mouse = GetMousePosition();
-            if (UData.SelectedFile is not null && !Hover((int)staticSelectedPos.X, (int)staticSelectedPos.Y, 65, 65))
-                DrawStorageUnit(UData.SelectedFile, (int)mouse.X, (int)mouse.Y, 122);
+            if (UData.SelectedFiles.Count != 0 && !Hover((int)staticSelectedPos.X, (int)staticSelectedPos.Y, 65, 65)) 
+            {
+                for (int i = 0; i < UData.SelectedFiles.Count; i++)
+                {
+                    DrawStorageUnit(UData.SelectedFiles[i], (int)mouse.X + i * 75, (int)mouse.Y, 122);
+                }
+            }
 
             // Update dropping action on selected item
             DropStorageUnit();
@@ -105,6 +113,12 @@ namespace Uniray
             // Draw the appropriate element
             if (unit is UFile file)
             {
+                // Draw selection aura if selected
+                if (ClickedUnits.Contains(unit))
+                {
+                    DrawRectangle(x - 5, y - 5, 75, 75, new Color(78, 211, 237, 75));
+                }
+                // Draw item texture and label
                 switch (((Container)Uniray.UI.Components["fileManager"]).ExtensionFile)
                 {
                     case "m3d":
@@ -124,6 +138,12 @@ namespace Uniray
             }
             else if (unit is UFolder)
             {
+                // Draw selection aura if selected
+                if (ClickedUnits.Contains(unit))
+                {
+                    DrawRectangle(x - 5, y - 5, HardRessource.Textures["folder"].Width + 10, HardRessource.Textures["folder"].Height + 10, new Color(78, 211, 237, 75));
+                }
+
                 DrawTexture(HardRessource.Textures["folder"], x, y, new Color(255, 255, 255, alpha));
                 DrawLabel(new Label(x + 10 + unit.Name.Length / 3, y + HardRessource.Textures["model_file"].Height + 20, lbl));
             }
@@ -166,16 +186,23 @@ namespace Uniray
                 }
             }
 
+            // Selection action
+            if (IsMouseButtonPressed(MouseButton.Left)) 
+            {
+                if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
+                {
+                    if (IsKeyUp(KeyboardKey.LeftControl)) ClickedUnits.Clear();
+                    ClickedUnits.Add(unit);
+                }
+            }
+
             // Drag action
             if (IsMouseButtonDown(MouseButton.Left))
             {
                 if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
-                    if (UData.SelectedFile is null)
-                    {
-                        UData.SelectedFile = unit;
-                        SetMouseCursor(MouseCursor.PointingHand);
-                    }
+                    if (UData.SelectedFiles.Count == 0) UData.SelectedFiles.Add(unit);
+                    SetMouseCursor(MouseCursor.PointingHand);
                 }
             }
 
@@ -191,7 +218,8 @@ namespace Uniray
                         ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath += '/' + unit.Path.Split('/').Last();
 
                         // Reset selected item
-                        UData.SelectedFile = null;
+                        UData.SelectedFiles.Clear();
+                        ClickedUnits.Clear();
                     }
                 }
             }
@@ -201,17 +229,17 @@ namespace Uniray
         {
             if (IsMouseButtonReleased(MouseButton.Left))
             {
-                if (UData.SelectedFile is not null)
+                if (UData.SelectedFiles.Count != 0)
                 {
                     // Get mouse position
                     Vector2 mouse = GetMousePosition();
                     // Check if in 3D conceptor
-                    if (mouse.X > Uniray.UI.Components["gameManager"].Width + 20 && mouse.Y < Uniray.UI.Components["fileManager"].Y - 10)
+                    if (mouse.X > Uniray.UI.Components["gameManager"].Width + 20 && mouse.Y < Uniray.UI.Components["fileManager"].Y - 10 && UData.SelectedFiles.Count == 1)
                     {
                         // Check if model
-                        if (UData.SelectedFile.Path.Split('.').Last() == "m3d")
+                        if (UData.SelectedFiles[0].Path.Split('.').Last() == "m3d")
                         {
-                            string modelKey = UData.SelectedFile.Name;
+                            string modelKey = UData.SelectedFiles[0].Name;
                             // Import model into the scene
                             if (Uniray.Ressource.ModelExists(modelKey))
                             {
@@ -224,7 +252,7 @@ namespace Uniray
                             else
                             {
                                 // Reset materials
-                                Model m = LoadModel(UData.SelectedFile.Path);
+                                Model m = LoadModel(UData.SelectedFiles[0].Path);
                                 for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
                                     m.Meshes[0].Colors[j] = 255;
                                 UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
@@ -243,11 +271,11 @@ namespace Uniray
                     if (Hover(box.X, box.Y, box.Width, box.Height))
                     {
                         // Check if texture
-                        if (UData.SelectedFile.Path.Split('.').Last() == "png") 
+                        if (UData.SelectedFiles[0].Path.Split('.').Last() == "png") 
                         {
                             if (UData.Selection.Count == 1 && UData.Selection.First() is UModel)
                             {
-                                ((UModel)UData.Selection.First()).SetTexture(UData.SelectedFile.Name, Uniray.Ressource.GetTexture(UData.SelectedFile.Name));
+                                ((UModel)UData.Selection.First()).SetTexture(UData.SelectedFiles[0].Name, Uniray.Ressource.GetTexture(UData.SelectedFiles[0].Name));
                             }
                         }
                     }
@@ -264,12 +292,12 @@ namespace Uniray
 
                         if (Hover(xPos, yPos, 65, 65))
                         {
-                            // Move file
-                            if (UData.SelectedFile is UFile file)
+                            // Move files
+                            foreach (UFile file in UData.SelectedFiles.Where(x => x is UFile))
                             {
                                 // Move virtual file
-                                folder.AddFile(UData.SelectedFile);
-                                CurrentFolder.DeleteFile(UData.SelectedFile);
+                                folder.AddFile(file);
+                                CurrentFolder.DeleteFile(file);
                                 File.Move(file.Path, folder.Path + '/' + file.FullName);
                                 file.Path = folder.Path + '/' + file.FullName;
                             }
@@ -281,7 +309,7 @@ namespace Uniray
                         }
                     }
                     // Clear file selection
-                    UData.SelectedFile = null;
+                    UData.SelectedFiles.Clear();
                 }
             }
         }
@@ -375,6 +403,7 @@ namespace Uniray
                             foreach (UFolder folder in ((UFolder)storage).Files.Where(x => x is UFolder))
                             {
                                 folder.UpstreamFolder = (UFolder)storage;
+                                folder.AddFile(folder.UpstreamFolder);
                             }
                         }
                         switch (i)
@@ -463,12 +492,28 @@ namespace Uniray
                     foreach (UFolder folder in ((UFolder)storage).Files.Where(x => x is UFolder))
                     {
                         folder.UpstreamFolder = (UFolder)storage;
+                        folder.AddFile(folder.UpstreamFolder);
                     }
                 }
                 files.Add(storage);
             }
             UnloadDirectoryFiles(list);
             return files;
+        }
+
+        /// <summary>Goes up one folder from the current one</summary>
+        public static void BackFolder()
+        {
+            if (CurrentFolder.UpstreamFolder is not null)
+            {
+                CurrentFolder = CurrentFolder.UpstreamFolder;
+
+                string? path = ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath;
+                int lastSlashIndex = path.LastIndexOf('/');
+                path = path.Substring(0, lastSlashIndex);
+
+                ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath = path;
+            }
         }
     }
 }

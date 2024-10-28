@@ -838,18 +838,17 @@ namespace Uniray
             nm.M34 = camera.Position.Z;
 
             camera.Transform = nm;
-            // Set the camera Target according to the rotation matrix
-
         }
     }
 }
 
 namespace Raylib_cs.Complements
 {
+    /// <summary>Represents an instance of the extension class of <see cref="Raylib"/>.</summary>
     public static class RaylibComplements
     {
+        // Public fields
         public static double LastTimeButtonPressed;
-
         public static bool FirstLoopEntry = true;
 
         // Fonction pour détecter un double-clic
@@ -859,14 +858,11 @@ namespace Raylib_cs.Complements
 
             if (IsMouseButtonPressed(button))
             {
-                Console.WriteLine("Je viens de " + source);
-                Console.WriteLine("1: " + (currentFrame - LastTimeButtonPressed));
                 if (FirstLoopEntry && (currentFrame - LastTimeButtonPressed) >= 0.25)
                 {
                     LastTimeButtonPressed = currentFrame;
                     FirstLoopEntry = false;
                 }
-                Console.WriteLine("2: " + (currentFrame - LastTimeButtonPressed));
                 if ((currentFrame - LastTimeButtonPressed) <= 0.25 && (currentFrame - LastTimeButtonPressed) >= 0.05)
                 {
                     return true;
@@ -874,7 +870,6 @@ namespace Raylib_cs.Complements
                 return false;
             }
             return false;
-
         }
     }
 }

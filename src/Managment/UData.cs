@@ -5,8 +5,8 @@
         /// <summary>The currently loaded <see cref="Project"/>.</summary>
         internal static Project? CurrentProject;
 
-        /// <summary>The currently selected <see cref="UFile"/>.</summary>
-        internal static UStorage? SelectedFile;
+        /// <summary>The currently selected <see cref="UFile"/>s.</summary>
+        internal static List<UStorage> SelectedFiles = new List<UStorage>();
 
         /// <summary>The currently opened <see cref="Modal"/>.</summary>
         internal static string? CurrentModal;

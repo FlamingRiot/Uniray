@@ -87,7 +87,7 @@ namespace Uniray
 
             // Upstream folder button
             Button returnButton = new Button("<", fileManager.X + 10, fileManager.Y + 40, 20, 20);
-            returnButton.Event = BackFolder;
+            returnButton.Event = FileManager.BackFolder;
             Components.Add("returnButton", returnButton);
 
             // Labels
@@ -154,7 +154,7 @@ namespace Uniray
             bool focus = false;
             DrawComponents(Components, ref focus);
             if (UData.CurrentModal is not null) DrawModal(UData.CurrentModal, ref focus);
-            if (!focus && UData.SelectedFile is null) { Raylib.SetMouseCursor(MouseCursor.Default); }
+            if (!focus && UData.SelectedFiles.Count == 0) { Raylib.SetMouseCursor(MouseCursor.Default); }
         }
         private void DrawComponents(Dictionary<string, Component> components, ref bool focus)
         {
@@ -280,20 +280,6 @@ namespace Uniray
             }
         }
 
-        /// <summary>Goes up one folder from the current one</summary>
-        public static void BackFolder()
-        {
-            if (FileManager.CurrentFolder.UpstreamFolder is not null)
-            {
-                FileManager.CurrentFolder = FileManager.CurrentFolder.UpstreamFolder;
-
-                string? path = ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath;
-                int lastSlashIndex = path.LastIndexOf('/');
-                path = path.Substring(0, lastSlashIndex);
-
-                ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath = path;
-            }
-        }
         /// <summary>
         /// Send exit code for positive response on open project modal
         /// </summary>
