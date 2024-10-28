@@ -1,5 +1,6 @@
 ﻿namespace Uniray
 {
+    /// <summary>Represents a <see cref="UFile"/> instance.</summary>
     public class UFile : UStorage, IRenamable
     {
         /// <summary>Extension of the file.</summary>
@@ -16,9 +17,8 @@
             Name = slashed.Last().Split('.').First();
             Extension = path.Split('.').Last();
         }
-        /// <summary>
-        /// Rename the file
-        /// </summary>
+
+        /// <summary>Renames the file both virtually and effectively.</summary>
         /// <param name="name">The new name of the file</param>
         public void Rename(string name)
         {

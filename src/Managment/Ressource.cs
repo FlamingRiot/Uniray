@@ -24,7 +24,6 @@ namespace Uniray
 
             // Load textures
             LoadTextures(_textures);
-
             // Load sounds
             LoadSounds(_sounds);
             // Load models

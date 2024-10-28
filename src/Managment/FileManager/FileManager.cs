@@ -183,6 +183,9 @@ namespace Uniray
                         // Set the new selected folder
                         CurrentFolder = folder;
                         ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath += '/' + unit.Path.Split('/').Last();
+
+                        // Reset selected item
+                        UData.SelectedFile = null;
                     }
                 }
             }
