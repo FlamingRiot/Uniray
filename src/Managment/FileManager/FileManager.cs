@@ -218,9 +218,6 @@ namespace Uniray
             {
                 if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
-                    // Test if clicked on selection
-
-
                     if (IsKeyUp(KeyboardKey.LeftControl) && !ClickOnSelection) ClickedUnits.Clear();
                     if (!ClickedUnits.Contains(unit)) ClickedUnits.Add(unit);
                 }
@@ -236,10 +233,9 @@ namespace Uniray
                 {
                     if (!UData.SelectedFiles.Contains(unit))
                     {
-                        UData.Selection.Clear();
                         foreach (UStorage file in ClickedUnits)
                         {
-                            if (UData.SelectedFiles.Count == 0 || ClickedUnits.Count > 1) UData.SelectedFiles.Add(file);
+                            if ((UData.SelectedFiles.Count == 0 || ClickedUnits.Count > 1) && !UData.SelectedFiles.Contains(file)) UData.SelectedFiles.Add(file);
                         }
                     }
                     SetMouseCursor(MouseCursor.PointingHand);
@@ -443,7 +439,6 @@ namespace Uniray
                             foreach (UFolder folder in ((UFolder)storage).Files.Where(x => x is UFolder))
                             {
                                 folder.UpstreamFolder = (UFolder)storage;
-                                folder.AddFile(folder.UpstreamFolder);
                             }
                         }
                         switch (i)
@@ -532,7 +527,6 @@ namespace Uniray
                     foreach (UFolder folder in ((UFolder)storage).Files.Where(x => x is UFolder))
                     {
                         folder.UpstreamFolder = (UFolder)storage;
-                        folder.AddFile(folder.UpstreamFolder);
                     }
                 }
                 files.Add(storage);
