@@ -185,26 +185,26 @@ namespace Uniray
                     CurrentFolder.Files.Remove(unit);
                 }
             }
+            // Drag action
+            if (IsMouseButtonDown(MouseButton.Left))
+            {
+                if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
+                {
+                    if (!UData.SelectedFiles.Contains(unit)) UData.SelectedFiles.Add(unit);
+                    SetMouseCursor(MouseCursor.PointingHand);
+                }
+            }
 
             // Selection action
             if (IsMouseButtonPressed(MouseButton.Left)) 
             {
                 if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
-                    if (IsKeyUp(KeyboardKey.LeftControl)) ClickedUnits.Clear();
+                    if (IsKeyUp(KeyboardKey.LeftControl) && ClickedUnits.Count == 1) ClickedUnits.Clear();
                     ClickedUnits.Add(unit);
                 }
             }
 
-            // Drag action
-            if (IsMouseButtonDown(MouseButton.Left))
-            {
-                if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
-                {
-                    if (UData.SelectedFiles.Count == 0) UData.SelectedFiles.Add(unit);
-                    SetMouseCursor(MouseCursor.PointingHand);
-                }
-            }
 
             // Folder entering action
             if (RaylibComplements.IsMouseButtonDoubleClicked(MouseButton.Left, "FileManager"))
