@@ -329,17 +329,35 @@ namespace Uniray
                         if (Hover(xPos, yPos, 65, 65))
                         {
                             // Move files
-                            foreach (UFile file in UData.SelectedFiles.Where(x => x is UFile))
+                            foreach (UStorage unit in UData.SelectedFiles)
                             {
-                                // Move virtual file
-                                if (!folder.Files.Contains(file)) folder.AddFile(file);
-                                CurrentFolder.DeleteFile(file);
-                                File.Move(file.Path, folder.Path + '/' + file.FullName);
-                                file.Path = folder.Path + '/' + file.FullName;
+                                if (unit is UFile)
+                                {
+                                    // Move file
+                                    if (!folder.Files.Contains(unit))
+                                    {
+                                        // Move virtually
+                                        folder.AddFile(unit);
+                                        CurrentFolder.DeleteFile(unit);
+                                        // Move effectively
+                                        File.Move(unit.Path, folder.Path + '/' + ((UFile)unit).FullName);
+                                        unit.Path = folder.Path + '/' + ((UFile)unit).FullName;
+                                    }
+                                }
+                                else if (unit is UFolder)
+                                {
+                                    // Move folder
+                                    if (!folder.Files.Contains(unit) && unit != folder)
+                                    {
+                                        // Move virtually
+                                        folder.AddFile(unit);
+                                        CurrentFolder.DeleteFile(unit);
+                                        // Move effectively
+                                        Directory.Move(unit.Path, folder.Path + '/' + unit.Name);
+                                        unit.Path = folder.Path + '/' + unit.Name;
+                                    }
+                                }
                             }
-
-                            // Move folder
-                            // To be continued...
 
                             break;
                         }

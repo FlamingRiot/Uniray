@@ -31,7 +31,7 @@
         }
 
         /// <summary>
-        /// Add a file to the folder
+        /// Adds a file to the folder
         /// </summary>
         /// <param name="file">The file to add</param>
         public void AddFile(UStorage file)
@@ -39,7 +39,7 @@
             Files.Add(file);
         }
         /// <summary>
-        /// Delete a file from the folder
+        /// Deletes a file from the folder
         /// </summary>
         /// <param name="file"></param>
         public void DeleteFile(UStorage file)
@@ -47,7 +47,7 @@
             Files.Remove(file);
         }
         /// <summary>
-        /// Rename the folder
+        /// Renames the folder
         /// </summary>
         /// <param name="name">The new name to give</param>
         public void Rename(string name)
