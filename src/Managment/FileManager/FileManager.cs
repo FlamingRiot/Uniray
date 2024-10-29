@@ -23,6 +23,8 @@ namespace Uniray
         /// <summary>The currently clicked <see cref="UStorage"/> unit.</summary>
         internal static List<UStorage> ClickedUnits = new List<UStorage>();
 
+        private static bool ClickOnSelection;
+
         /// <summary>Loads the entire folder architecture of the project.</summary>
         public static void Init(string directory)
         {
@@ -45,8 +47,29 @@ namespace Uniray
             // Future static position
             Vector2 staticSelectedPos = Vector2.Zero;
 
-            // Loop over files
             List<UStorage> _units = CurrentFolder.Files;
+
+            ClickOnSelection = true;
+
+            // Test if clicked on selection
+            for (int i = 0; i < _units.Count; i++) 
+            {
+                // Define file row
+                short row = (short)(i / 10);
+                // Define drawing position
+                int xPos = Uniray.UI.Components["fileManager"].X + 150 * (i % 10 + 1) - 100;
+                int yPos = Uniray.UI.Components["fileManager"].Y + 60 + row * 120;
+
+                if (IsMouseButtonPressed(MouseButton.Left))
+                {
+                    if (!ClickedUnits.Contains(_units[i]) && Hover(xPos, yPos, 65, 65))
+                    {
+                        ClickOnSelection = false;
+                    }
+                }
+            }
+
+            // Loop over files
             for (int i = 0; i < _units.Count; i++) 
             {
                 // Define file row
@@ -189,26 +212,39 @@ namespace Uniray
                     CurrentFolder.Files.Remove(unit);
                 }
             }
-            // Drag action
-            if (IsMouseButtonDown(MouseButton.Left))
-            {
-                if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
-                {
-                    if (!UData.SelectedFiles.Contains(unit)) UData.SelectedFiles.Add(unit);
-                    SetMouseCursor(MouseCursor.PointingHand);
-                }
-            }
 
             // Selection action
             if (IsMouseButtonPressed(MouseButton.Left)) 
             {
                 if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
-                    if (IsKeyUp(KeyboardKey.LeftControl) && ClickedUnits.Count == 1) ClickedUnits.Clear();
-                    ClickedUnits.Add(unit);
+                    // Test if clicked on selection
+
+
+                    if (IsKeyUp(KeyboardKey.LeftControl) && !ClickOnSelection) ClickedUnits.Clear();
+                    if (!ClickedUnits.Contains(unit)) ClickedUnits.Add(unit);
                 }
             }
+         
+            DrawText(ClickedUnits.Count.ToString(), 0, 0, 50, Color.Red);
+            DrawText(UData.SelectedFiles.Count.ToString(), 0, 50, 50, Color.Blue);
 
+            // Drag action
+            if (IsMouseButtonDown(MouseButton.Left))
+            {
+                if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
+                {
+                    if (!UData.SelectedFiles.Contains(unit))
+                    {
+                        UData.Selection.Clear();
+                        foreach (UStorage file in ClickedUnits)
+                        {
+                            if (UData.SelectedFiles.Count == 0 || ClickedUnits.Count > 1) UData.SelectedFiles.Add(file);
+                        }
+                    }
+                    SetMouseCursor(MouseCursor.PointingHand);
+                }
+            }
 
             // Folder entering action
             if (RaylibComplements.IsMouseButtonDoubleClicked(MouseButton.Left, "FileManager"))
