@@ -1,4 +1,5 @@
-﻿using RayGUI_cs;
+﻿using Newtonsoft.Json.Converters;
+using RayGUI_cs;
 using Raylib_cs;
 
 namespace Uniray
@@ -6,6 +7,9 @@ namespace Uniray
     /// <summary>Represents an instance of the application's <see cref="UI"/>.</summary>
     public class UI
     {
+        private static Container _modalTemplate = new Container(0, 0, 0, 0);
+        private static bool _globalFocus = false;
+
         /// <summary>The list of every components in the UI</summary>
         public Dictionary<string, Component> Components;
 
@@ -36,9 +40,8 @@ namespace Uniray
             Container gameManager = new Container(10, 10, cont1X - 20, Program.Height - 20, "gameManager");
             Components.Add("gameManager", gameManager);
 
-            // Modal Template
-            Container modalTemplate = new Container(Program.Width / 2 - Program.Width / 6, Program.Height / 2 - Program.Height / 6, Program.Width / 3, Program.Height / 3, "modal");
-            Components.Add("modalTemplate", modalTemplate);
+            // Template modal
+            _modalTemplate = new Container(Program.Width / 2 - Program.Width / 6, Program.Height / 2 - Program.Height / 6, Program.Width / 3, Program.Height / 3, "modal");
 
             // Buttons
             // Models section
@@ -114,17 +117,17 @@ namespace Uniray
             Components.Add("textureTextbox", txb);
 
             // Modals
-            Button okModalButton = new Button("Proceed", Components["modalTemplate"].X + Components["modalTemplate"].Width - 70, Components["modalTemplate"].Y + Components["modalTemplate"].Height - 30, 60, 20);
+            Button okModalButton = new Button("Proceed", _modalTemplate.X + _modalTemplate.Width - 70, _modalTemplate.Y + _modalTemplate.Height - 30, 60, 20);
             okModalButton.BaseColor = Color.Lime;
             okModalButton.Event = OkModal;
-            Button closeModalButton = new Button("x", Components["modalTemplate"].X + Components["modalTemplate"].Width - 30, Components["modalTemplate"].Y + 10, 20, 20);
+            Button closeModalButton = new Button("x", _modalTemplate.X + _modalTemplate.Width - 30, _modalTemplate.Y + 10, 20, 20);
             closeModalButton.BaseColor = Color.Red;
             closeModalButton.Event = CloseModal;
             // Open project modal
             Dictionary<string, Component> openProjModalComponents = new Dictionary<string, Component>();
-            Label openProjectLabel = new Label(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 50, "Copy .uproj link");
+            Label openProjectLabel = new Label(_modalTemplate.X + 20, _modalTemplate.Y + 50, "Copy .uproj link");
             openProjModalComponents.Add("openProjectLabel", openProjectLabel);
-            Textbox openProjectTextbox = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 70, 250, 20, "");
+            Textbox openProjectTextbox = new Textbox(_modalTemplate.X + 20, _modalTemplate.Y + 70, 250, 20, "");
             openProjModalComponents.Add("openProjectTextbox", openProjectTextbox);
             openProjModalComponents.Add("closeModalButton", closeModalButton);
             openProjModalComponents.Add("okModalButton", okModalButton);
@@ -133,72 +136,47 @@ namespace Uniray
 
             // New project modal
             Dictionary<string, Component> newProjModalComponents = new Dictionary<string, Component>();
-            Label newProjectLabel1 = new Label(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 50, "Copy target directory path");
+            Label newProjectLabel1 = new Label(_modalTemplate.X + 20, _modalTemplate.Y + 50, "Copy target directory path");
             newProjModalComponents.Add("newProjectLabel1", newProjectLabel1);
-            Label newProjectLabel2 = new Label(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 100, "Choose your project name");
+            Label newProjectLabel2 = new Label(_modalTemplate.X + 20, _modalTemplate.Y + 100, "Choose your project name");
             newProjModalComponents.Add("newProjectLabel2", newProjectLabel2);
-            Textbox newProjectTextbox1 = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 70, 250, 20, "");
+            Textbox newProjectTextbox1 = new Textbox(_modalTemplate.X + 20, _modalTemplate.Y + 70, 250, 20, "");
             newProjModalComponents.Add("newProjectTextbox1", newProjectTextbox1);
-            Textbox newProjectTextbox2 = new Textbox(Components["modalTemplate"].X + 20, Components["modalTemplate"].Y + 120, 250, 20, "");
+            Textbox newProjectTextbox2 = new Textbox(_modalTemplate.X + 20, _modalTemplate.Y + 120, 250, 20, "");
             newProjModalComponents.Add("newProjectTextbox2", newProjectTextbox2);
             newProjModalComponents.Add("closeModalButton", closeModalButton);
             newProjModalComponents.Add("okModalButton", okModalButton);
 
             Modals.Add("newProjectModal", new Modal(newProjModalComponents));
         }
-        /// <summary>
-        /// Draw the UI of the application
-        /// </summary>
+
+        /// <summary>Draws the full 2D UI of the application.</summary>
         public void Draw()
         {
             bool focus = false;
-            DrawComponents(Components, ref focus);
-            if (UData.CurrentModal is not null) DrawModal(UData.CurrentModal, ref focus);
-            if (!focus && UData.SelectedFiles.Count == 0) { Raylib.SetMouseCursor(MouseCursor.Default); }
-        }
-        private void DrawComponents(Dictionary<string, Component> components, ref bool focus)
-        {
-            foreach (KeyValuePair<string, Component> component in components)
+            bool oModal = false;
+            if (UData.CurrentModal is not null)
             {
-                switch (component.Value)
-                {
-                    case Button button:
-                        RayGUI.DrawButton(button);
-                        if (RayGUI.Hover(button.X, button.Y, button.Width, button.Height)) { focus = true; }
-                        break;
-                    case Textbox textbox:
-                        RayGUI.DrawTextbox(ref textbox);
-                        components[component.Key] = textbox;
-                        if (RayGUI.Hover(textbox.X, textbox.Y, textbox.Width, textbox.Height)) { focus = true; }
-                        break;
-                    case Label label:
-                        RayGUI.DrawLabel(label);
-                        break;
-                    case Panel panel:
-                        RayGUI.DrawPanel(panel);
-                        break;
-                    case Tickbox tickbox:
-                        RayGUI.DrawTickbox(ref tickbox);
-                        Components[component.Key] = tickbox;
-                        break;
-                    case Container container:
-                        if (container.Tag != "modal") RayGUI.DrawContainer(ref container);
-                        Components[component.Key] = container;
-                        break;
-
-                }
+                DrawModal(UData.CurrentModal, ref focus);
+                if (focus) oModal = true;
+                RayGUI.DeactivateList();
             }
+            RayGUI.DrawGUIList(Components.Values.ToList(), ref focus);
+            RayGUI.ActivateList();
+
+            // Check focus
+            if (!focus && !oModal) Raylib.SetMouseCursor(MouseCursor.Default);
         }
-        /// <summary>
-        /// Draw a give modal
-        /// </summary>
+
+        /// <summary>Draws a modal and its components.</summary>
         /// <param name="key">Key of the modal to draw</param>
         public void DrawModal(string key, ref bool focus)
         {
             Raylib.DrawRectangle(0, 0, Program.Width, Program.Height, new Color(0, 0, 0, 75));
-            RayGUI.DrawContainer((Container)Components["modalTemplate"]);
-            DrawComponents(Modals[key].Components, ref focus);
+            RayGUI.DrawContainer(_modalTemplate);
+            RayGUI.DrawGUIList(Modals[key].Components.Values.ToList(), ref focus);
         }
+
         /// <summary>
         /// Set the file manager to the models page
         /// </summary>
