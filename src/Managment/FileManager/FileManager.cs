@@ -332,7 +332,7 @@ namespace Uniray
                             foreach (UFile file in UData.SelectedFiles.Where(x => x is UFile))
                             {
                                 // Move virtual file
-                                folder.AddFile(file);
+                                if (!folder.Files.Contains(file)) folder.AddFile(file);
                                 CurrentFolder.DeleteFile(file);
                                 File.Move(file.Path, folder.Path + '/' + file.FullName);
                                 file.Path = folder.Path + '/' + file.FullName;
