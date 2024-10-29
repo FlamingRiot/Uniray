@@ -84,6 +84,10 @@ namespace Uniray
                 folder.UpstreamFolder = CurrentFolder;
                 CurrentFolder.Files.Add(folder);
                 Directory.CreateDirectory(CurrentFolder.Path + "/new");
+
+                // Set clicked item to new folder
+                ClickedUnits.Clear();
+                ClickedUnits.Add(folder);
             }
 
             // Draw selected item
