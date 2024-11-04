@@ -14,8 +14,11 @@ using static Uniray.UData;
 namespace Uniray
 {
     /// <summary>Represents an instance of the Uniray application.</summary>
-    public unsafe struct Uniray
+    public static unsafe class Uniray
     { 
+        // -----------------------------------------------------------
+        // Constants and static instances
+        // -----------------------------------------------------------
         /// <summary>Base FOV of the environment camera.</summary>
         internal const int CAMERA_FOV = 90;
 
@@ -24,155 +27,67 @@ namespace Uniray
 
         /// <summary>Primary color of the application.</summary>
         public static readonly Color APPLICATION_COLOR = new(30, 30, 30, 255);
+
         /// <summary>Secondary color of the application.</summary>
         public static readonly Color FOCUS_COLOR = new(60, 60, 60, 255);
 
-        /// <summary>
-        /// The object containing all the assets that have been loaded in the RAM
-        /// </summary>
-        public static Ressource Ressource;
+        /// <summary>Instance containing the ressources of the loaded project.</summary>
+        public static Ressource Ressource = new Ressource();
 
         /// <summary>Global UI of the application.</summary>
         public static UI UI = new UI();
 
-        public static Camera3D EnvCamera;
+        /// <summary>Built-in shaders of the engine.</summary>
+        public static UShaders Shaders = new UShaders();
 
-        /// <summary>
-        /// RenderTexture used for the selected camera's POV
-        /// </summary>
-        private RenderTexture2D cameraView;
-        /// <summary>
-        /// The rectangle used to render the selected camera's POV
-        /// </summary>
-        private Rectangle cameraViewRec;
-        /// <summary>
-        /// The error handler system of the application
-        /// </summary>
-        private ErrorHandler errorHandler;
+        // -----------------------------------------------------------
+        // Private and internal instances
+        // -----------------------------------------------------------
+        private static RenderTexture2D _cameraView;
+        private static Rectangle _cameraViewRec;
+        private static List<GameObject3D> _clipboard = new List<GameObject3D>();
 
-        // File storage related attributes
-        /// <summary>
-        /// The texture used for rendering files in the file manager
-        /// </summary>
-        private Texture2D fileTex;
-        /// <summary>
-        /// The texture used for rendering folders in the file manager
-        /// </summary>
-        private Texture2D folderTex;
-
-        // 3D related attributes
-        /// <summary>
-        /// The clipboard of the Game Objects
-        /// </summary>
-        private List<GameObject3D> clipboard;
-        /// <summary>
-        /// The Ray used to check collisions between the 2D and 3D world
-        /// </summary>
-        private Ray mouseRay;
-        /// <summary>
-        /// The collision detection used for the GameObjects
-        /// </summary>
-        private RayCollision goCollision;
-        /// <summary>
-        /// 3D model of the displayed scene camera
-        /// </summary>
-        public Model cameraModel;
-        /// <summary>
-        /// Material of the generic camera model used for the application
-        /// </summary>
-        public Material cameraMaterial;
-
-        // Shader related attributes
-        /// <summary>
-        /// The built-in shaders of Uniray
-        /// </summary>
-        private UShaders shaders;
-        /// <summary>
-        /// 3D model of the skybox
-        /// </summary>
-        private Mesh skybox;
-        /// <summary>
-        /// Skybox panorama
-        /// </summary>
-        private Texture2D panorama;
-        /// <summary>
-        /// Skybox cubemap
-        /// </summary>
-        private Texture2D cubemap;
-        /// <summary>
-        /// The last time a button was pressed
-        /// </summary>
-        private double lastTimeButtonPressed;
-
-        // Properties
-        /// <summary>
-        /// 3D model of the skybox
-        /// </summary>
-        public Mesh Skybox { get { return skybox; } set { skybox = value; } }
-        /// <summary>
-        /// The built-in shaders of Uniray
-        /// </summary>
-        public UShaders Shaders { get { return shaders; } }
-        /// <summary>
-        /// Uniray constructor
-        /// </summary>
-        /// <param name="WWindow">The width of the window</param>
-        /// <param name="HWindow">The height of the window</param>
-        /// <param name="scene">A default scene to be used until the user loads/create a project</param>
-        public Uniray(Scene scene)
+        /// <summary>Initializes the <see cref="Uniray"/> engine.</summary>
+        public static void Init()
         {
             // Intitialize the Uniray shaders
-            shaders = new UShaders();
-            panorama = LoadTexture("data/shaders/skyboxes/industrial.hdr");
-            cubemap = shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
-            shaders.SetCubemap(cubemap);
-
-            // Load hard ressources
-            HardRessource.Init();
+            Shaders = new UShaders();
+            Texture2D panorama = LoadTexture("data/shaders/skyboxes/industrial.hdr");
+            Texture2D cubemap = Shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
+            Shaders.SetCubemap(cubemap);
 
             // Unload useless texture
             UnloadTexture(panorama);
 
-            // Intitialize the default scene and the render camera for Uniray
-            CurrentScene = scene;
-            EnvCamera = new Camera3D();
+            // Load hard ressources
+            HardRessource.Init();
 
-            // Init the clipboard list
-            clipboard = new List<GameObject3D>();
+            // Init error handler
+            ErrorHandler.Init(RayGUI.Font, new Vector2(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2 - 150, UI.Components["fileManager"].Y - 60));
+
+            // Init the 3D conceptor
+            Conceptor3D.Init();
+
+            // Intitialize the default scene and the render camera for Uniray
+            CurrentScene = new Scene(new List<GameObject3D>());
 
             // Create the render texture for preview of a camera's POV
-            cameraView = LoadRenderTexture(Program.Width / 2, Program.Height / 2);
-            cameraViewRec = new Rectangle(0, 0, Program.Width / 2, -(Program.Height / 2));
-
-            // 3D-2D Collision variables
-            mouseRay = new Ray();
-            goCollision = new RayCollision();
-
-            // Load the Uniray camera model and apply its texture
-            cameraModel = LoadModel("data/camera.m3d");
-            cameraMaterial = LoadMaterialDefault();
-            SetMaterialTexture(ref cameraMaterial, MaterialMapIndex.Diffuse, LoadTexture("data/cameraTex.png"));
-            // Load some required textures
-            fileTex = LoadTexture("data/img/file.png");
-            folderTex = LoadTexture("data/img/folder.png");
-            // Load the skybox model
-            skybox = GenMeshCube(1.0f, 1.0f, 1.0f);
+            _cameraView = LoadRenderTexture(Program.Width / 2, Program.Height / 2);
+            _cameraViewRec = new Rectangle(0, 0, Program.Width / 2, -(Program.Height / 2));
 
             // Initialize the volatile Data
             FileManager.CurrentFolder = FileManager.ModelFolder;
-            // Initialize the error handler
-            errorHandler = new ErrorHandler(new Vector2((UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2) - 150, UI.Components["fileManager"].Y - 60), RayGUI.Font);
-
         }
-        public void DrawScene()
+
+        /// <summary>Draws the currently displayed <see cref="Scene"/>.</summary>
+        public static void DrawScene()
         {
             // =========================================================================================================================================================
             // ================================================================ MANAGE 3D DRAWING ======================================================================
             // =========================================================================================================================================================
 
             // Define a mouse ray for collision check
-            Vector2 mousePos = GetMousePosition();
-            mouseRay = GetMouseRay(mousePos, EnvCamera);
+            Conceptor3D.UpdateMouseRay();
 
             // Render the outlined selected GameObjects and deactivate the Raylib culling to make it possible
             SetCullFace(ZERO);
@@ -181,31 +96,31 @@ namespace Uniray
                 switch (go)
                 {
                     case UModel model:
-                        DrawMesh(model.Mesh, shaders.OutlineMaterial, model.Transform);
+                        DrawMesh(model.Mesh, Shaders.OutlineMaterial, model.Transform);
                         break;
                     case UCamera camera:
-                        DrawMesh(cameraModel.Meshes[0], shaders.OutlineMaterial, camera.Transform);
+                        DrawMesh(HardRessource.Models["camera"].Meshes[0], Shaders.OutlineMaterial, camera.Transform);
                         break;
                 }
             }
             SetCullFace(ONE);
 
             // Draw 3-Dimensional models of the current scene and check for a hypothetical new selected object
-            short index = -1;
+            int index = -1;
             foreach (GameObject3D go in CurrentScene.GameObjects)
             {
                 // Manage objects drawing + object selection (according to the object type)
                 if (go is UModel)
                 {
                     DrawMesh(((UModel)go).Mesh, ((UModel)go).Material, ((UModel)go).Transform);
-                    short i = (short)CheckCollisionScreenToWorld(go, ((UModel)go).Mesh, mousePos, ((UModel)go).Transform);
-                    index = CheckDistance(index, i);
+                    int i = Conceptor3D.CheckCollisionScreenToWorld(go, ((UModel)go).Mesh, ((UModel)go).Transform);
+                    index = Conceptor3D.CheckDistance(index, i);
                 }
                 else if (go is UCamera)
                 {
-                    DrawMesh(cameraModel.Meshes[0], cameraMaterial, ((UCamera)go).Transform);
-                    short i = (short)CheckCollisionScreenToWorld(go, cameraModel.Meshes[0], mousePos, ((UCamera)go).Transform);
-                    index = CheckDistance(index, i);
+                    DrawMesh(HardRessource.Models["camera"].Meshes[0], HardRessource.Materials["camera"], ((UCamera)go).Transform);
+                    int i = Conceptor3D.CheckCollisionScreenToWorld(go, HardRessource.Models["camera"].Meshes[0], ((UCamera)go).Transform);
+                    index = Conceptor3D.CheckDistance(index, i);
                 }
             }
 
@@ -244,22 +159,22 @@ namespace Uniray
                 // Copy action on the active selection of game objects
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.C))
                 {
-                    clipboard = Selection;
+                    _clipboard = Selection;
                 }
                 // Paste action on the active selection of game objects
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.V))
                 {
-                    Vector3 dir = GetCameraForward(ref EnvCamera) * 5f;
-                    for (int i = 0; i < clipboard.Count; i++)
+                    Vector3 dir = GetCameraForward(ref Conceptor3D.EnvCamera) * 5f;
+                    for (int i = 0; i < _clipboard.Count; i++)
                     {
                         UModel go = new UModel(
-                            clipboard[i].Name,
-                            clipboard[i].Position,
-                            Ressource.GetModel(((UModel)clipboard[i]).ModelID).Meshes[0],
-                            ((UModel)clipboard[i]).ModelID,
-                            ((UModel)clipboard[i]).TextureID);
+                            _clipboard[i].Name,
+                            _clipboard[i].Position,
+                            Ressource.GetModel(((UModel)_clipboard[i]).ModelID).Meshes[0],
+                            ((UModel)_clipboard[i]).ModelID,
+                            ((UModel)_clipboard[i]).TextureID);
                         // Set the rotations of the model
-                        go.SetRotation(((UModel)clipboard[i]).Pitch, ((UModel)clipboard[i]).Yaw, ((UModel)clipboard[i]).Roll);
+                        go.SetRotation(((UModel)_clipboard[i]).Pitch, ((UModel)_clipboard[i]).Yaw, ((UModel)_clipboard[i]).Roll);
                         // Set final position of the model
                         go.Position -= dir;
                         // Add the copied object to the list
@@ -275,7 +190,7 @@ namespace Uniray
                     if (IsKeyDown(KeyboardKey.G))
                     {
                         // Translate a neutral vector for selection uniformity
-                        Vector3 newPos = TranslateObject(Vector3.Zero);
+                        Vector3 newPos = Conceptor3D.TranslateObject(Vector3.Zero);
                         foreach (GameObject3D go in Selection)
                         {
                             // Add the position of the current object
@@ -292,12 +207,12 @@ namespace Uniray
                             if (go is UModel)
                             {
                                 UModel model = (UModel)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
-                                RotateObject(ref model);
+                                Conceptor3D.RotateObject(ref model);
                             }
                             else if (go is UCamera)
                             {
                                 UCamera camera = (UCamera)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
-                                RotateObject(ref camera);
+                                Conceptor3D.RotateObject(ref camera);
                             }
                         }
                         HideCursor();
@@ -311,7 +226,7 @@ namespace Uniray
             {
                 EndMode3D();
 
-                BeginTextureMode(cameraView);
+                BeginTextureMode(_cameraView);
 
                 ClearBackground(new Color(70, 70, 70, 255));
 
@@ -322,7 +237,7 @@ namespace Uniray
                 // Draw the external skybox 
                 DisableBackfaceCulling();
                 DisableDepthMask();
-                DrawMesh(skybox, shaders.SkyboxMaterial, MatrixIdentity());
+                DrawMesh(Program.Skybox, Shaders.SkyboxMaterial, MatrixIdentity());
                 EnableBackfaceCulling();
                 EnableDepthMask();
 
@@ -339,13 +254,12 @@ namespace Uniray
                 
                 EndTextureMode();
 
-                BeginMode3D(EnvCamera);
+                BeginMode3D(Conceptor3D.EnvCamera);
             }
         }
-        /// <summary>
-        /// Draw user interface of the application
-        /// </summary>
-        public void DrawUI()
+
+        /// <summary>Draws 2-Dimensional user interface.</summary>
+        public static void DrawUI()
         {
             // =========================================================================================================================================================
             // ================================================================ MANAGE 2D DRAWING ======================================================================
@@ -365,7 +279,7 @@ namespace Uniray
             UI.Draw();
 
             // Tick the error handler for the errors to potentially disappear
-            errorHandler.Tick();
+            ErrorHandler.Tick();
 
             // Draw and update file manager
             FileManager.Draw();
@@ -374,7 +288,7 @@ namespace Uniray
             if (Selection.Count == 1 && Selection.First() is UCamera cam)
             {
                 DrawRectangleLinesEx(new Rectangle(Program.Width - Program.Width / 5 - 11, 9, Program.Width / 5 + 2, Program.Height / 5 + 2), 2, Color.White);
-                DrawTexturePro(cameraView.Texture, cameraViewRec, new Rectangle(Program.Width - Program.Width / 5 - 10, 10, Program.Width / 5, Program.Height / 5), Vector2.Zero, 0, Color.White);
+                DrawTexturePro(_cameraView.Texture, _cameraViewRec, new Rectangle(Program.Width - Program.Width / 5 - 10, 10, Program.Width / 5, Program.Height / 5), Vector2.Zero, 0, Color.White);
             }
 
             // Draw the currently displayed modal and define its state
@@ -415,11 +329,9 @@ namespace Uniray
             }
         }
 
-        /// <summary>
-        /// Load project from .uproj file
-        /// </summary>
+        /// <summary>Loads project from .uproj file.</summary>
         /// <param name="path">path to the .uproj file</param>
-        public void LoadProject(string path)
+        public static void LoadProject(string path)
         {
             try
             {
@@ -455,26 +367,24 @@ namespace Uniray
             }
             catch
             {
-                errorHandler.Send(new Error(2, "Project could not be loaded !"));
+                ErrorHandler.Send(new Error(2, "Project could not be loaded !"));
             }
         }
 
-        /// <summary>
-        /// Save current game objects and scenes
-        /// </summary>
-        public void SaveProject()
+        /// <summary>Saves the currently loaded project.</summary>
+        public static void SaveProject()
         {
-            if (UData.CurrentProject != null)
+            if (CurrentProject != null)
             {
                 string[] jsons = JsonfyGos(CurrentScene.GameObjects);
                 string? path;
-                if (UData.CurrentProject.Path.Contains('.'))
+                if (CurrentProject.Path.Contains('.'))
                 {
-                    path = Path.GetDirectoryName(UData.CurrentProject.Path);
+                    path = Path.GetDirectoryName(CurrentProject.Path);
                 }
                 else
                 {
-                    path = UData.CurrentProject.Path;
+                    path = CurrentProject.Path;
                 }
                 
                 StreamWriter stream = new (path + "/scenes/new_scene/locs.json", false);
@@ -498,7 +408,7 @@ namespace Uniray
         /// Create project (.uproj file)
         /// </summary>
         /// <param name="path">path to the target directory</param>
-        public void CreateProject(string path, string name)
+        public static void CreateProject(string path, string name)
         {
             try
             {
@@ -572,25 +482,14 @@ namespace Uniray
             }
             catch
             {
-                errorHandler.Send(new Error(1, "Project " + name + " could not be created"));
+                ErrorHandler.Send(new Error(1, "Project " + name + " could not be created"));
             }
         }
 
-        /// <summary>
-        /// String definition of the uniray class
-        /// </summary>
-        /// <returns>Message</returns>
-        public override string ToString()
-        {
-            return "Uniray is a game engine by Evan Comtesse";
-        }
-
-        /// <summary>
-        /// Convert game objects list to json according to the ressource dictionaries
-        /// </summary>
+        /// <summary>Converts the informations of a <see cref="List{T}"/> of <see cref="GameObject3D"/> to a JSON stream.</summary>
         /// <param name="gos">Game objects list</param>
-        /// <returns></returns>
-        public string[] JsonfyGos(List<GameObject3D> gos)
+        /// <returns>The JSON stream containing the informations.</returns>
+        private static string[] JsonfyGos(List<GameObject3D> gos)
         {
             // Open the jsons
             string modelsJson = "[";
@@ -627,7 +526,7 @@ namespace Uniray
         /// Load all the scenes from a project directory
         /// </summary>
         /// <returns></returns>
-        public List<Scene> LoadScenes(string directory)
+        public static List<Scene> LoadScenes(string directory)
         {
             string[] scenesPath = Directory.GetDirectories(directory + "\\scenes");
             List<Scene> scenes = new();
@@ -682,162 +581,14 @@ namespace Uniray
             }
             return scenes;
         }
-        
-        /// <summary>
-        /// Translate a 3-Dimensional vector according to the application standards in Dev environement
-        /// </summary>
-        /// <param name="position">3-Dimensional vector representing the position to translate</param>
-        /// <returns></returns>
-        public Vector3 TranslateObject(Vector3 position)
-        {
-            if (IsKeyDown(KeyboardKey.X))
-            {
-                position.X += (GetCameraRight(ref EnvCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, EnvCamera.Position)).X;
-            }
-            else if (IsKeyDown(KeyboardKey.Y))
-            {
-                position.Z += (GetCameraForward(ref EnvCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, EnvCamera.Position)).X;
-            }
-            else if (IsKeyDown(KeyboardKey.Z))
-            {
-                position.Y -= (GetCameraUp(ref EnvCamera) * GetMouseDelta().Y / 500 * Vector3Distance(position, EnvCamera.Position)).Y;
-            }
-            else
-            {
-                position += GetCameraRight(ref EnvCamera) * GetMouseDelta().X / 500 * Vector3Distance(position, EnvCamera.Position);
-                position -= GetCameraUp(ref EnvCamera) * GetMouseDelta().Y / 500 * Vector3Distance(position, EnvCamera.Position);
-            }
-            HideCursor();
-            return position;
-        }
 
-        /// <summary>
-        /// Build the current project loaded in Uniray
-        /// </summary>
-        public void BuildProject(string path)
+        /// <summary>Builds the currently load project.</summary>
+        public static void BuildProject(string path)
         {
             // Build and run project here...
             string? projectPath = Path.GetDirectoryName(path);
             string commmand = "/C cd " + projectPath + " && dotnet run --project uniray_Project.csproj";
             System.Diagnostics.Process.Start("CMD.exe", commmand);
-        }
-        /// <summary>
-        /// Check if a collision occurs between the mouse (screen) and an object of the world (Game object) and 
-        /// returns the index of the selected object
-        /// </summary>
-        /// <param name="go">Game object</param>
-        /// <param name="mesh">Mesh</param>
-        /// <param name="mousePos">2-Dimensional position of the mouse</param>
-        /// <returns>Selected object index (-1 if nothing found)</returns>
-        public int CheckCollisionScreenToWorld(GameObject3D go, Mesh mesh, Vector2 mousePos, Matrix4x4 transform)
-        {
-            if (mousePos.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width && mousePos.Y < UI.Components["fileManager"].Y - 10 && IsMouseButtonPressed(MouseButton.Left))
-            {
-
-                goCollision = GetRayCollisionMesh(mouseRay, mesh, transform);
-                if (goCollision.Hit)
-                {
-                    return CurrentScene.GameObjects.IndexOf(go);
-                }
-                else
-                {
-                    return -1;
-                }
-            }
-            else
-            {
-                return -1;
-            }
-        }
-        /// <summary>
-        /// Check distance from camera between two game objects
-        /// </summary>
-        /// <param name="index1">Index of the first object</param>
-        /// <param name="index2">Index of the second object</param>
-        /// <returns>The index to change or keep</returns>
-        public short CheckDistance(short index1, short index2)
-        {
-            if (index2 != -1)
-            {
-                if (index1 != -1)
-                {
-                    // Retrive the position data of the conflicted game objects
-                    Vector3 iPos1 = CurrentScene.GameObjects[index1].Position;
-                    Vector3 iPos2 = CurrentScene.GameObjects[index2].Position;
-
-                    if (Vector3Distance(iPos1, EnvCamera.Position) > Vector3Distance(iPos2, EnvCamera.Position))
-                    {
-                        // Set the new selected game object as closer
-                        return index2;
-                    }
-                    else
-                    {
-                        return index1;
-                    }
-                }
-                // Set the first potential selected element
-                return index2;
-            }
-            // Keep the old one 
-            return index1;
-        }
-        /// <summary>
-        /// Rotate a model according to the mouse delta
-        /// </summary>
-        /// <param name="model">UModel to rotate</param>
-        public void RotateObject(ref UModel model)
-        {
-            // Rotate the model according to the 3-Dimensional axes
-            Vector2 mouse = GetMouseDelta();
-            if (IsKeyDown(KeyboardKey.X))
-            {
-                model.Pitch += mouse.Y;
-            }
-            if (IsKeyDown(KeyboardKey.Y))
-            {
-                model.Roll += mouse.Y;
-            }
-            if (IsKeyDown(KeyboardKey.Z))
-            {
-                model.Yaw += mouse.X;
-            }
-            // Set the model tranform
-            Matrix4x4 nm = MatrixRotateXYZ(new Vector3(model.Pitch / RAD2DEG, model.Yaw / RAD2DEG, model.Roll / RAD2DEG));
-
-            nm.M14 = model.Position.X;
-            nm.M24 = model.Position.Y;
-            nm.M34 = model.Position.Z;
-
-            model.Transform = nm;
-        }
-        /// <summary>
-        /// Rotate a camera according to the mouse delta
-        /// </summary>
-        /// <param name="camera">UCamrea to rotate</param>
-        public void RotateObject(ref UCamera camera)
-        {
-            // Rotate the camera according to the 3-Dimensional axes
-            Vector2 mouse = GetMouseDelta();
-            if (IsKeyDown(KeyboardKey.X))
-            {
-                camera.Pitch += mouse.Y;
-            }
-            if (IsKeyDown(KeyboardKey.Y))
-            {
-                camera.Roll += mouse.Y;
-            }
-            if (IsKeyDown(KeyboardKey.Z))
-            {
-                camera.Yaw += mouse.X;
-            }
-            // Set the camera model Transform
-            Matrix4x4 nm = MatrixRotateXYZ(new Vector3(camera.Pitch / RAD2DEG, camera.Yaw / RAD2DEG, camera.Roll / RAD2DEG));
-
-            nm.M14 = camera.Position.X;
-            nm.M24 = camera.Position.Y;
-            nm.M34 = camera.Position.Z;
-
-            camera.Transform = nm;
         }
     }
 }

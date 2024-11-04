@@ -30,7 +30,6 @@ namespace Uniray
             LoadModels(_models);
         }
 
-
         /// <summary>
         /// Empty lists constructor
         /// </summary>
@@ -179,6 +178,9 @@ namespace Uniray
             Raylib.UnloadSound(_sounds[key]);
             _sounds.Remove(key);
         }
+
+        /// <summary>Returns informations about the current instance.</summary>
+        /// <returns>Informations as a <see langword="string"/>.</returns>
         public override string ToString()
         {
             return "Les ressources contiennent :\n" + GetTextureCount() + " textures\n" + GetSoundCount() + " sons\n" + GetModelCount() + " modèles";

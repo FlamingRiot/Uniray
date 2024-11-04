@@ -281,7 +281,7 @@ namespace Uniray
                             {
                                 UData.CurrentScene.AddGameObject(new UModel(
                                     "[New model]",
-                                    Uniray.EnvCamera.Position + GetCameraForward(ref Uniray.EnvCamera) * 5,
+                                    Conceptor3D.EnvCamera.Position + GetCameraForward(ref Conceptor3D.EnvCamera) * 5,
                                     Uniray.Ressource.GetModel(modelKey).Meshes[0],
                                     modelKey));
                             }
@@ -296,7 +296,7 @@ namespace Uniray
                                 Uniray.Ressource.AddModel(m, modelKey);
                                 UData.CurrentScene.AddGameObject(new UModel(
                                     "[New model]",
-                                    Uniray.EnvCamera.Position + GetCameraForward(ref Uniray.EnvCamera) * 5,
+                                    Conceptor3D.EnvCamera.Position + GetCameraForward(ref Conceptor3D.EnvCamera) * 5,
                                     Uniray.Ressource.GetModel(modelKey).Meshes[0],
                                     modelKey));
                             }

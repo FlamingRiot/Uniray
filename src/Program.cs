@@ -21,6 +21,7 @@ namespace Uniray
     {
         internal static int Width;
         internal static int Height;
+        internal static Mesh Skybox;
 
         /// <summary>Enters the entrypoint of the program.</summary>
         /// <param name="args">Passed arguments from the outside.</param>
@@ -36,6 +37,7 @@ namespace Uniray
 
             Width = GetScreenWidth();
             Height = GetScreenHeight();
+            Skybox = GenMeshCube(1.0f, 1.0f, 1.0f);
 
             // Change CultureInfo
             ChangeCultureInfo();
@@ -45,13 +47,12 @@ namespace Uniray
 
             // Set 3D camera for the default scene
             Camera3D camera = RLoading.LoadCamera();
+
+            // Init the engine
+            Uniray.Init();
             
             // Set camera motion object
             CameraMotion motion = new(2f, (short)Width, (short)Height);
-
-            // Set UI and application default scene
-            Scene scene = new(new List<GameObject3D>());
-            Uniray uniray = new(scene);
 
             // Maximize window
             SetWindowState(ConfigFlags.MaximizedWindow);
@@ -65,7 +66,7 @@ namespace Uniray
             {
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.S))
                 {
-                    uniray.SaveProject();
+                    Uniray.SaveProject();
                 }
 
                 // =========================================================================================================================================================
@@ -105,7 +106,7 @@ namespace Uniray
                         motion.Distance -= GetMouseWheelMove() * 2f * Raymath.Vector3Distance(camera.Position, camera.Target) / 10;
                         MoveCamera(motion.Distance, ref camera, camera.Target, motion.YOffset, true, motion.Mouse, motion.MouseOrigin);
                     }
-                    Uniray.EnvCamera = camera;
+                    Conceptor3D.EnvCamera = camera;
                 }
                 // =========================================================================================================================================================
                 // ============================================================= MANAGE OVERALL DRAWING ====================================================================
@@ -122,15 +123,15 @@ namespace Uniray
                 // Draw the external skybox 
                 Rlgl.DisableBackfaceCulling();
                 Rlgl.DisableDepthMask();
-                DrawMesh(uniray.Skybox, uniray.Shaders.SkyboxMaterial, Raymath.MatrixIdentity());
+                DrawMesh(Skybox, Uniray.Shaders.SkyboxMaterial, Raymath.MatrixIdentity());
                 Rlgl.EnableBackfaceCulling();
                 Rlgl.EnableDepthMask();
 
-                if (UData.CurrentProject is not null) uniray.DrawScene();
+                if (UData.CurrentProject is not null) Uniray.DrawScene();
 
                 EndMode3D();
 
-                uniray.DrawUI();
+                Uniray.DrawUI();
 
                 DrawFPS(40, 200);
 
@@ -151,7 +152,7 @@ namespace Uniray
                 }
             }
             // Unload shaders
-            uniray.Shaders.UnloadShaders();
+            Uniray.Shaders.UnloadShaders();
         }
 
         /// <summary>Moves the editor's camera.</summary>
