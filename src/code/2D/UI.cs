@@ -166,6 +166,8 @@ namespace Uniray
 
             // Check focus
             if (!focus && !oModal) Raylib.SetMouseCursor(MouseCursor.Default);
+
+            Raylib.DrawText(focus.ToString(), 500, 20, 30, Color.DarkBlue);
         }
 
         /// <summary>Draws a modal and its components.</summary>
