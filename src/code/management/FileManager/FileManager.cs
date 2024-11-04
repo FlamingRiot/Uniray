@@ -642,5 +642,25 @@ namespace Uniray
                 ((Container)Uniray.UI.Components["fileManager"]).OutputFilePath = path;
             }
         }
+
+        /// <summary>Updates the paths of every downstream units of a folder.</summary>
+        /// <param name="folder">Folder to update</param>
+        public static void UpdateFileTree(UFolder folder)
+        {
+            // Get parent folder
+            string curFolder = folder.Path.Replace("\\", "/");
+            DirectoryInfo? d = Directory.GetParent(curFolder);
+            string parent = "";
+            if (d is not null) parent = d.Name;
+            // Set new path
+            folder.Path = Path.Combine(parent, folder.Name);
+
+            // Loop over folders
+            folder.Files.ForEach(x =>
+            {
+                if (x is UFolder ufolder) UpdateFileTree(ufolder);
+                else if (x is UFile ufile) ufile.Path = Path.Combine(folder.Path, ufile.Name);
+            });
+        }
     }
-}
+}   

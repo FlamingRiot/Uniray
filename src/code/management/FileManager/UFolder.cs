@@ -56,6 +56,9 @@ namespace Uniray
             processInfo.UseShellExecute = false;
 
             Process.Start(processInfo);
+
+            // Update folder downstream tree
+            FileManager.UpdateFileTree(this);
         }
     }
 }
