@@ -535,7 +535,7 @@ namespace Uniray
                 // Import stored camera
                 StreamReader rCam = new(scenesPath[i] + "\\camera.json");
                 string camJson = rCam.ReadToEnd();
-                List<UCamera> ucameras = JsonConvert.DeserializeObject<List<UCamera>>(camJson);
+                List<UCamera>? ucameras = JsonConvert.DeserializeObject<List<UCamera>>(camJson);
                 rCam.Close();
                 // Import stored game objects
                 StreamReader rGos = new(scenesPath[i] + "\\locs.json");
@@ -543,6 +543,8 @@ namespace Uniray
                 List<UModel>? umodels = JsonConvert.DeserializeObject<List<UModel>>(gosJson);
                 rGos.Close();
 
+                List<GameObject3D> gos = new List<GameObject3D>();
+                // Prepare the models for insertion
                 if (umodels is not null)
                 {
                     foreach (UModel go in umodels)
@@ -553,6 +555,7 @@ namespace Uniray
                             if (go.TextureID != "") go.SetTexture(go.TextureID, Ressource.GetTexture(go.TextureID));
                         }
                     }
+                    gos.AddRange(umodels);
                 }
 
                 if (ucameras is not null)
@@ -570,13 +573,8 @@ namespace Uniray
 
                         uCamera.Camera = camera;
                     }
+                    gos.AddRange(ucameras);
                 }
-
-                // Transfer all the objects into a single GameObject3D list
-                List<GameObject3D> gos = new List<GameObject3D>();
-                gos.AddRange(ucameras);
-                gos.AddRange(umodels);
-
                 scenes.Add(new Scene(gos));
             }
             return scenes;

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Converters;
-using RayGUI_cs;
+﻿using RayGUI_cs;
 using Raylib_cs;
 
 namespace Uniray
@@ -8,7 +7,6 @@ namespace Uniray
     public class UI
     {
         private static Container _modalTemplate = new Container(0, 0, 0, 0);
-        private static bool _globalFocus = false;
 
         /// <summary>The list of every components in the UI</summary>
         public Dictionary<string, Component> Components;
