@@ -1,5 +1,6 @@
 ﻿namespace Uniray
 {
+    /// <summary>Represents an instance of <see cref="UData"/>.</summary>
     public static class UData
     {
         /// <summary>The currently loaded <see cref="Project"/>.</summary>
@@ -10,6 +11,9 @@
 
         /// <summary>The currently opened <see cref="Modal"/>.</summary>
         internal static string? CurrentModal;
+
+        /// <summary>The currently renaming field.</summary>
+        internal static UStorage? CurrentRenaming;
 
         /// <summary>The currently displayed scene.</summary>
         internal static Scene CurrentScene = new Scene();

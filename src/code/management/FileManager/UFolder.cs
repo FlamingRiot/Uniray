@@ -1,19 +1,15 @@
-﻿namespace Uniray
+﻿using System.Diagnostics;
+
+namespace Uniray
 {
+    /// <summary>Represents an instance of <see cref="UFolder"/>.</summary>
     public class UFolder : UStorage, IRenamable
     {
-        /// <summary>
-        /// The files contained inside of the folder
-        /// </summary>
+        /// <summary>Containes files and folders inside of the current one.</summary>
         public List<UStorage> Files;
-        /// <summary>
-        /// The upstream folder according to this one
-        /// </summary>
-        private UFolder? upstreamFolder;
-        /// <summary>
-        /// The upstream folder according to this one
-        /// </summary>
-        public UFolder? UpstreamFolder { get { return upstreamFolder; } set { upstreamFolder = value; } }
+
+        /// <summary>Upstream folder of the current instance.</summary>
+        public UFolder? UpstreamFolder;
 
         /// <summary>Creates an empty instance of <see cref="UFolder"/>.</summary>
         public UFolder()
@@ -30,32 +26,36 @@
             Files = files;
         }
 
-        /// <summary>
-        /// Adds a file to the folder
-        /// </summary>
-        /// <param name="file">The file to add</param>
+        /// <summary>Adds a file to the folder.</summary>
+        /// <param name="file">File to add.</param>
         public void AddFile(UStorage file)
         {
             Files.Add(file);
         }
-        /// <summary>
-        /// Deletes a file from the folder
-        /// </summary>
-        /// <param name="file"></param>
+
+        /// <summary>Deletes a file from the folder.</summary>
+        /// <param name="file">File to delete.</param>
         public void DeleteFile(UStorage file)
         {
             Files.Remove(file);
         }
-        /// <summary>
-        /// Renames the folder
-        /// </summary>
+
+        /// <summary>Renames the folder.</summary>
         /// <param name="name">The new name to give</param>
         public void Rename(string name)
         {
             string oldPath = Path;
             Path = Path.Replace($"{this.Name}", $"{name}");
             Name = name;
-            Directory.Move(oldPath, Path);
+
+            // Rename physical folder
+            ProcessStartInfo processInfo = new ProcessStartInfo();
+            processInfo.FileName = "cmd.exe";
+            processInfo.Arguments = $"/C ren \"{oldPath}\" \"{name}\"";
+            processInfo.CreateNoWindow = true;
+            processInfo.UseShellExecute = false;
+
+            Process.Start(processInfo);
         }
     }
 }

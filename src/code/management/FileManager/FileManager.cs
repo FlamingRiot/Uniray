@@ -22,8 +22,10 @@ namespace Uniray
 
         /// <summary>The currently clicked <see cref="UStorage"/> unit.</summary>
         internal static List<UStorage> ClickedUnits = new List<UStorage>();
-
+        // Private attributes
         private static bool ClickOnSelection;
+        private static int _labelWidth;
+        private static int _labelHeight;
 
         /// <summary>Loads the entire folder architecture of the project.</summary>
         public static void Init(string directory)
@@ -37,6 +39,11 @@ namespace Uniray
 
             // Load assets
             LoadAssets();
+
+            // Load label size infos
+            Vector2 labelSize = MeasureTextEx(RayGUI.Font, "RRRRRR", 15, 1);
+            _labelWidth = (int)labelSize.X;
+            _labelHeight = (int)labelSize.Y;
         }
 
         /// <summary>Displays the content of the current folder into the file manager.</summary>
@@ -100,6 +107,30 @@ namespace Uniray
             }
             // now you can
 
+            // Update current renaming action
+            if (Uniray.UI.Components.Where(x => x.Key == "rename_box").Count() > 0)
+            {
+                Textbox box = (Textbox)Uniray.UI.Components.Where(x => x.Key == "rename_box").ToList()[0].Value;
+                // Check if focus has been released
+                if (!box.Focus)
+                {
+                    // Rename storage unit
+                    switch (UData.CurrentRenaming)
+                    {
+                        case UFile file:
+                            file.Rename(box.Text);
+                            break;
+                        case UFolder folder:
+                            folder.Rename(box.Text);
+                            break;
+                    }
+                    // Clear renaming
+                    UData.CurrentRenaming = null;
+                    // Remove textbox
+                    Uniray.UI.Components.Remove("rename_box");
+                }
+            }
+
             // Creates folder action
             if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
             {
@@ -120,6 +151,31 @@ namespace Uniray
                 for (int i = 0; i < UData.SelectedFiles.Count; i++)
                 {
                     DrawStorageUnit(UData.SelectedFiles[i], (int)mouse.X + i * 75, (int)mouse.Y, 122);
+                }
+            }
+
+            // Check for renaming on F2
+            if (IsKeyPressed(KeyboardKey.F2))
+            {
+                if (ClickedUnits.Count == 1)
+                {
+                    if (UData.CurrentRenaming is null)
+                    {
+                        // Get index and name
+                        int index = CurrentFolder.Files.IndexOf(ClickedUnits[0]);
+                        string name = ClickedUnits[0].Name;
+
+                        // Define file row
+                        short row = (short)(index / 10);
+                        // Define drawing position
+                        int xPos = Uniray.UI.Components["fileManager"].X + 150 * (index % 10 + 1) - 100;
+                        int yPos = Uniray.UI.Components["fileManager"].Y + 60 + row * 120;
+
+                        Textbox box = new Textbox(xPos, yPos + HardRessource.Textures["model_file"].Height + 20, _labelWidth + 10, _labelHeight, name);
+                        box.Focus = true;
+                        Uniray.UI.Components.Add("rename_box", box);
+                    }
+                    UData.CurrentRenaming = ClickedUnits[0];
                 }
             }
 
@@ -150,7 +206,6 @@ namespace Uniray
                 {
                     case "m3d":
                         DrawTexture(HardRessource.Textures["model_file"], x, y, new Color(255, 255, 255, alpha));
-                        DrawLabel(new Label(x + 10 - lbl.Length / 2, y + HardRessource.Textures["model_file"].Height + 20, lbl));
                         break;
                     case "png":
                         // Prepare preview texture
@@ -159,9 +214,10 @@ namespace Uniray
                         Rectangle destRectangle = new Rectangle(x, y, 65, 65);
 
                         DrawTexturePro(previewTexture, srcRectangle, destRectangle, Vector2.Zero, 0, new Color(255, 255, 255, alpha));
-                        DrawLabel(new Label(x + 10 - lbl.Length / 2, y + HardRessource.Textures["model_file"].Height + 20, lbl));
                         break;
                 }
+                // Draw label
+                if (UData.CurrentRenaming != unit) DrawLabel(new Label(x + 10 - lbl.Length / 2, y + HardRessource.Textures["model_file"].Height + 20, lbl));
             }
             else if (unit is UFolder)
             {
@@ -172,7 +228,7 @@ namespace Uniray
                 }
 
                 DrawTexture(HardRessource.Textures["folder"], x, y, new Color(255, 255, 255, alpha));
-                DrawLabel(new Label(x + 10 + unit.Name.Length / 3, y + HardRessource.Textures["model_file"].Height + 20, lbl));
+                if (UData.CurrentRenaming != unit) DrawLabel(new Label(x + 10 + unit.Name.Length / 3, y + HardRessource.Textures["model_file"].Height + 20, lbl));
             }
         }
 
@@ -221,6 +277,15 @@ namespace Uniray
                     if (IsKeyUp(KeyboardKey.LeftControl) && !ClickOnSelection) ClickedUnits.Clear();
                     if (!ClickedUnits.Contains(unit)) ClickedUnits.Add(unit);
                 }
+                else if (!Hover(x + 10, y + HardRessource.Textures["model_file"].Height + 20, _labelWidth, _labelHeight)) 
+                {
+                    // Reset current renaming field if clicked outside of the box
+                    if (UData.CurrentRenaming == unit)
+                    {
+                        Uniray.UI.Components.Remove("rename_box");
+                        UData.CurrentRenaming = null;
+                    }
+                }
             }
          
             DrawText(ClickedUnits.Count.ToString(), 0, 0, 50, Color.Red);
@@ -257,6 +322,16 @@ namespace Uniray
                         UData.SelectedFiles.Clear();
                         ClickedUnits.Clear();
                     }
+                }
+                else if (Hover(x + 10, y + HardRessource.Textures["model_file"].Height + 20, _labelWidth, _labelHeight))
+                {
+                    if (UData.CurrentRenaming is null)
+                    {
+                        Textbox box = new Textbox(x, y + HardRessource.Textures["model_file"].Height + 20, _labelWidth + 10, _labelHeight, unit.Name);
+                        box.Focus = true;
+                        Uniray.UI.Components.Add("rename_box", box);
+                    }
+                    UData.CurrentRenaming = unit;
                 }
             }
         }
