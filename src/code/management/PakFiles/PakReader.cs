@@ -33,10 +33,11 @@ namespace Uniray.PakFiles
                     // Read entry informations
                     string fileName = reader.ReadString();
                     string fileType = reader.ReadString();
-                    long fileSize = reader.ReadInt64();
+                    long fileOriginalSize = reader.ReadInt64();
+                    long fileCompressedSize = reader.ReadInt64();
                     long offset = reader.ReadInt64();
 
-                    entries.Add(fileName, new PakFileEntry(fileName, fileType, fileSize, offset));
+                    entries.Add(fileName, new PakFileEntry(fileName, fileType, fileOriginalSize, fileCompressedSize, offset));
                 }
             }
         }
@@ -55,11 +56,13 @@ namespace Uniray.PakFiles
 
             using (FileStream pakFile = new FileStream(_pakFilePath, FileMode.Open))
             {
-                // Look for file index
+                // Move to file index
                 pakFile.Seek(entry.Index, SeekOrigin.Begin);
-                // Read data from pak file
-                byte[] buffer = new byte[entry.FileSize];
-                pakFile.Read(buffer, 0, buffer.Length);
+                // Read compressed data from pak file
+                byte[] compressedBuffer = new byte[entry.CompressedSize];
+                pakFile.Read(compressedBuffer, 0, compressedBuffer.Length);
+                // Decompress data
+                byte[] buffer = PakArchive.Decompress(compressedBuffer);
                 // Return loaded data
                 return buffer;
             }

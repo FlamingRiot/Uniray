@@ -1,4 +1,6 @@
-﻿namespace Uniray.PakFiles
+﻿using System.IO.Compression;
+
+namespace Uniray.PakFiles
 {
     /// <summary>Represents an instance of <see cref="PakArchive"/>.</summary>
     internal class PakArchive
@@ -27,13 +29,16 @@
                 {
                     if (unit is UFile)
                     {
+                        // Get raw data
                         byte[] fileData = File.ReadAllBytes(unit.Path);
+                        // Compress data
+                        byte[] compressedData = Compress(fileData);
                         // Create pak file entry
-                        PakFileEntry entry = new PakFileEntry(unit.Name, ((UFile)unit).Extension, fileData.Length, offset);
+                        PakFileEntry entry = new PakFileEntry(unit.Name, ((UFile)unit).Extension, fileData.Length, compressedData.Length, offset);
                         entries.Add(entry);
                         // Write binary data to the pak archive
-                        writer.Write(fileData);
-                        offset += fileData.Length;
+                        writer.Write(compressedData);
+                        offset += compressedData.Length;
                     }
                 }
                 // Keep files ending offset
@@ -43,7 +48,8 @@
                 {
                     writer.Write(entry.FileName);
                     writer.Write(entry.FileType);
-                    writer.Write(entry.FileSize);
+                    writer.Write(entry.OriginalSize);
+                    writer.Write(entry.CompressedSize);
                     writer.Write(entry.Index);
                 }
                 // Go back to the beginning of the file to write entries number + table offset
@@ -58,6 +64,34 @@
                  * Files data at specific location
                  * Entries informations (Name, size, index), aka information table
                  * */
+            }
+        }
+
+        /// <summary>Compresses an array of bytes with the GZIP algorithm.</summary>
+        /// <param name="data">Data to compress.</param>
+        /// <returns>Compressed data.</returns>
+        internal static byte[] Compress(byte[] data)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            using (GZipStream gzipStream = new GZipStream(memoryStream, CompressionMode.Compress))
+            {
+                gzipStream.Write(data, 0, data.Length);
+                gzipStream.Close();
+                return memoryStream.ToArray();
+            }
+        }
+
+        /// <summary>Decompresses an array of bytes with the GZIP algorithm</summary>
+        /// <param name="data">Data to decompress.</param>
+        /// <returns>Decompressed data.</returns>
+        internal static byte[] Decompress(byte[] data) 
+        {
+            MemoryStream memoryStream = new MemoryStream(data);
+            GZipStream gzipStream = new GZipStream(memoryStream, CompressionMode.Decompress);
+            using (MemoryStream resultStream = new MemoryStream())
+            {
+                gzipStream.CopyTo(resultStream);
+                return resultStream.ToArray();
             }
         }
     }
