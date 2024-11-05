@@ -43,41 +43,41 @@ namespace Uniray
 
             // Buttons
             // Models section
-            Button modelButton = new Button("Models", fileManager.X + 48, fileManager.Y, 60, 25, "modelsSection");
+            Button modelButton = new Button("Models", fileManager.X + 10, fileManager.Y, 60, 25, "modelsSection");
             modelButton.Event = UpdateToModel;
             Components.Add("modelsButton", modelButton);
 
             // Textures section
-            Button texturesButton = new Button("Textures", fileManager.X + 164, fileManager.Y, 60, 25, "texturesSection");
+            Button texturesButton = new Button("Textures", fileManager.X + 80, fileManager.Y, 80, 25, "texturesSection");
             texturesButton.Event = UpdateToTexture;
             Components.Add("texturesButton", texturesButton);
 
             // Sounds section
-            Button soundsButton = new Button("Sounds", fileManager.X + 260, fileManager.Y, 60, 25, "soundsSection");
+            Button soundsButton = new Button("Sounds", fileManager.X + 170, fileManager.Y, 60, 25, "soundsSection");
             soundsButton.Event = UpdateToSound;
             Components.Add("soundsButton", soundsButton);
 
             // Animations section
-            Button animationsButton = new Button("Animations", fileManager.X + 392, fileManager.Y, 60, 25, "animationsSections");
+            Button animationsButton = new Button("Animations", fileManager.X + 240, fileManager.Y, 90, 25, "animationsSections");
             animationsButton.Event = UpdateToAnimation;
             Components.Add("animationsButton", animationsButton);
 
             // Scripts section
-            Button scriptsButton = new Button("Scripts", fileManager.X + 492, fileManager.Y, 60, 25, "scriptsSections");
+            Button scriptsButton = new Button("Scripts", fileManager.X + 340, fileManager.Y, 70, 25, "scriptsSections");
             scriptsButton.Event = UpdateToScript;
             Components.Add("scriptsButton", scriptsButton);
 
             // Open File button
-            Button openFileButton = new Button("Open", fileManager.X + fileManager.Width - 38, fileManager.Y + 5, 40, 20, "openExplorer"); //{ Type = ButtonType.PathFinder };
+            Button openFileButton = new Button("Open", fileManager.X + fileManager.Width - 70, fileManager.Y, 60, 25, "openExplorer"); //{ Type = ButtonType.PathFinder };
             Components.Add("openFileButton", openFileButton);
 
             // Open project button
-            Button openProjectButton = new Button("Open project", fileManager.X + fileManager.Width - 175, fileManager.Y + 5, 125, 20, "openProject");
+            Button openProjectButton = new Button("Open project", fileManager.X + fileManager.Width - 200, fileManager.Y, 125, 25, "openProject");
             openProjectButton.Event = OpenProject;
             Components.Add("openProjectButton", openProjectButton);
 
             // New project button
-            Button newProjectButton = new Button("New project", fileManager.X + fileManager.Width - 303, fileManager.Y + 5, 50, 20, "newProject");
+            Button newProjectButton = new Button("New project", fileManager.X + fileManager.Width - 328, fileManager.Y, 120, 25, "newProject");
             newProjectButton.Event = NewProject;
             Components.Add("newProjectButton", newProjectButton);
 

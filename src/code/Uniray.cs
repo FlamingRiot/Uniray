@@ -26,10 +26,10 @@ namespace Uniray
         internal static ProgramState State;
 
         /// <summary>Primary color of the application.</summary>
-        public static readonly Color APPLICATION_COLOR = new(30, 30, 30, 255);
+        public static readonly Color APPLICATION_COLOR = new(56, 56, 56, 255);
 
         /// <summary>Secondary color of the application.</summary>
-        public static readonly Color FOCUS_COLOR = new(60, 60, 60, 255);
+        public static readonly Color FOCUS_COLOR = new(40, 40, 40, 255);
 
         /// <summary>Instance containing the ressources of the loaded project.</summary>
         public static Ressource Ressource = new Ressource();
@@ -272,8 +272,8 @@ namespace Uniray
                 UI = new UI();   
             }
             // Draw the outline rectangles that appear behind the main panels
-            DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.25f), Program.Height, new Color(20, 20, 20, 255));
-            DrawRectangle(0, Program.Height - Program.Height / 3 - 10, Program.Width, Program.Height - (Program.Height - Program.Height / 3) + 10, new Color(20, 20, 20, 255));
+            DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.25f), Program.Height, new Color(40, 40, 40, 255));
+            DrawRectangle(0, Program.Height - Program.Height / 3 - 10, Program.Width, Program.Height - (Program.Height - Program.Height / 3) + 10, new Color(40, 40, 40, 255));
 
             // Draw the entire UI and handle the events related to it
             UI.Draw();
