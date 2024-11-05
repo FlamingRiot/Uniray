@@ -651,7 +651,7 @@ namespace Uniray
             string curFolder = folder.Path.Replace("\\", "/");
             DirectoryInfo? d = Directory.GetParent(curFolder);
             string parent = "";
-            if (d is not null) parent = d.Name;
+            if (d is not null) parent = d.FullName;
             // Set new path
             folder.Path = Path.Combine(parent, folder.Name);
 
@@ -659,7 +659,7 @@ namespace Uniray
             folder.Files.ForEach(x =>
             {
                 if (x is UFolder ufolder) UpdateFileTree(ufolder);
-                else if (x is UFile ufile) ufile.Path = Path.Combine(folder.Path, ufile.Name);
+                else if (x is UFile ufile) ufile.Path = Path.Combine(folder.Path, ufile.FullName);
             });
         }
     }
