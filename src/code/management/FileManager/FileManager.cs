@@ -157,6 +157,12 @@ namespace Uniray
                 }
             }
 
+            // File deletion
+            if (IsKeyPressed(KeyboardKey.Delete))
+            {
+                ClickedUnits.ForEach(DeleteUnit);
+            }
+
             // Check for renaming on F2
             if (IsKeyPressed(KeyboardKey.F2))
             {
@@ -226,33 +232,7 @@ namespace Uniray
             {
                 if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
-                    if (unit is UFolder)
-                    {
-                        // Delte the folder along with all its content
-                        Directory.Delete(unit.Path, true);
-                    }
-                    else
-                    {
-                        // Delete the physical file from the folder
-                        File.Delete(unit.Path);
-                        // Delete the loaded ressource of the file
-                        switch (unit.Path.Split('.').Last())
-                        {
-                            case "m3d":
-                                Uniray.Ressource.DeleteModel(unit.Name);
-                                break;
-                            case "png":
-                                Uniray.Ressource.DeleteTexture(unit.Name);
-                                break;
-                            case "wav":
-                                Uniray.Ressource.DeleteSound(unit.Name);
-                                break;
-                            case "cs":
-                                break;
-                        }
-                    }
-                    // Remove virtual storage unit from current folder
-                    CurrentFolder.Files.Remove(unit);
+                    DeleteUnit(unit);
                 }
             }
 
@@ -671,6 +651,39 @@ namespace Uniray
                 Uniray.UI.Components.Add("rename_box", box);
             }
             UData.CurrentRenaming = unit;
+        }
+
+        /// <summary>Deletes a <see cref="UStorage"/> instance, along with its dependencies.</summary>
+        /// <param name="unit"><see cref="UStorage"/> unit to delete.</param>
+        private static void DeleteUnit(UStorage unit)
+        {
+            if (unit is UFolder)
+            {
+                // Delte the folder along with all its content
+                Directory.Delete(unit.Path, true);
+            }
+            else
+            {
+                // Delete the physical file from the folder
+                File.Delete(unit.Path);
+                // Delete the loaded ressource of the file
+                switch (unit.Path.Split('.').Last())
+                {
+                    case "m3d":
+                        Uniray.Ressource.DeleteModel(unit.Name);
+                        break;
+                    case "png":
+                        Uniray.Ressource.DeleteTexture(unit.Name);
+                        break;
+                    case "wav":
+                        Uniray.Ressource.DeleteSound(unit.Name);
+                        break;
+                    case "cs":
+                        break;
+                }
+            }
+            // Remove virtual storage unit from current folder
+            CurrentFolder.Files.Remove(unit);
         }
     }
 }   
