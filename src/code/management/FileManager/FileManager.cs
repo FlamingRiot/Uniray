@@ -239,11 +239,13 @@ namespace Uniray
             // Selection action
             if (IsMouseButtonPressed(MouseButton.Left)) 
             {
+                // If over current unit
                 if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
                     if (IsKeyUp(KeyboardKey.LeftControl) && !ClickOnSelection) ClickedUnits.Clear();
                     if (!ClickedUnits.Contains(unit)) ClickedUnits.Add(unit);
                 }
+                // If not hover renming text
                 else if (!Hover(x + 10, y + HardRessource.Textures["model_file"].Height + 20, _labelWidth, _labelHeight)) 
                 {
                     // Reset current renaming field if clicked outside of the box
@@ -252,6 +254,26 @@ namespace Uniray
                         Uniray.UI.Components.Remove("rename_box");
                         UData.CurrentRenaming = null;
                     }
+                }
+                // If not over clicked units
+                bool clickedUnit = false;
+                ClickedUnits.ForEach(unit =>
+                {
+                    // Get index and name
+                    int index = CurrentFolder.Files.IndexOf(unit);
+
+                    // Define file row
+                    short row = (short)(index / 10);
+                    // Define drawing position
+                    int xPos = Uniray.UI.Components["fileManager"].X + 150 * (index % 10 + 1) - 100;
+                    int yPos = Uniray.UI.Components["fileManager"].Y + 60 + row * 120;
+
+                    // Test if over clicked unit
+                    if (Hover(xPos, yPos, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height)) clickedUnit = true;
+                });
+                if (!clickedUnit)  
+                {
+                    ClickedUnits.Clear();
                 }
             }
          
