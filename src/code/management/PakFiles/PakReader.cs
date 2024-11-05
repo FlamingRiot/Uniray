@@ -6,6 +6,8 @@ namespace Uniray.PakFiles
     {
         private readonly Dictionary<string, PakFileEntry> entries = new Dictionary<string, PakFileEntry>();
         private readonly string _pakFilePath;
+        private readonly long _tableOffset;
+        private readonly int _fileCount;
 
         /// <summary>Creates a connection to .pak file.</summary>
         /// <param name="pakFilePath"></param>
@@ -17,10 +19,14 @@ namespace Uniray.PakFiles
             FileStream pakFile = new FileStream(_pakFilePath, FileMode.Open);
             using (BinaryReader reader = new BinaryReader(pakFile))
             {
-                // Read number of files
-                int fileCount = reader.ReadInt32();
+                // Read entries count
+                _fileCount = reader.ReadInt32(); // 4 bytes entry
+                // Read table offset
+                _tableOffset = reader.ReadInt64(); // 8 bytes entry
+                // Move to table offset
+                pakFile.Seek(_tableOffset, SeekOrigin.Begin);
                 // Loop over different file entries
-                for (int i = 0; i < fileCount; i++)
+                for (int i = 0; i < _fileCount; i++)
                 {
                     // Read entry informations
                     string fileName = reader.ReadString();
@@ -32,6 +38,10 @@ namespace Uniray.PakFiles
             }
         }
 
+        /// <summary>Loads a file from a .pak file from file name.</summary>
+        /// <param name="fileName">File name to load.</param>
+        /// <returns><see langword="byte[]"/> containing the file's bytes.</returns>
+        /// <exception cref="Exception">File not found.</exception>
         public byte[] LoadFile(string fileName)
         {
             // Check if file exists in archive entries
@@ -52,6 +62,9 @@ namespace Uniray.PakFiles
             }
         }
 
+        /// <summary>Loads texture from .pak file from file name.</summary>
+        /// <param name="fileName">File name to load.</param>
+        /// <returns>Loaded <see cref="Texture2D"/> of the specified file.</returns>
         public Texture2D LoadTextureFromPack(string fileName)
         {
             // Read data of the file
