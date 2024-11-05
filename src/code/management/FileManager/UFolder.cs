@@ -44,21 +44,26 @@ namespace Uniray
         /// <param name="name">The new name to give</param>
         public void Rename(string name)
         {
-            string oldPath = Path;
-            Path = Path.Replace($"{this.Name}", $"{name}");
-            Name = name;
+            // Check if text null
+            if (name != "")
+            {
+                string oldPath = Path;
+                Path = Path.Replace($"{this.Name}", $"{name}");
+                Name = name;
 
-            // Rename physical folder
-            ProcessStartInfo processInfo = new ProcessStartInfo();
-            processInfo.FileName = "cmd.exe";
-            processInfo.Arguments = $"/C ren \"{oldPath}\" \"{name}\"";
-            processInfo.CreateNoWindow = true;
-            processInfo.UseShellExecute = false;
+                // Rename physical folder
+                ProcessStartInfo processInfo = new ProcessStartInfo();
+                processInfo.FileName = "cmd.exe";
+                processInfo.Arguments = $"/C ren \"{oldPath}\" \"{name}\"";
+                processInfo.CreateNoWindow = true;
+                processInfo.UseShellExecute = false;
 
-            Process.Start(processInfo);
+                Process.Start(processInfo);
 
-            // Update folder downstream tree
-            FileManager.UpdateFileTree(this);
+                // Update folder downstream tree
+                FileManager.UpdateFileTree(this);
+
+            }
         }
     }
 }

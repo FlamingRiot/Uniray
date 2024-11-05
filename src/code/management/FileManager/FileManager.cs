@@ -134,10 +134,10 @@ namespace Uniray
             // Creates folder action
             if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
             {
-                UFolder folder = new UFolder(CurrentFolder.Path + "/new", new List<UStorage>());
+                UFolder folder = new UFolder(CurrentFolder.Path + "/New", new List<UStorage>());
                 folder.UpstreamFolder = CurrentFolder;
                 CurrentFolder.Files.Add(folder);
-                Directory.CreateDirectory(CurrentFolder.Path + "/new");
+                Directory.CreateDirectory(CurrentFolder.Path + "/New");
 
                 // Set clicked item to new folder
                 ClickedUnits.Clear();
