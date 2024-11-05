@@ -126,6 +126,7 @@ namespace Uniray
                     }
                     // Clear renaming
                     UData.CurrentRenaming = null;
+                    ClickedUnits.Clear();
                     // Remove textbox
                     Uniray.UI.Components.Remove("rename_box");
                 }
