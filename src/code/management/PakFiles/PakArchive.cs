@@ -1,6 +1,6 @@
 ﻿namespace Uniray.PakFiles
 {
-    internal static class PakArchive
+    internal class PakArchive
     {
         public static void CreatePakFile(UFolder folder, string filePath)
         {
@@ -23,7 +23,7 @@
                         byte[] fileData = File.ReadAllBytes(unit.Path);
 
                         // Create file entry for the pak archive
-                        PakFileEntry entry = new PakFileEntry(relativePath, fileData.Length, offset);
+                        PakFileEntry entry = new PakFileEntry(unit.Name, fileData.Length, offset);
                         entries.Add(entry);
 
                         // Write binary data to the pak archive
@@ -49,27 +49,6 @@
                  * Entries informations (Name, size, index)
                  * Files data at specific location
                  * */
-            }
-        }
-
-        public static void ReadPakFile(string path)
-        {
-            List<PakFileEntry> entries = new List<PakFileEntry>();
-
-            // Open and read pak file
-            FileStream pakFile = new FileStream(path, FileMode.Open);
-            using (BinaryReader reader = new BinaryReader(pakFile))
-            {
-                int fileCount = reader.ReadInt32();
-                for (int i = 0; i < fileCount; i++) 
-                {
-                    // Read entry informations
-                    string fileName = reader.ReadString();
-                    long fileSize = reader.ReadInt64();
-                    long offset = reader.ReadInt64();
-
-                    entries.Add(new PakFileEntry(fileName, fileSize, offset));
-                }
             }
         }
     }

@@ -168,7 +168,10 @@ namespace Uniray
             // Debug Pak Files
             if (IsKeyPressed(KeyboardKey.P))
             {
-                PakArchive.CreatePakFile(CurrentFolder, "fold.pak");
+               PakArchive.CreatePakFile(CurrentFolder, "fold.pak");
+
+                PakReader reader = new PakReader("fold.pak");
+                Texture2D t = reader.LoadTextureFromPack("radio");
             }
 
             // Check for renaming on F2
