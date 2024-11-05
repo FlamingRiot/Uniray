@@ -1,54 +1,41 @@
 ﻿namespace Uniray
 {
+    /// <summary>Represents an instance of <see cref="Project"/>.</summary>
     public class Project
     {
-        /// <summary>
-        /// Project name
-        /// </summary>
-        private string name;
+        /// <summary>Project name.</summary>
+        public string Name;
 
-        /// <summary>
-        /// Absolute path to the project
-        /// </summary>
-        private string path;
+        /// <summary>Absolute path to the project.</summary>
+        public string Path;
 
-        /// <summary>
-        /// Scenes of the project
-        /// </summary>
-        private List<Scene> scenes;
+        /// <summary>Scenes of the project.</summary>
+        public List<Scene> Scenes;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        /// <summary>Creates a new project.</summary>
         /// <param name="name">Project name</param>
         /// <param name="path">Abosulte path to the project</param>
         /// <param name="scenes">Scenes of the project</param>
         public Project(string name, string path, List<Scene> scenes)
         {
-            this.name = name;
-            this.path = path;
-            this.scenes = scenes;
+            Name = name;
+            Path = path.Replace('\\', '/');
+            Scenes = scenes;
         }
 
-        public string Path { get { return path; } set { path = value; } }
-
-        /// <summary>
-        /// Get scene according to an index
-        /// </summary>
-        /// <param name="index">Wanted scene index</param>
-        /// <returns>Wanted scene</returns>
+        /// <summary>Gets the scenes at a specified location.</summary>
+        /// <param name="index">Scene index</param>
+        /// <returns><see cref="Scene"/> at the specified location.</returns>
         public Scene GetScene(int index)
         {
-            return scenes[index];
+            return Scenes[index];
         }
 
-        /// <summary>
-        /// Overrided ToString
-        /// </summary>
-        /// <returns>Stringified project</returns>
+        /// <summary>Returns informations about the current instance.</summary>
+        /// <returns>Informations as a <see langword="string"/>.</returns>
         public override string ToString()
         {
-            return "The project " + name + " is located at : " + path + " and has " + scenes.Count + "scenes";
+            return "The project " + Name + " is located at : " + Path + " and has " + Scenes.Count + "scenes";
         }
     }
 }

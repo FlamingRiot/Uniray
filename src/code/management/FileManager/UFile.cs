@@ -22,10 +22,40 @@
         /// <param name="name">The new name of the file</param>
         public void Rename(string name)
         {
+            string oldKey = Name;
             string oldPath = Path;
             Path = Path.Replace($"{Name}", $"{name}");
             Name = name;
             File.Move(oldPath, Path);
+
+            // Update model and texture keys
+            switch (Extension) 
+            {
+                case "m3d":
+                    // Loop over every scene
+                    UData.CurrentProject?.Scenes.ForEach(scene =>
+                    {
+                        // Get objects with corresponding keys
+                        scene.GameObjects.Where(obj => obj is UModel).Where(obj => ((UModel)obj).ModelID == oldKey).ToList().ForEach(obj =>
+                        {
+                            // Replace with new key/name
+                            ((UModel)obj).ModelID = Name;
+                        });
+                    });
+                    break;
+                case "png":
+                    // Loop over every scene
+                    UData.CurrentProject?.Scenes.ForEach(scene =>
+                    {
+                        // Get objects with corresponding keys
+                        scene.GameObjects.Where(obj => obj is UModel).Where(obj => ((UModel)obj).TextureID == oldKey).ToList().ForEach(obj => 
+                        {
+                            // Replace with new key/name
+                            ((UModel)obj).TextureID = Name;
+                        });
+                    });
+                    break;
+            }
         }
     }
 }

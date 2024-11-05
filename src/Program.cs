@@ -142,6 +142,9 @@ namespace Uniray
 
             if (UData.CurrentProject is not null)
             {
+                // Save project beforehand
+                Uniray.SaveProject();
+
                 // Unload all used ressources
                 Uniray.Ressource.UnloadRessources();
                 // Unload materials
