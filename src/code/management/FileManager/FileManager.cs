@@ -277,9 +277,6 @@ namespace Uniray
                     ClickedUnits.Clear();
                 }
             }
-         
-            DrawText(ClickedUnits.Count.ToString(), 0, 0, 50, Color.Red);
-            DrawText(UData.SelectedFiles.Count.ToString(), 0, 50, 50, Color.Blue);
 
             // Drag action
             if (IsMouseButtonDown(MouseButton.Left))
