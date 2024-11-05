@@ -29,7 +29,7 @@
                     {
                         byte[] fileData = File.ReadAllBytes(unit.Path);
                         // Create pak file entry
-                        PakFileEntry entry = new PakFileEntry(unit.Name, fileData.Length, offset);
+                        PakFileEntry entry = new PakFileEntry(unit.Name, ((UFile)unit).Extension, fileData.Length, offset);
                         entries.Add(entry);
                         // Write binary data to the pak archive
                         writer.Write(fileData);
@@ -42,6 +42,7 @@
                 foreach (PakFileEntry entry in entries) 
                 {
                     writer.Write(entry.FileName);
+                    writer.Write(entry.FileType);
                     writer.Write(entry.FileSize);
                     writer.Write(entry.Index);
                 }

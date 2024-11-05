@@ -171,7 +171,7 @@ namespace Uniray
                PakArchive.CreatePakFile(CurrentFolder, "fold.pak");
 
                 PakReader reader = new PakReader("fold.pak");
-                Texture2D t = reader.LoadTextureFromPack("crystal");
+                Texture2D t = reader.LoadTextureFromPak("crystal");
             }
 
             // Check for renaming on F2

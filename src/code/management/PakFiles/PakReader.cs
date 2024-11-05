@@ -30,10 +30,11 @@ namespace Uniray.PakFiles
                 {
                     // Read entry informations
                     string fileName = reader.ReadString();
+                    string fileType = reader.ReadString();
                     long fileSize = reader.ReadInt64();
                     long offset = reader.ReadInt64();
 
-                    entries.Add(fileName, new PakFileEntry(fileName, fileSize, offset));
+                    entries.Add(fileName, new PakFileEntry(fileName, fileType, fileSize, offset));
                 }
             }
         }
@@ -42,7 +43,7 @@ namespace Uniray.PakFiles
         /// <param name="fileName">File name to load.</param>
         /// <returns><see langword="byte[]"/> containing the file's bytes.</returns>
         /// <exception cref="Exception">File not found.</exception>
-        public byte[] LoadFile(string fileName)
+        public byte[] LoadRawFile(string fileName)
         {
             // Check if file exists in archive entries
             if (!entries.ContainsKey(fileName))
@@ -65,26 +66,23 @@ namespace Uniray.PakFiles
         /// <summary>Loads texture from .pak file from file name.</summary>
         /// <param name="fileName">File name to load.</param>
         /// <returns>Loaded <see cref="Texture2D"/> of the specified file.</returns>
-        public Texture2D LoadTextureFromPack(string fileName)
+        public Texture2D LoadTextureFromPak(string fileName)
         {
-            // Read data of the file
-            byte[] data = LoadFile(fileName);
-            data.Where(x => x == 137).ToList().ForEach(x =>
+            if (entries[fileName].FileType == "png")
             {
-                Console.WriteLine("Ceci est une nouvelle section : ");
-                for (int i = Array.IndexOf(data, x); i < Array.IndexOf(data, x) + 10; i++)
-                {
-                    Console.WriteLine(data[i]);
-                }
-            });
-            File.WriteAllBytes("temp_image.png", data);
-            // Load image from data
-            Image image = Raylib.LoadImageFromMemory(".png", data);
-            // Convert to Texture2D
-            Texture2D texture = Raylib.LoadTextureFromImage(image);
-            // Unload image
-            Raylib.UnloadImage(image);
-            return texture;
+                // Read data of the file
+                byte[] data = LoadRawFile(fileName);
+                // Load image from data
+                Image image = Raylib.LoadImageFromMemory(".png", data);
+                // Convert to Texture2D
+                Texture2D texture = Raylib.LoadTextureFromImage(image);
+                // Unload image
+                Raylib.UnloadImage(image);
+                return texture;
+            }
+            // Return blank texture if no png file was found within the archive
+            Raylib.TraceLog(TraceLogLevel.Warning, "Failed to load texture from .pak archive");
+            return new Texture2D();
         }
     }
 }
