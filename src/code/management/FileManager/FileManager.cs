@@ -294,7 +294,7 @@ namespace Uniray
                 {
                     if (UData.CurrentRenaming is null)
                     {
-                        Textbox box = new Textbox(x, y + HardRessource.Textures["model_file"].Height + 20, _labelWidth + 10, _labelHeight, unit.Name);
+                        Textbox box = new Textbox(x, y + HardRessource.Textures["model_file"].Height + 20, _labelWidth + 10, _labelHeight, "");
                         box.Focus = true;
                         Uniray.UI.Components.Add("rename_box", box);
                     }
@@ -646,7 +646,7 @@ namespace Uniray
                 int xPos = Uniray.UI.Components["fileManager"].X + 150 * (index % 10 + 1) - 100;
                 int yPos = Uniray.UI.Components["fileManager"].Y + 60 + row * 120;
 
-                Textbox box = new Textbox(xPos, yPos + HardRessource.Textures["model_file"].Height + 20, _labelWidth + 10, _labelHeight, name);
+                Textbox box = new Textbox(xPos, yPos + HardRessource.Textures["model_file"].Height + 20, _labelWidth + 10, _labelHeight, "");
                 box.Focus = true;
                 Uniray.UI.Components.Add("rename_box", box);
             }
