@@ -142,6 +142,9 @@ namespace Uniray
                 // Set clicked item to new folder
                 ClickedUnits.Clear();
                 ClickedUnits.Add(folder);
+
+                // Add rename box
+                InjectRenameBox(folder);
             }
 
             // Draw selected item
@@ -159,23 +162,7 @@ namespace Uniray
             {
                 if (ClickedUnits.Count == 1)
                 {
-                    if (UData.CurrentRenaming is null)
-                    {
-                        // Get index and name
-                        int index = CurrentFolder.Files.IndexOf(ClickedUnits[0]);
-                        string name = ClickedUnits[0].Name;
-
-                        // Define file row
-                        short row = (short)(index / 10);
-                        // Define drawing position
-                        int xPos = Uniray.UI.Components["fileManager"].X + 150 * (index % 10 + 1) - 100;
-                        int yPos = Uniray.UI.Components["fileManager"].Y + 60 + row * 120;
-
-                        Textbox box = new Textbox(xPos, yPos + HardRessource.Textures["model_file"].Height + 20, _labelWidth + 10, _labelHeight, name);
-                        box.Focus = true;
-                        Uniray.UI.Components.Add("rename_box", box);
-                    }
-                    UData.CurrentRenaming = ClickedUnits[0];
+                    InjectRenameBox(ClickedUnits[0]);
                 }
             }
 
@@ -661,6 +648,29 @@ namespace Uniray
                 if (x is UFolder ufolder) UpdateFileTree(ufolder);
                 else if (x is UFile ufile) ufile.Path = Path.Combine(folder.Path, ufile.FullName);
             });
+        }
+
+        /// <summary>Injects a renaming box to the specified file.</summary>
+        /// <param name="unit"><see cref="UStorage"/> to use.</param>
+        private static void InjectRenameBox(UStorage unit)
+        {
+            if (UData.CurrentRenaming is null)
+            {
+                // Get index and name
+                int index = CurrentFolder.Files.IndexOf(unit);
+                string name = unit.Name;
+
+                // Define file row
+                short row = (short)(index / 10);
+                // Define drawing position
+                int xPos = Uniray.UI.Components["fileManager"].X + 150 * (index % 10 + 1) - 100;
+                int yPos = Uniray.UI.Components["fileManager"].Y + 60 + row * 120;
+
+                Textbox box = new Textbox(xPos, yPos + HardRessource.Textures["model_file"].Height + 20, _labelWidth + 10, _labelHeight, name);
+                box.Focus = true;
+                Uniray.UI.Components.Add("rename_box", box);
+            }
+            UData.CurrentRenaming = unit;
         }
     }
 }   
