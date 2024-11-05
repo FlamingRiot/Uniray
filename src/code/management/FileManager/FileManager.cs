@@ -5,6 +5,7 @@ using System.Text;
 using static Raylib_cs.Raylib;
 using Raylib_cs.Complements;
 using System.Numerics;
+using Uniray.PakFiles;
 
 namespace Uniray
 {
@@ -162,6 +163,12 @@ namespace Uniray
             if (IsKeyPressed(KeyboardKey.Delete))
             {
                 ClickedUnits.ForEach(DeleteUnit);
+            }
+
+            // Debug Pak Files
+            if (IsKeyPressed(KeyboardKey.P))
+            {
+                PakArchive.CreatePakFile(CurrentFolder, "fold.pak");
             }
 
             // Check for renaming on F2

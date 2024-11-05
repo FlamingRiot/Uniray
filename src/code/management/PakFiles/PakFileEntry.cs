@@ -6,17 +6,18 @@
         /// <summary>File name of the entry.</summary>
         public string FileName;
         /// <summary>File original size of the entry.</summary>
-        public int FileSize;
+        public long FileSize;
         /// <summary>File index in archive.</summary>
-        public int Index;
+        public long Index;
 
         /// <summary>Creates an instance of <see cref="PakFileEntry"/>.</summary>
         /// <param name="name">Name of the file.</param>
         /// <param name="size"></param>
-        public PakFileEntry(string name, int size)
+        public PakFileEntry(string name, long size, long index)
         {
             FileName = name;
             FileSize = size;
+            Index = index;
         }
 
         /// <summary>Returns informations about the current instance.</summary>
