@@ -2,8 +2,10 @@
 namespace Uniray.PakFiles
 {
     /// <summary>Represents an instance of <see cref="PakReader"/>.</summary>
-    internal class PakReader
+    internal unsafe class PakReader
     {
+        public const string DEFAULT_TMP_FILE = "TEMP_PAK_FILE"; // Temporary file for not supported Load*FromMemory functions
+
         private readonly Dictionary<string, PakFileEntry> entries = new Dictionary<string, PakFileEntry>();
         private readonly string _pakFilePath;
         private readonly long _tableOffset;
@@ -83,6 +85,31 @@ namespace Uniray.PakFiles
             // Return blank texture if no png file was found within the archive
             Raylib.TraceLog(TraceLogLevel.Warning, "Failed to load texture from .pak archive");
             return new Texture2D();
+        }
+
+        /// <summary>Loads model from .pak file from file name.</summary>
+        /// <param name="fileName">File name to load.</param>
+        /// <returns><see cref="Model"/> of the specified file.</returns>
+        public Model LoadModelFromPak(string fileName)
+        {
+            if (entries[fileName].FileType == "m3d")
+            {
+                // Read data of the file
+                byte[] data = LoadRawFile(fileName);
+                // Write data to temporary m3d file
+                File.WriteAllBytes(DEFAULT_TMP_FILE + ".m3d", data);
+                // Load model from tmp created file and fix material issue
+                Model model = Raylib.LoadModel(DEFAULT_TMP_FILE + ".m3d");
+                for (int j = 0; j < model.Meshes[0].VertexCount * 4; j++)
+                    model.Meshes[0].Colors[j] = 255;
+                Raylib.UpdateMeshBuffer(model.Meshes[0], 3, model.Meshes[0].Colors, model.Meshes[0].VertexCount * 4, 0);
+                // Delete tmp file
+                File.Delete(DEFAULT_TMP_FILE + ".m3d");
+                return model;
+            }
+            // Return blank model if no m3d file was found within the archive
+            Raylib.TraceLog(TraceLogLevel.Warning, "Failed to load model from .pak archive");
+            return new Model();
         }
     }
 }
