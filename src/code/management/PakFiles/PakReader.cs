@@ -4,6 +4,10 @@ namespace Uniray.PakFiles
     /// <summary>Represents an instance of <see cref="PakReader"/>.</summary>
     internal unsafe class PakReader
     {
+        // -----------------------------------------------------------
+        // Private and internal instances
+        // -----------------------------------------------------------
+
         public const string DEFAULT_TMP_FILE = "TEMP_PAK_FILE"; // Temporary file for not supported Load*FromMemory functions
 
         private readonly Dictionary<string, PakFileEntry> entries = new Dictionary<string, PakFileEntry>();

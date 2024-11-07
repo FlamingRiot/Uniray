@@ -26,10 +26,10 @@ namespace Uniray
         internal static ProgramState State;
 
         /// <summary>Primary color of the application.</summary>
-        public static readonly Color APPLICATION_COLOR = new(56, 56, 56, 255);
+        public static readonly Color APPLICATION_COLOR = new(41, 41, 41, 255);
 
         /// <summary>Secondary color of the application.</summary>
-        public static readonly Color FOCUS_COLOR = new(40, 40, 40, 255);
+        public static readonly Color FOCUS_COLOR = new(25, 25, 25, 255);
 
         /// <summary>Instance containing the ressources of the loaded project.</summary>
         public static Ressource Ressource = new Ressource();
@@ -75,16 +75,16 @@ namespace Uniray
             _cameraView = LoadRenderTexture(Program.Width / 2, Program.Height / 2);
             _cameraViewRec = new Rectangle(0, 0, Program.Width / 2, -(Program.Height / 2));
 
-            // Initialize the volatile Data
+            // Set default asset folder
             FileManager.CurrentFolder = FileManager.ModelFolder;
         }
 
         /// <summary>Draws the currently displayed <see cref="Scene"/>.</summary>
         public static void DrawScene()
         {
-            // =========================================================================================================================================================
-            // ================================================================ MANAGE 3D DRAWING ======================================================================
-            // =========================================================================================================================================================
+            // -----------------------------------------------------------
+            // 3D graphics rendering
+            // -----------------------------------------------------------
 
             // Define a mouse ray for collision check
             Conceptor3D.UpdateMouseRay();
@@ -138,9 +138,13 @@ namespace Uniray
                 }
             }
             
-            // Manage GameObjects interaction
+            // Manage Game Objects selection interaction
             if (Selection.Count != 0) 
             {
+                // -----------------------------------------------------------
+                // Game Objects Management actions
+                // -----------------------------------------------------------
+
                 // Deletion action on the active selection of game objects
                 if (IsKeyPressed(KeyboardKey.Delete))
                 {
@@ -183,45 +187,47 @@ namespace Uniray
                     Selection.Clear();
                 }
 
-                // Manage GameObjects transformations effects
-                if (Selection.Count != 0)
+                // -----------------------------------------------------------
+                // Game Objects transformative actions
+                // -----------------------------------------------------------
+
+                // Translate the currently selected object, indpendently of its type
+                if (IsKeyDown(KeyboardKey.G))
                 {
-                    // Translate the currently selected object, indpendently of its type
-                    if (IsKeyDown(KeyboardKey.G))
+                    // Translate a neutral vector for selection uniformity
+                    Vector3 newPos = Conceptor3D.TranslateObject(Vector3.Zero);
+                    foreach (GameObject3D go in Selection)
                     {
-                        // Translate a neutral vector for selection uniformity
-                        Vector3 newPos = Conceptor3D.TranslateObject(Vector3.Zero);
-                        foreach (GameObject3D go in Selection)
-                        {
-                            // Add the position of the current object
-                            Vector3 finalPos = Vector3Add(newPos, go.Position);
-                            CurrentScene.SetGameObjectPosition(CurrentScene.GameObjects.IndexOf(go), finalPos);
-                        }
+                        // Add the position of the current object
+                        Vector3 finalPos = Vector3Add(newPos, go.Position);
+                        CurrentScene.SetGameObjectPosition(CurrentScene.GameObjects.IndexOf(go), finalPos);
                     }
-                    // Rotate the currently selected game object
-                    else if (IsKeyDown(KeyboardKey.R))
-                    {
-                        foreach (GameObject3D go in Selection)
-                        {
-                            // Cast the object to apply the appropriate rotation effects
-                            if (go is UModel)
-                            {
-                                UModel model = (UModel)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
-                                Conceptor3D.RotateObject(ref model);
-                            }
-                            else if (go is UCamera)
-                            {
-                                UCamera camera = (UCamera)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
-                                Conceptor3D.RotateObject(ref camera);
-                            }
-                        }
-                        HideCursor();
-                    }
-                    else ShowCursor();
                 }
+                // Rotate the currently selected game object
+                else if (IsKeyDown(KeyboardKey.R))
+                {
+                    foreach (GameObject3D go in Selection)
+                    {
+                        // Cast the object to apply the appropriate rotation effects
+                        if (go is UModel)
+                        {
+                            UModel model = (UModel)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
+                            Conceptor3D.RotateObject(ref model);
+                        }
+                        else if (go is UCamera)
+                        {
+                            UCamera camera = (UCamera)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
+                            Conceptor3D.RotateObject(ref camera);
+                        }
+                    }
+                    HideCursor();
+                }
+                else ShowCursor();
             }
 
-            // Draw the scene all over again for the camera render, if activated
+            // -----------------------------------------------------------
+            // 3D graphics rendering for camera preview
+            // -----------------------------------------------------------
             if (Selection.Count == 1 && Selection.First() is UCamera cam)
             {
                 EndMode3D();
@@ -241,13 +247,9 @@ namespace Uniray
                 EnableBackfaceCulling();
                 EnableDepthMask();
 
-                foreach (GameObject3D go in CurrentScene.GameObjects)
+                foreach (UModel go in CurrentScene.GameObjects.Where(x => x is UModel))
                 {
-                    // Manage objects drawing + object selection (according to the object type)
-                    if (go is UModel)
-                    {
-                        DrawMesh(((UModel)go).Mesh, ((UModel)go).Material, ((UModel)go).Transform);
-                    }
+                     DrawMesh(go.Mesh, go.Material, go.Transform);
                 }
 
                 EndMode3D();
@@ -261,9 +263,10 @@ namespace Uniray
         /// <summary>Draws 2-Dimensional user interface.</summary>
         public static void DrawUI()
         {
-            // =========================================================================================================================================================
-            // ================================================================ MANAGE 2D DRAWING ======================================================================
-            // =========================================================================================================================================================
+            // -----------------------------------------------------------
+            // 2D graphics rendering (User Interface)
+            // -----------------------------------------------------------
+
             // Check if the window has been resized to adjust the size of the UI
             if (IsWindowResized())
             {

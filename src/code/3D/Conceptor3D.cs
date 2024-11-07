@@ -10,11 +10,14 @@ namespace Uniray
         /// <summary>3D Camera used to render the conceptor.</summary>
         public static Camera3D EnvCamera;
 
+        // -----------------------------------------------------------
+        // Private and internal instances
+        // -----------------------------------------------------------
         private static Vector2 mouse;
         private static Ray _mouseRay;
         private static RayCollision _mouseRayCollision;
 
-        /// <summary>Inits the internal variable of the 3D conceptor.</summary>
+        /// <summary>Inits the internal variables of the 3D conceptor.</summary>
         public static void Init()
         {
             _mouseRay = new Ray();

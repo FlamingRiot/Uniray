@@ -12,11 +12,21 @@ namespace Uniray
     /// <summary>Represents a <see cref="FileManager"/> instance.</summary>
     internal static unsafe class FileManager
     {
+        // -----------------------------------------------------------
+        // Constants and static instances
+        // -----------------------------------------------------------
+
+        public static readonly Color DEFAULT_SELECTION_COLOR = new Color(78, 211, 237, 75);
+
         public static UFolder ModelFolder = new UFolder();
         public static UFolder TextureFolder = new UFolder();
         public static UFolder SoundFolder = new UFolder();
         public static UFolder AnimationFolder = new UFolder();
         public static UFolder ScriptFolder = new UFolder();
+
+        // -----------------------------------------------------------
+        // Private and internal instances
+        // -----------------------------------------------------------
 
         /// <summary>The currently displayed <see cref="UFolder"/>.</summary>
         internal static UFolder CurrentFolder = new UFolder();
@@ -203,7 +213,7 @@ namespace Uniray
                 // Draw selection aura if selected
                 if (ClickedUnits.Contains(unit))
                 {
-                    DrawRectangle(x - 5, y - 5, 75, 75, new Color(78, 211, 237, 75));
+                    DrawRectangle(x - 5, y - 5, 75, 75, DEFAULT_SELECTION_COLOR);
                 }
                 // Draw item texture and label
                 switch (((Container)Uniray.UI.Components["fileManager"]).ExtensionFile)
@@ -228,7 +238,7 @@ namespace Uniray
                 // Draw selection aura if selected
                 if (ClickedUnits.Contains(unit))
                 {
-                    DrawRectangle(x - 5, y - 5, HardRessource.Textures["folder"].Width + 10, HardRessource.Textures["folder"].Height + 10, new Color(78, 211, 237, 75));
+                    DrawRectangle(x - 5, y - 5, HardRessource.Textures["folder"].Width + 10, HardRessource.Textures["folder"].Height + 10, DEFAULT_SELECTION_COLOR);
                 }
 
                 DrawTexture(HardRessource.Textures["folder"], x, y, new Color(255, 255, 255, alpha));
@@ -640,7 +650,7 @@ namespace Uniray
             }
         }
 
-        /// <summary>Updates the paths of every downstream units of a folder.</summary>
+        /// <summary>Runs a check over a folder's file-tree to ensure coherence.</summary>
         /// <param name="folder">Folder to update</param>
         public static void UpdateFileTree(UFolder folder)
         {
