@@ -361,7 +361,7 @@ namespace Uniray
                             // Import model into the scene
                             if (Uniray.Ressource.ModelExists(modelKey))
                             {
-                                UData.CurrentScene.AddGameObject(new UModel(
+                                UData.CurrentScene.GameObjects.Add(new UModel(
                                     "[New model]",
                                     Conceptor3D.EnvCamera.Position + GetCameraForward(ref Conceptor3D.EnvCamera) * 5,
                                     Uniray.Ressource.GetModel(modelKey).Meshes[0],
@@ -376,7 +376,7 @@ namespace Uniray
                                 UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
                                 // Add model
                                 Uniray.Ressource.AddModel(m, modelKey);
-                                UData.CurrentScene.AddGameObject(new UModel(
+                                UData.CurrentScene.GameObjects.Add(new UModel(
                                     "[New model]",
                                     Conceptor3D.EnvCamera.Position + GetCameraForward(ref Conceptor3D.EnvCamera) * 5,
                                     Uniray.Ressource.GetModel(modelKey).Meshes[0],

@@ -69,7 +69,7 @@ namespace Uniray
             Conceptor3D.Init();
 
             // Intitialize the default scene and the render camera for Uniray
-            CurrentScene = new Scene(new List<GameObject3D>());
+            CurrentScene = new Scene("", new List<GameObject3D>());
 
             // Create the render texture for preview of a camera's POV
             _cameraView = LoadRenderTexture(Program.Width / 2, Program.Height / 2);
@@ -129,12 +129,12 @@ namespace Uniray
             {
                 if (IsKeyDown(KeyboardKey.LeftShift))
                 {
-                    Selection.Add(CurrentScene.GetGameObject(index));
+                    Selection.Add(CurrentScene.GameObjects[index]);
                 }
                 else
                 {
                     Selection.Clear();
-                    Selection.Add(CurrentScene.GetGameObject(index));
+                    Selection.Add(CurrentScene.GameObjects[index]);
                 }
             }
             
@@ -182,7 +182,7 @@ namespace Uniray
                         // Set final position of the model
                         go.Position -= dir;
                         // Add the copied object to the list
-                        CurrentScene.AddGameObject(go);
+                        CurrentScene.GameObjects.Add(go);
                     }
                     Selection.Clear();
                 }
@@ -200,7 +200,7 @@ namespace Uniray
                     {
                         // Add the position of the current object
                         Vector3 finalPos = Vector3Add(newPos, go.Position);
-                        CurrentScene.SetGameObjectPosition(CurrentScene.GameObjects.IndexOf(go), finalPos);
+                        go.Position = finalPos;
                     }
                 }
                 // Rotate the currently selected game object
@@ -379,6 +379,8 @@ namespace Uniray
         {
             if (CurrentProject != null)
             {
+                //DatabaseConnection connection = new DatabaseConnection(CurrentScene)
+
                 string[] jsons = JsonfyGos(CurrentScene.GameObjects);
                 string? path;
                 if (CurrentProject.Path.Contains('.'))
@@ -474,7 +476,7 @@ namespace Uniray
                 cs.Write(newCam);
                 cs.Close();
 
-                Scene defaultScene = new(new List<GameObject3D> { ucamera });
+                Scene defaultScene = new Scene("PLACEHOLDER", new List<GameObject3D> { ucamera });
                 List<Scene> scenes = new() { defaultScene };
                 CurrentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
                 Ressource = new Ressource();
@@ -578,7 +580,7 @@ namespace Uniray
                     }
                     gos.AddRange(ucameras);
                 }
-                scenes.Add(new Scene(gos));
+                scenes.Add(new Scene("PLACEHOLDER", gos));
             }
             return scenes;
         }

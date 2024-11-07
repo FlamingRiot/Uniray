@@ -1,86 +1,36 @@
-﻿using Raylib_cs;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Uniray
 {
+    /// <summary>Represents an instance of Uniray <see cref="Scene"/>.</summary>
     public class Scene
     {
-        /// <summary>
-        /// Objects of the scene
-        /// </summary>
-        private List<GameObject3D> gameObjects;
-        /// <summary>
-        /// Game objects list property
-        /// </summary>
-        public List<GameObject3D> GameObjects { get { return gameObjects; } }    
-        /// <summary>
-        /// Add game object
-        /// </summary>
-        /// <param name="go">Game object</param>
-        public void AddGameObject(GameObject3D go)
-        {
-            gameObjects.Add(go);
-        }
-        /// <summary>
-        /// Get game object
-        /// </summary>
-        /// <param name="index">Index of the object</param>
-        /// <returns>Game object</returns>
-        public GameObject3D GetGameObject(int index)
-        {
-            return gameObjects[index];
-        }
-        /// <summary>
-        /// Set game object
-        /// </summary>
-        /// <param name="index">Index of the object</param>
-        /// <param name="go">Game object</param>
-        public void SetGameObject(int index, GameObject3D go)
-        {
-            gameObjects[index] = go;
-        }
-        /// <summary>
-        /// Set game object position
-        /// </summary>
-        /// <param name="index">Index of the object</param>
-        /// <param name="position">Game object position</param>
-        public void SetGameObjectPosition(int index, Vector3 position)
-        {
-            if (gameObjects[index] is UModel)
-            {
-                UModel go = (UModel)gameObjects[index];
-                go.Position = position;
-                gameObjects[index] = go;
-            }
-            else if (gameObjects[index] is UCamera)
-            {
-                UCamera go = (UCamera)gameObjects[index];
-                go.Position = position;
-                gameObjects[index] = go;
-            }
-        }
-        /// <summary>
-        /// Scene default Constructor
-        /// </summary>
+        /// <summary>Name of the scene.</summary>
+        public string Name;
+
+        /// <summary>Game objects of the scene.</summary>
+        public List<GameObject3D> GameObjects;
+
+        /// <summary>Creates an empty instance of Uniray <see cref="Scene"/>.</summary>
         public Scene()
         {
-            gameObjects = new List<GameObject3D>();
+            GameObjects = new List<GameObject3D>();
+            Name = "";
         }
-        /// <summary>
-        /// Scene Constructor
-        /// </summary>
-        /// <param name="gameObjects">Scene game objects</param>
-        public Scene(List<GameObject3D> gameObjects)
+
+        /// <summary>Creates an instance of Uniray <see cref="Scene"/>.</summary>
+        /// <param name="gameObjects">Scene game objects.</param>
+        public Scene(string name, List<GameObject3D> gameObjects)
         {
-            this.gameObjects = gameObjects;
+            GameObjects = gameObjects;
+            Name = name;
         }
-        /// <summary>
-        /// Scene scene informations
-        /// </summary>
-        /// <returns>String</returns>
+
+        /// <summary>Returns informations about the current instance.</summary>
+        /// <returns>Informations as a <see langword="string"/>.</returns>
         public override string ToString()
         {
-            return "This scene contains : " + gameObjects.Count;
+            return $"The scene {Name} contains {GameObjects.Count} elements";
         }
     }
 }
