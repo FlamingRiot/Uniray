@@ -7,7 +7,18 @@
         public string Name;
 
         /// <summary>Absolute path to the project.</summary>
-        public string Path;
+        public string ProjectFile;
+
+        /// <summary>Returns the folder of the project.</summary>
+        public string ProjectFolder 
+        { 
+            get 
+            { 
+                string? path = Path.GetDirectoryName(ProjectFile);
+                if (path != null) return path;
+                else return "";
+            } 
+        }
 
         /// <summary>Scenes of the project.</summary>
         public List<Scene> Scenes;
@@ -19,7 +30,7 @@
         public Project(string name, string path, List<Scene> scenes)
         {
             Name = name;
-            Path = path.Replace('\\', '/');
+            ProjectFile = path.Replace('\\', '/');
             Scenes = scenes;
         }
 
@@ -35,7 +46,7 @@
         /// <returns>Informations as a <see langword="string"/>.</returns>
         public override string ToString()
         {
-            return "The project " + Name + " is located at : " + Path + " and has " + Scenes.Count + "scenes";
+            return "The project " + Name + " is located at : " + ProjectFile + " and has " + Scenes.Count + "scenes";
         }
     }
 }

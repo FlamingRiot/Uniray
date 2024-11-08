@@ -9,6 +9,7 @@ using RayGUI_cs;
 // Other
 using System.Numerics;
 using Newtonsoft.Json;
+using Uniray.DatFiles;
 using static Uniray.UData;
 
 namespace Uniray
@@ -328,8 +329,12 @@ namespace Uniray
             // Check the shortcut for game building
             if (IsKeyPressed(KeyboardKey.F5) && CurrentProject is not null)
             {
-                BuildProject(CurrentProject.Path);
+                BuildProject(CurrentProject.ProjectFolder);
             }
+
+            DrawText(CurrentProject?.ProjectFolder, 20, 20, 30, Color.DarkGreen);
+
+            if (IsKeyPressed(KeyboardKey.J)) DatEncoder.EncodeScene(CurrentScene);
         }
 
         /// <summary>Loads project from .uproj file.</summary>
@@ -382,15 +387,7 @@ namespace Uniray
                 //DatabaseConnection connection = new DatabaseConnection(CurrentScene)
 
                 string[] jsons = JsonfyGos(CurrentScene.GameObjects);
-                string? path;
-                if (CurrentProject.Path.Contains('.'))
-                {
-                    path = Path.GetDirectoryName(CurrentProject.Path);
-                }
-                else
-                {
-                    path = CurrentProject.Path;
-                }
+                string path = CurrentProject.ProjectFolder;
                 
                 StreamWriter stream = new (path + "/scenes/new_scene/locs.json", false);
                 stream.Write(jsons[0]);
