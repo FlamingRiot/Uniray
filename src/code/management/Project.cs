@@ -1,8 +1,13 @@
-﻿namespace Uniray
+﻿using Uniray.DatFiles;
+
+namespace Uniray
 {
     /// <summary>Represents an instance of <see cref="Project"/>.</summary>
     public class Project
     {
+        private byte[] _encryptionKey;
+        private byte[] _symmetricalVector;
+
         /// <summary>Project name.</summary>
         public string Name;
 
@@ -20,6 +25,12 @@
             } 
         }
 
+        /// <summary>Encryption key of the project.</summary>
+        public byte[] EncryptionKey { get { return _encryptionKey; } set { if (value.Length == DatEncoder.AES_KEY_LENGTH) _encryptionKey = value; } }
+
+        /// <summary>Symmetrical vector used for project encoding.</summary>
+        public byte[] SymmetricalVector { get { return _symmetricalVector; } set { if (value.Length == DatEncoder.AES_IV_LENGTH) _symmetricalVector = value; } }
+
         /// <summary>Scenes of the project.</summary>
         public List<Scene> Scenes;
 
@@ -32,6 +43,9 @@
             Name = name;
             ProjectFile = path.Replace('\\', '/');
             Scenes = scenes;
+            // Init cryptography keys
+            _encryptionKey = new byte[DatEncoder.AES_KEY_LENGTH];
+            _symmetricalVector = new byte[DatEncoder.AES_IV_LENGTH];
         }
 
         /// <summary>Gets the scenes at a specified location.</summary>

@@ -10,8 +10,8 @@ namespace Uniray.DatFiles
         // Private and constant instances
         // -----------------------------------------------------------
 
-        private const int AES_KEY_LENGTH = 32;
-        private const int AES_IV_LENGTH = 16;
+        internal const int AES_KEY_LENGTH = 32;
+        internal const int AES_IV_LENGTH = 16;
 
         private const string MODELS_SECTION = "MODEL";
         private const string CAMERAS_SECTION = "CAMERA";
