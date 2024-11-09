@@ -14,8 +14,7 @@ namespace Uniray.DatFiles
         private const int AES_IV_LENGTH = 16;
 
         private const string MODELS_SECTION = "MODEL";
-        private const string TEXTURES_SECTION = "TEXTURE";
-        private const string SOUNDS_SECTION = "SOUND";
+        private const string CAMERAS_SECTION = "CAMERA";
 
         private static int _offset = 0;
         private static List<DatFileEntry> _entries = new List<DatFileEntry>();
@@ -41,7 +40,7 @@ namespace Uniray.DatFiles
                 writer.Write(aes.Key); // 32 Bytes
                 writer.Write(aes.IV); // 16 Bytes
                 _offset += 48; // 16 + 32 = 48 Bytes
-                               // Encode and write JSON data   
+                // Encode and write JSON data       
                 for (int i = 0; i < jsons.Length; i++)
                 {
                     // Define game objects section
@@ -52,7 +51,7 @@ namespace Uniray.DatFiles
                             name = MODELS_SECTION;
                             break;
                         case 1: // UCamera section
-                            name = TEXTURES_SECTION;
+                            name = CAMERAS_SECTION;
                             break;
                     }
 
@@ -90,6 +89,63 @@ namespace Uniray.DatFiles
                 _offset = 0;
                 _entries.Clear();
             }
+        }
+
+        /// <summary>Read a .DAT file and decodes the scene informations from it.</summary>
+        /// <param name="path">Path to the .DAT file.</param>
+        /// <returns>Uniray corresponding Scene.</returns>
+        /// <exception cref="Exception">No file found exception.</exception>
+        public static Scene DecodeScene(string path)
+        {
+            if (!Path.Exists(path)) throw new Exception("No .DAT file was found at the given location");
+            // Open file stream
+            FileStream datFile = new FileStream(path, FileMode.Open);
+            using BinaryReader reader = new BinaryReader(datFile);
+            // Read file header data
+            int _entryCount = reader.ReadInt32(); // Read object count
+            int _tableOffset = reader.ReadInt32(); // Read entry table offset
+            byte[] _aesKey = new byte[AES_KEY_LENGTH]; // Read AES algorithm encoding key
+            datFile.Read(_aesKey, 0, AES_KEY_LENGTH);
+            byte[] _aesIv = new byte[AES_IV_LENGTH];// Read AES algorithm encoding vector
+            datFile.Read(_aesIv, 0, AES_IV_LENGTH);
+            // Move to table offset
+            datFile.Seek(_tableOffset, SeekOrigin.Begin);
+            // Loop over different file entries
+            for (int i = 0; i < _entryCount; i++)
+            { 
+                // Read entry data
+                string entryName = reader.ReadString();
+                int index = reader.ReadInt32();
+                int size = reader.ReadInt32();
+                _entries.Add(new DatFileEntry(entryName, index, size));
+            }
+            List<GameObject3D> objects = new List<GameObject3D>();
+            // Read entries data
+            foreach (DatFileEntry entry in _entries) 
+            { 
+                // Move to entry index
+                datFile.Seek(entry.Index, SeekOrigin.Begin);
+                // Read encrypted data from the file
+                byte[] encryptedData = new byte[entry.Size];
+                datFile.Read(encryptedData, 0, encryptedData.Length);
+                // Decrypt data
+                string text = Decrypt(encryptedData, _aesKey, _aesIv);
+                switch (entry.Name)
+                {
+                    case MODELS_SECTION:
+                        List<UModel>? models = JsonConvert.DeserializeObject<List<UModel>>(text);
+                        if (models is not null) objects.AddRange(models);
+                        break;
+                    case CAMERAS_SECTION:
+                        List<UCamera>? cameras = JsonConvert.DeserializeObject<List<UCamera>>(text);
+                        if (cameras is not null) objects.AddRange(cameras);
+                        break;
+                }
+            }
+            // Reset entries list
+            _entries.Clear();
+            // Create scene
+            return new Scene("PLACHOLDER", objects);
         }
 
         /// <summary>Encrypts data with the AES algorithm.</summary>

@@ -334,7 +334,11 @@ namespace Uniray
 
             DrawText(CurrentProject?.ProjectFolder, 20, 20, 30, Color.DarkGreen);
 
-            if (IsKeyPressed(KeyboardKey.J)) DatEncoder.EncodeScene(CurrentScene);
+            /*if (IsKeyPressed(KeyboardKey.J))
+            {
+                DatEncoder.EncodeScene(CurrentScene);
+                Scene newScene = DatEncoder.DecodeScene(CurrentProject?.ProjectFolder + "/scenes/PLACEHOLDER.DAT");
+            }*/
         }
 
         /// <summary>Loads project from .uproj file.</summary>
