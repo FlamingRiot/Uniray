@@ -146,6 +146,13 @@ namespace Uniray
             this.textureID = textureID;
             Raylib.SetMaterialTexture(ref material, MaterialMapIndex.Diffuse, texture);
         }
+
+        /// <summary>Applies the corresponding texture to the model.</summary>
+        public void LoadTexture()
+        {
+            Raylib.SetMaterialTexture(ref material, MaterialMapIndex.Diffuse, Uniray.Ressource.GetTexture(TextureID));
+        }
+
         public override string ToString()
         {
             return "Name: " + Name + " Position: " + Position + " Rotation: < " + Yaw + "; " + Pitch + "; " + Roll + " >";  

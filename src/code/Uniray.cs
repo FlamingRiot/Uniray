@@ -371,8 +371,8 @@ namespace Uniray
                 ((Label)UI.Components["ressourceInfoLabel"]).Text = "File type : .m3d";
 
                 // Load scenes along with their game objects
-                CurrentProject = new Project(project_name, path, LoadScenes(directory));
-                CurrentScene = CurrentProject.GetScene(0);
+                CurrentProject = new Project(project_name, path, LoadProjectScenes(directory));
+                CurrentScene = CurrentProject.GetScene(0); // Set default scene
                 SetWindowTitle("Uniray - " + project_name);
 
                 TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
@@ -388,32 +388,22 @@ namespace Uniray
         {
             if (CurrentProject != null)
             {
-                //DatabaseConnection connection = new DatabaseConnection(CurrentScene)
-
-                string[] jsons = JsonfyGos(CurrentScene.GameObjects);
-                string path = CurrentProject.ProjectFolder;
-                
-                StreamWriter stream = new (path + "/scenes/new_scene/locs.json", false);
-                stream.Write(jsons[0]);
-                stream.Close();
-
-                StreamWriter camStream = new (path + "/scenes/new_scene/camera.json", false);
-                camStream.Write(jsons[1]);
-                camStream.Close();
+                foreach (Scene scene in CurrentProject.Scenes)
+                {
+                    DatEncoder.EncodeScene(scene); // Encode project scenes
+                }
 
                 TraceLog(TraceLogLevel.Info, "Project was saved successfully !");
             }
             else
             {
                 // Open modal for the user to create a new project
-                UData.CurrentModal = "newProjectModal";
+                CurrentModal = "newProjectModal";
             }
         }
 
-        /// <summary>
-        /// Create project (.uproj file)
-        /// </summary>
-        /// <param name="path">path to the target directory</param>
+        /// <summary>Creates a new Uniray project.</summary>
+        /// <param name="path">Path to the target directory.</param>
         public static void CreateProject(string path, string name)
         {
             try
@@ -426,14 +416,6 @@ namespace Uniray
                 Directory.CreateDirectory(path + "\\assets\\scripts");
                 Directory.CreateDirectory(path + "\\assets\\sounds");
                 Directory.CreateDirectory(path + "\\assets\\textures");
-
-                Directory.CreateDirectory(path + "\\scenes\\new_scene\\");
-                StreamWriter default_locs = new (path + "\\scenes\\new_scene\\locs.json");
-                default_locs.WriteLine("[");
-                default_locs.WriteLine("    {");
-                default_locs.WriteLine("    }");
-                default_locs.WriteLine("]");
-                default_locs.Close();
 
                 // Unzip default Visual Studio project from internal data
                 System.IO.Compression.ZipFile.ExtractToDirectory("data/default_VS_Project.zip", path);
@@ -457,10 +439,12 @@ namespace Uniray
                     write.WriteLine(file[i]);
                 }
                 write.Close();
+
+                // Set file manager output to new project directory
                 ((Container)UI.Components["fileManager"]).OutputFilePath = path + "\\assets\\models\\";
-
+                // Set new window title
                 SetWindowTitle("Uniray - " + name);
-
+                // Create default camera
                 Camera3D camera = new()
                 {
                     Position = Vector3.Zero,
@@ -469,22 +453,18 @@ namespace Uniray
                     Projection = CameraProjection.Perspective,
                     FovY = 90
                 };
+
+                // Create new empty scene (except camera)
                 UCamera ucamera = new UCamera("Default camera", camera);
-                Matrix4x4 transform = Matrix4x4.Identity;
-
-                StreamWriter cs = new StreamWriter(path + "\\scenes\\new_scene\\camera.json");
-                string newCam = JsonConvert.SerializeObject(ucamera);
-                cs.Write(newCam);
-                cs.Close();
-
                 Scene defaultScene = new Scene("PLACEHOLDER", new List<GameObject3D> { ucamera });
                 List<Scene> scenes = new() { defaultScene };
-                CurrentProject = new Project(name, path + "\\" + name + ".uproj", scenes);
-                Ressource = new Ressource();
-                CurrentScene = CurrentProject.GetScene(0);
-                Selection.Clear();
+                CurrentProject = new Project(name, path + "\\" + name + ".uproj", scenes); // Create project
 
-                TraceLog(TraceLogLevel.Warning, "Project \"" + name + "\" has been created");
+                Ressource = new Ressource(); // Init ressource lists
+                CurrentScene = CurrentProject.GetScene(0); // Set current scene to default
+                DatEncoder.EncodeScene(CurrentScene); // Encode newly created scene to .DAT files
+
+                TraceLog(TraceLogLevel.Info, "Project \"" + name + "\" has been created");
             }
             catch
             {
@@ -492,96 +472,26 @@ namespace Uniray
             }
         }
 
-        /// <summary>Converts the informations of a <see cref="List{T}"/> of <see cref="GameObject3D"/> to a JSON stream.</summary>
-        /// <param name="gos">Game objects list</param>
-        /// <returns>The JSON stream containing the informations.</returns>
-        private static string[] JsonfyGos(List<GameObject3D> gos)
+        /// <summary>Loads the scenes from a given directory.</summary>
+        /// <param name="directory">Directory to retrives scenes from.</param>
+        /// <returns>The list of scenes contained in the given directory.</returns>
+        public static List<Scene> LoadProjectScenes(string directory)
         {
-            // Open the jsons
-            string modelsJson = "[";
-            string cameraJson = "[";
-            // Go through every element of the scene's list
-            foreach(GameObject3D go in gos)
-            {
-                if (go is UModel model)
-                {
-                    modelsJson += "{" + "X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
-                    ",Pitch: " + model.Pitch + ",Roll: " + model.Roll + ",ModelID: \"" + model.ModelID + "\",TextureID: \"" + model.TextureID + "\", Transform:";
-                    modelsJson += JsonConvert.SerializeObject(model.Transform);
-                    modelsJson += "}, ";
-                }
-                else if (go is UCamera camera)
-                {
-                    cameraJson += JsonConvert.SerializeObject(camera);
-                    cameraJson += ",";
-                }
-
-            }
-            // Delete the last comma of the jsons
-            
-            if (modelsJson != "[") modelsJson = modelsJson.Substring(0, modelsJson.LastIndexOf(','));
-            if (cameraJson != "[") cameraJson = cameraJson.Substring(0, cameraJson.LastIndexOf(','));
-
-            // Close the jsons
-            modelsJson += "]";
-            cameraJson += "]";
-            return new string[] { modelsJson, cameraJson };
-        }
-
-        /// <summary>
-        /// Load all the scenes from a project directory
-        /// </summary>
-        /// <returns></returns>
-        public static List<Scene> LoadScenes(string directory)
-        {
-            string[] scenesPath = Directory.GetDirectories(directory + "\\scenes");
-            List<Scene> scenes = new();
+            string[] scenesPath = Directory.GetFiles(directory + "/scenes"); // Gets all .DAT files paths
+            List<Scene> scenes = new List<Scene>();
             for (int i = 0; i < scenesPath.Length; i++)
             {
-                // Import stored camera
-                StreamReader rCam = new(scenesPath[i] + "\\camera.json");
-                string camJson = rCam.ReadToEnd();
-                List<UCamera>? ucameras = JsonConvert.DeserializeObject<List<UCamera>>(camJson);
-                rCam.Close();
-                // Import stored game objects
-                StreamReader rGos = new(scenesPath[i] + "\\locs.json");
-                string gosJson = rGos.ReadToEnd();
-                List<UModel>? umodels = JsonConvert.DeserializeObject<List<UModel>>(gosJson);
-                rGos.Close();
-
-                List<GameObject3D> gos = new List<GameObject3D>();
-                // Prepare the models for insertion
-                if (umodels is not null)
+                Scene scene = DatEncoder.DecodeScene(scenesPath[i]);
+                // Prepare the models
+                foreach (UModel model in scene.GameObjects.Where(x => x is UModel))
                 {
-                    foreach (UModel go in umodels)
+                    if (model.ModelID != "")
                     {
-                        if (go.ModelID != "" && go.ModelID is not null)
-                        {
-                            go.Mesh = Ressource.GetModel(go.ModelID).Meshes[0];
-                            if (go.TextureID != "") go.SetTexture(go.TextureID, Ressource.GetTexture(go.TextureID));
-                        }
+                        model.Mesh = Ressource.GetModel(model.ModelID).Meshes[0];
+                        if (model.TextureID != "") model.LoadTexture();
                     }
-                    gos.AddRange(umodels);
                 }
-
-                if (ucameras is not null)
-                {
-                    foreach (UCamera uCamera in ucameras)
-                    {
-                        Camera3D camera = new Camera3D()
-                        {
-                            Position = uCamera.Position,
-                            Target = Vector3.Zero,
-                            Up = Vector3.UnitY,
-                            FovY = 45f,
-                            Projection = CameraProjection.Perspective
-                        };
-
-                        uCamera.Camera = camera;
-                    }
-                    gos.AddRange(ucameras);
-                }
-                scenes.Add(new Scene("PLACEHOLDER", gos));
+                scenes.Add(scene);
             }
             return scenes;
         }

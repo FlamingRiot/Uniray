@@ -1,6 +1,5 @@
 ﻿using Raylib_cs;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace Uniray
 {

@@ -91,7 +91,7 @@ namespace Uniray.DatFiles
             }
         }
 
-        /// <summary>Read a .DAT file and decodes the scene informations from it.</summary>
+        /// <summary>Reads a .DAT file and decodes the scene informations from it.</summary>
         /// <param name="path">Path to the .DAT file.</param>
         /// <returns>Uniray corresponding Scene.</returns>
         /// <exception cref="Exception">No file found exception.</exception>
@@ -145,7 +145,7 @@ namespace Uniray.DatFiles
             // Reset entries list
             _entries.Clear();
             // Create scene
-            return new Scene("PLACHOLDER", objects);
+            return new Scene("PLACEHOLDER", objects);
         }
 
         /// <summary>Encrypts data with the AES algorithm.</summary>
