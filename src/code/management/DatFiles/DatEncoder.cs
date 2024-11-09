@@ -35,11 +35,6 @@ namespace Uniray.DatFiles
                 writer.Write(_offset); // Table placeholder (Int-32)
                 // Move writer after placeholder
                 _offset += 8; // Int-32 + Int-32 = 8 bytes
-                // Start AES algorithm
-                using Aes aes = Aes.Create();
-                writer.Write(aes.Key); // 32 Bytes
-                writer.Write(aes.IV); // 16 Bytes
-                _offset += 48; // 16 + 32 = 48 Bytes
                 // Encode and write JSON data       
                 for (int i = 0; i < jsons.Length; i++)
                 {
@@ -56,8 +51,7 @@ namespace Uniray.DatFiles
                     }
 
                     // Encrypt string to byte array
-                    byte[] data = Encrypt(jsons[i], aes.Key, aes.IV);
-                    //string text = Decrypt(data, aes.Key, aes.IV);
+                    byte[] data = Encrypt(jsons[i], UData.CurrentProject.EncryptionKey, UData.CurrentProject.SymmetricalVector);
                     // Create DAT file entry
                     DatFileEntry entry = new DatFileEntry(name, _offset, data.Length);
                     _entries.Add(entry);
@@ -95,7 +89,7 @@ namespace Uniray.DatFiles
         /// <param name="path">Path to the .DAT file.</param>
         /// <returns>Uniray corresponding Scene.</returns>
         /// <exception cref="Exception">No file found exception.</exception>
-        public static Scene DecodeScene(string path)
+        public static Scene DecodeScene(string path, byte[] key, byte[] iv)
         {
             if (!Path.Exists(path)) throw new Exception("No .DAT file was found at the given location");
             // Open file stream
@@ -104,10 +98,6 @@ namespace Uniray.DatFiles
             // Read file header data
             int _entryCount = reader.ReadInt32(); // Read object count
             int _tableOffset = reader.ReadInt32(); // Read entry table offset
-            byte[] _aesKey = new byte[AES_KEY_LENGTH]; // Read AES algorithm encoding key
-            datFile.Read(_aesKey, 0, AES_KEY_LENGTH);
-            byte[] _aesIv = new byte[AES_IV_LENGTH];// Read AES algorithm encoding vector
-            datFile.Read(_aesIv, 0, AES_IV_LENGTH);
             // Move to table offset
             datFile.Seek(_tableOffset, SeekOrigin.Begin);
             // Loop over different file entries
@@ -129,7 +119,7 @@ namespace Uniray.DatFiles
                 byte[] encryptedData = new byte[entry.Size];
                 datFile.Read(encryptedData, 0, encryptedData.Length);
                 // Decrypt data
-                string text = Decrypt(encryptedData, _aesKey, _aesIv);
+                string text = Decrypt(encryptedData, key, iv);
                 switch (entry.Name)
                 {
                     case MODELS_SECTION:

@@ -26,6 +26,8 @@ namespace Uniray
         /// <summary>Current state of the program.</summary>
         internal static ProgramState State;
 
+        public static readonly Color BACKGROUND_COLOR = new(34, 34, 34, 255);
+
         /// <summary>Primary color of the application.</summary>
         public static readonly Color APPLICATION_COLOR = new(41, 41, 41, 255);
 
@@ -276,8 +278,8 @@ namespace Uniray
                 UI = new UI();   
             }
             // Draw the outline rectangles that appear behind the main panels
-            DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.25f), Program.Height, new Color(40, 40, 40, 255));
-            DrawRectangle(0, Program.Height - Program.Height / 3 - 10, Program.Width, Program.Height - (Program.Height - Program.Height / 3) + 10, new Color(40, 40, 40, 255));
+            DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.25f), Program.Height, BACKGROUND_COLOR);
+            DrawRectangle(0, Program.Height - Program.Height / 3 - 10, Program.Width, Program.Height - (Program.Height - Program.Height / 3) + 10, BACKGROUND_COLOR);
 
             // Draw the entire UI and handle the events related to it
             UI.Draw();
@@ -327,9 +329,9 @@ namespace Uniray
                 }
             }
             // Check the shortcut for game building
-            if (IsKeyPressed(KeyboardKey.F5) && CurrentProject is not null)
+            if (IsKeyPressed(KeyboardKey.F5))
             {
-                BuildProject(CurrentProject.ProjectFolder);
+                CurrentProject?.Build();
             }
         }
 
@@ -360,7 +362,7 @@ namespace Uniray
                 ((Label)UI.Components["ressourceInfoLabel"]).Text = "File type : .m3d";
 
                 // Load scenes along with their game objects
-                CurrentProject = new Project(_projectName, path, LoadProjectScenes(directory), _aesKey, _aesIv);
+                CurrentProject = new Project(_projectName, path, LoadProjectScenes(directory, _aesKey, _aesIv), _aesKey, _aesIv);
                 CurrentScene = CurrentProject.GetScene(0); // Set default scene
                 SetWindowTitle("Uniray - " + _projectName);
 
@@ -375,7 +377,7 @@ namespace Uniray
         /// <summary>Saves the currently loaded project.</summary>
         public static void SaveProject()
         {
-            if (CurrentProject != null)
+            if (CurrentProject is not null)
             {
                 foreach (Scene scene in CurrentProject.Scenes)
                 {
@@ -434,7 +436,7 @@ namespace Uniray
                 UCamera ucamera = new UCamera("Default camera", UCamera.DefaultCamera);
                 Scene defaultScene = new Scene("PLACEHOLDER", new List<GameObject3D> { ucamera });
                 List<Scene> scenes = new() { defaultScene };
-                CurrentProject = new Project(name, path + "/" + name + ".uproj", scenes, new byte[DatEncoder.AES_KEY_LENGTH], new byte[DatEncoder.AES_IV_LENGTH]); // Create project
+                CurrentProject = new Project(name, path + "/" + name + ".uproj", scenes, _aesKey, _aesIv); // Create project
 
                 Ressource = new Ressource(); // Init ressource lists
                 CurrentScene = CurrentProject.GetScene(0); // Set current scene to default
@@ -451,13 +453,13 @@ namespace Uniray
         /// <summary>Loads the scenes from a given directory.</summary>
         /// <param name="directory">Directory to retrives scenes from.</param>
         /// <returns>The list of scenes contained in the given directory.</returns>
-        public static List<Scene> LoadProjectScenes(string directory)
+        public static List<Scene> LoadProjectScenes(string directory, byte[] key, byte[] iv)
         {
             string[] scenesPath = Directory.GetFiles(directory + "/scenes"); // Gets all .DAT files paths
             List<Scene> scenes = new List<Scene>();
             for (int i = 0; i < scenesPath.Length; i++)
-            {
-                Scene scene = DatEncoder.DecodeScene(scenesPath[i]);
+            {   
+                Scene scene = DatEncoder.DecodeScene(scenesPath[i], key, iv);
                 // Prepare the models
                 foreach (UModel model in scene.GameObjects.Where(x => x is UModel))
                 {
@@ -470,15 +472,6 @@ namespace Uniray
                 scenes.Add(scene);
             }
             return scenes;
-        }
-
-        /// <summary>Builds the currently load project.</summary>
-        public static void BuildProject(string path)
-        {
-            // Build and run project here...
-            string? projectPath = Path.GetDirectoryName(path);
-            string commmand = "/C cd " + projectPath + " && dotnet run --project uniray_Project.csproj";
-            System.Diagnostics.Process.Start("CMD.exe", commmand);
         }
     }
 }
