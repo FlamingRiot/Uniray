@@ -5,6 +5,16 @@ namespace Uniray
 {
     public class UCamera : GameObject3D
     {
+        /// <summary>Default <see cref="Camera3D"/> configuration.</summary>
+        public static readonly Camera3D DefaultCamera = new Camera3D()
+        {
+            Position = Vector3.Zero,
+            Target = Vector3.Zero,
+            Up = Vector3.UnitY,
+            Projection = CameraProjection.Perspective,
+            FovY = 90
+        };
+
         /// <summary>
         /// Yaw rotation
         /// </summary>

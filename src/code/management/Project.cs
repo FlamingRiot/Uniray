@@ -1,4 +1,5 @@
-﻿using Uniray.DatFiles;
+﻿using System.Windows.Input;
+using Uniray.DatFiles;
 
 namespace Uniray
 {
@@ -38,14 +39,14 @@ namespace Uniray
         /// <param name="name">Project name</param>
         /// <param name="path">Abosulte path to the project</param>
         /// <param name="scenes">Scenes of the project</param>
-        public Project(string name, string path, List<Scene> scenes)
+        public Project(string name, string path, List<Scene> scenes, byte[] aesKey, byte[] aesIv)
         {
             Name = name;
-            ProjectFile = path.Replace('\\', '/');
+            ProjectFile = path.Replace('\\', '/'); // Ensure linux compatibility 
             Scenes = scenes;
             // Init cryptography keys
-            _encryptionKey = new byte[DatEncoder.AES_KEY_LENGTH];
-            _symmetricalVector = new byte[DatEncoder.AES_IV_LENGTH];
+            _encryptionKey = aesKey;
+            _symmetricalVector = aesIv;
         }
 
         /// <summary>Gets the scenes at a specified location.</summary>
@@ -54,6 +55,13 @@ namespace Uniray
         public Scene GetScene(int index)
         {
             return Scenes[index];
+        }
+
+        /// <summary>Builds the project from an external window.</summary>
+        public void Build()
+        {
+            string command = $"/C cd \"{ProjectFolder}\" && dotnet run --project uniray_Project.csproj";
+            System.Diagnostics.Process.Start("CMD.exe", command); // Run project externally
         }
 
         /// <summary>Returns informations about the current instance.</summary>

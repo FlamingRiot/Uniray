@@ -331,14 +331,6 @@ namespace Uniray
             {
                 BuildProject(CurrentProject.ProjectFolder);
             }
-
-            DrawText(CurrentProject?.ProjectFolder, 20, 20, 30, Color.DarkGreen);
-
-            /*if (IsKeyPressed(KeyboardKey.J))
-            {
-                DatEncoder.EncodeScene(CurrentScene);
-                Scene newScene = DatEncoder.DecodeScene(CurrentProject?.ProjectFolder + "/scenes/PLACEHOLDER.DAT");
-            }*/
         }
 
         /// <summary>Loads project from .uproj file.</summary>
@@ -347,15 +339,12 @@ namespace Uniray
         {
             try
             {
-                string project_name = "";
-                StreamReader stream = new StreamReader(path);
-                if (stream.ReadLine() == "<Project>")
-                {
-                    string? line = stream.ReadLine();
-                    if (line is not null) project_name = line.Split('>')[1].Split('<')[0];
-                    else throw new Exception("The given project file was empty, or contained wrong information");
-                }
-                stream.Close();
+                // Read project informations from .uproj
+                FileStream stream = new FileStream(path, FileMode.Open);
+                using BinaryReader reader = new BinaryReader(stream);
+                string _projectName = reader.ReadString();
+                byte[] _aesKey = reader.ReadBytes(DatEncoder.AES_KEY_LENGTH);
+                byte[] _aesIv = reader.ReadBytes(DatEncoder.AES_IV_LENGTH);
 
                 // Set Project info in application
                 string? directory = Path.GetDirectoryName(path);
@@ -371,9 +360,9 @@ namespace Uniray
                 ((Label)UI.Components["ressourceInfoLabel"]).Text = "File type : .m3d";
 
                 // Load scenes along with their game objects
-                CurrentProject = new Project(project_name, path, LoadProjectScenes(directory));
+                CurrentProject = new Project(_projectName, path, LoadProjectScenes(directory), _aesKey, _aesIv);
                 CurrentScene = CurrentProject.GetScene(0); // Set default scene
-                SetWindowTitle("Uniray - " + project_name);
+                SetWindowTitle("Uniray - " + _projectName);
 
                 TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
             }
@@ -409,56 +398,43 @@ namespace Uniray
             try
             {
                 // Create directories (assets, locs, etc.)
-                Directory.CreateDirectory(path + "\\assets");
+                Directory.CreateDirectory(path + "/assets");
 
-                Directory.CreateDirectory(path + "\\assets\\animations");
-                Directory.CreateDirectory(path + "\\assets\\models");
-                Directory.CreateDirectory(path + "\\assets\\scripts");
-                Directory.CreateDirectory(path + "\\assets\\sounds");
-                Directory.CreateDirectory(path + "\\assets\\textures");
+                Directory.CreateDirectory(path + "/assets/animations");
+                Directory.CreateDirectory(path + "/assets/models");
+                Directory.CreateDirectory(path + "/assets/scripts");
+                Directory.CreateDirectory(path + "/assets/sounds");
+                Directory.CreateDirectory(path + "/assets/textures");
+
+                Directory.CreateDirectory(path + "/scenes");
 
                 // Unzip default Visual Studio project from internal data
                 System.IO.Compression.ZipFile.ExtractToDirectory("data/default_VS_Project.zip", path);
 
+                // Create project 32 bytes encryption key
+                byte[] _aesKey = new byte[DatEncoder.AES_KEY_LENGTH];
+                for (int i = 0; i < _aesKey.Length; i++) Random.Shared.NextBytes(_aesKey);
+                // Create project 16 byte symmetrical vector (for encryption)
+                byte[] _aesIv = new byte[DatEncoder.AES_IV_LENGTH];
+                for (int i = 0; i < _aesIv.Length; i++) Random.Shared.NextBytes(_aesIv);
+
                 // Create .uproj file
-                StreamReader read = new ("data\\project_template.txt");
-                string content = "";
-                while (!read.EndOfStream) 
-                {
-                    content += read.ReadLine() + '$';
-                }
-                read.Close();
-                // Replace specific elements
-                content = content.Replace("{ASSETS_PATH}", path + "\\assets");
-                content = content.Replace("{JSON_PATH}", path + "\\scenes\\new_scene\\locs.json");
-                content = content.Replace("{PROJECT_NAME}", name);
-                string[] file = content.Split('$');
-                StreamWriter write = new (path + "\\" + name + ".uproj");
-                for (int i = 0; i < file.Length; i++)
-                {
-                    write.WriteLine(file[i]);
-                }
-                write.Close();
+                FileStream stream = new FileStream($"{path}/{name}.uproj", FileMode.Create);
+                using BinaryWriter writer = new BinaryWriter(stream);
+                writer.Write(name); // Write project name
+                writer.Write(_aesKey); // Write project key
+                writer.Write(_aesIv); // Write project symmetrical vector
 
                 // Set file manager output to new project directory
-                ((Container)UI.Components["fileManager"]).OutputFilePath = path + "\\assets\\models\\";
+                ((Container)UI.Components["fileManager"]).OutputFilePath = path + "/assets/models/";
                 // Set new window title
                 SetWindowTitle("Uniray - " + name);
-                // Create default camera
-                Camera3D camera = new()
-                {
-                    Position = Vector3.Zero,
-                    Target = Vector3.Zero,
-                    Up = Vector3.UnitY,
-                    Projection = CameraProjection.Perspective,
-                    FovY = 90
-                };
 
                 // Create new empty scene (except camera)
-                UCamera ucamera = new UCamera("Default camera", camera);
+                UCamera ucamera = new UCamera("Default camera", UCamera.DefaultCamera);
                 Scene defaultScene = new Scene("PLACEHOLDER", new List<GameObject3D> { ucamera });
                 List<Scene> scenes = new() { defaultScene };
-                CurrentProject = new Project(name, path + "\\" + name + ".uproj", scenes); // Create project
+                CurrentProject = new Project(name, path + "/" + name + ".uproj", scenes, new byte[DatEncoder.AES_KEY_LENGTH], new byte[DatEncoder.AES_IV_LENGTH]); // Create project
 
                 Ressource = new Ressource(); // Init ressource lists
                 CurrentScene = CurrentProject.GetScene(0); // Set current scene to default

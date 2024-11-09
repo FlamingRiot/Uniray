@@ -175,15 +175,6 @@ namespace Uniray
                 ClickedUnits.ForEach(DeleteUnit);
             }
 
-            // Debug Pak Files
-            if (IsKeyPressed(KeyboardKey.P))
-            {
-               PakArchive.CreatePakFile(CurrentFolder, "fold.pak");
-
-                PakReader reader = new PakReader("fold.pak");
-                Model t = reader.LoadModelFromPak("tree");
-            }
-
             // Check for renaming on F2
             if (IsKeyPressed(KeyboardKey.F2))
             {
