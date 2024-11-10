@@ -381,12 +381,15 @@ namespace Uniray
                     Component box = Uniray.UI.Components["textureTextbox"];
                     if (Hover(box.X, box.Y, box.Width, box.Height))
                     {
-                        // Check if texture
-                        if (UData.SelectedFiles[0].Path.Split('.').Last() == "png") 
+                        if (UData.GameSimulation is null)
                         {
-                            if (UData.Selection.Count == 1 && UData.Selection.First() is UModel)
+                            // Check if texture
+                            if (UData.SelectedFiles[0].Path.Split('.').Last() == "png")
                             {
-                                ((UModel)UData.Selection.First()).SetTexture(UData.SelectedFiles[0].Name, Uniray.Ressource.GetTexture(UData.SelectedFiles[0].Name));
+                                if (UData.Selection.Count == 1 && UData.Selection.First() is UModel)
+                                {
+                                    ((UModel)UData.Selection.First()).SetTexture(UData.SelectedFiles[0].Name, Uniray.Ressource.GetTexture(UData.SelectedFiles[0].Name));
+                                }
                             }
                         }
                     }
