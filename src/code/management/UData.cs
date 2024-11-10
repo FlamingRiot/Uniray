@@ -21,6 +21,9 @@
         /// <summary>The currently selected game objects.</summary>
         internal static List<GameObject3D> Selection = new List<GameObject3D>();
 
+        /// <summary>The currently running game simulation.</summary>
+        internal static GameSimulation? GameSimulation;
+
         /// <summary>The exit code of the latest closed <see cref="Modal"/>.</summary>
         internal static int? LastModalExitCode;
     }

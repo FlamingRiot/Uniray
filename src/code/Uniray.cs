@@ -11,6 +11,7 @@ using System.Numerics;
 using Newtonsoft.Json;
 using Uniray.DatFiles;
 using static Uniray.UData;
+using System.Diagnostics;
 
 namespace Uniray
 {
@@ -43,21 +44,11 @@ namespace Uniray
         /// <summary>Built-in shaders of the engine.</summary>
         public static UShaders Shaders = new UShaders();
 
-        /// <summary>Defines whether a project is running or not.</summary>
-        public static bool RunningProject = false;
-
-        /// <summary>Render texture of the game simulation.</summary>
-        public static RenderTexture2D GameSimView;
-
-        /// <summary>Render rectangle of the game simulation.</summary>
-        public static Rectangle GameSimDestRectangle;
-
         // -----------------------------------------------------------
         // Private and internal instances
         // -----------------------------------------------------------
         private static RenderTexture2D _cameraView;
         private static Rectangle _cameraViewRec;
-        private static Rectangle _gameSimSourceRec;
         private static List<GameObject3D> _clipboard = new List<GameObject3D>();
 
         /// <summary>Initializes the <see cref="Uniray"/> engine.</summary>
@@ -305,14 +296,20 @@ namespace Uniray
             FileManager.Draw();
 
             // Render the selected camera POV to the top right corner of the screen
-            if (Selection.Count == 1 && Selection.First() is UCamera cam && !RunningProject)
+            if (Selection.Count == 1 && Selection.First() is UCamera cam && UData.GameSimulation is null)
             {
                 DrawRectangleLinesEx(new Rectangle(Program.Width - Program.Width / 5 - 11, 9, Program.Width / 5 + 2, Program.Height / 5 + 2), 2, Color.White);
                 DrawTexturePro(_cameraView.Texture, _cameraViewRec, new Rectangle(Program.Width - Program.Width / 5 - 10, 10, Program.Width / 5, Program.Height / 5), Vector2.Zero, 0, Color.White);
             }
-            if (RunningProject)
+            if (UData.GameSimulation is not null)
             {
-                DrawTexturePro(GameSimView.Texture, _gameSimSourceRec, GameSimDestRectangle, Vector2.Zero, 0, Color.White);
+                DrawTexturePro(GameSimulation.GameSimView.Texture, GameSimulation.SourceRectangle, GameSimulation.DestinationRectangle, Vector2.Zero, 0, Color.White);
+            }
+
+            // Draw game debugger if displayed
+            if (UData.GameSimulation is not null)
+            {
+                GameDebugger.Update();
             }
 
             // Draw the currently displayed modal and define its state
@@ -491,18 +488,35 @@ namespace Uniray
         private static void GenSimulationView()
         {
             // Game simulation view
-            _gameSimSourceRec = new Rectangle(0, 0, Program.Width, -Program.Height);
+            GameSimulation.SourceRectangle = new Rectangle(0, 0, Program.Width, -Program.Height);
             int renderHeight = Program.Height - (UI.Components["fileManager"].Height + 20);
             float renderRatio = (float)Program.Height / renderHeight;
             float renderWidth = Program.Width / (float)renderRatio;
-            GameSimView = LoadRenderTexture(Program.Width, Program.Height);
-            GameSimDestRectangle = new Rectangle(UI.Components["gameManager"].Width + 20, 0,
+            GameSimulation.GameSimView = LoadRenderTexture(Program.Width, Program.Height);
+            GameSimulation.DestinationRectangle = new Rectangle(UI.Components["gameManager"].Width + 20, 0,
                 renderWidth,
                 renderHeight);
         }
 
+        /// <summary>Starts the game simulation.</summary>
+        public static void StartGameSimulation()
+        {
+            if (CurrentProject is not null)
+            {
+                UData.GameSimulation = new GameSimulation(); // Start game simulation
+                GameDebugger.Init(RayGUI.Font, new Vector2(GameSimulation.DestinationRectangle.X + GameSimulation.DestinationRectangle.Width, 0)); // Init game debugger
+            }
+        }
+
+        /// <summary>Stops the game simulation.</summary>
+        public static void StopGameSimulation()
+        {
+            GameDebugger.Close();
+            UData.GameSimulation = null;
+        }
+
         /// <summary>Runs the current project's game.</summary>
-        public static void RunGame()
+        public static void RunGameSimulation()
         {
             // Draw scene game objects
             foreach (UModel model in CurrentScene.GameObjects.Where(x => x is UModel))

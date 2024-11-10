@@ -50,6 +50,7 @@ namespace Uniray
 
             // Init the GUI library with the two main colors of the application
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, LoadFont("data/font/Ubuntu-Regular.ttf"));
+            SetDefaultFontSize(15);
 
             // Set 3D camera for the default scene
             Camera3D camera = RLoading.LoadCamera();
@@ -75,7 +76,7 @@ namespace Uniray
             {
                 if (IsKeyPressed(KeyboardKey.F5))
                 {
-                    if (UData.CurrentProject is not null) Uniray.RunningProject = true;
+                    Uniray.StartGameSimulation();
                 }
 
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.S))
@@ -83,10 +84,10 @@ namespace Uniray
                     Uniray.SaveProject();
                 }
 
-                // =========================================================================================================================================================
-                // ============================================================= MANAGE 3D ENVIRONMENT =====================================================================
-                // =========================================================================================================================================================
-                
+                // -----------------------------------------------------------
+                // Manage environment updating
+                // -----------------------------------------------------------
+
                 if (Hover(Uniray.UI.Components["gameManager"].X + Uniray.UI.Components["gameManager"].Width + 
                     10, 0, Width - Uniray.UI.Components["gameManager"].Width - 20, Height - Uniray.UI.Components["fileManager"].Height - 20))
                 {
@@ -122,21 +123,21 @@ namespace Uniray
                     }
                     Conceptor3D.EnvCamera = camera;
                 }
-                // =========================================================================================================================================================
-                // ============================================================= MANAGE OVERALL DRAWING ====================================================================
-                // =========================================================================================================================================================
+                // -----------------------------------------------------------
+                // Manage application overall rendering
+                // -----------------------------------------------------------
 
                 BeginDrawing();
 
                 ClearBackground(Uniray.APPLICATION_COLOR);
 
-                if (Uniray.RunningProject)
+                if (UData.GameSimulation is not null)
                 {
-                    BeginTextureMode(Uniray.GameSimView);
+                    BeginTextureMode(GameSimulation.GameSimView);
                     ClearBackground(Uniray.APPLICATION_COLOR);
                     BeginMode3D(UData.CurrentScene.Camera.Camera);
                     DrawSkybox();
-                    Uniray.RunGame();
+                    Uniray.RunGameSimulation();
                     EndMode3D();
                     EndTextureMode();
                 }
