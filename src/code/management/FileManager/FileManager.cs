@@ -344,33 +344,36 @@ namespace Uniray
                     // Check if in 3D conceptor
                     if (mouse.X > Uniray.UI.Components["gameManager"].Width + 20 && mouse.Y < Uniray.UI.Components["fileManager"].Y - 10 && UData.SelectedFiles.Count == 1)
                     {
-                        // Check if model
-                        if (UData.SelectedFiles[0].Path.Split('.').Last() == "m3d")
+                        if (UData.GameSimulation is null)
                         {
-                            string modelKey = UData.SelectedFiles[0].Name;
-                            // Import model into the scene
-                            if (Uniray.Ressource.ModelExists(modelKey))
+                            // Check if model
+                            if (UData.SelectedFiles[0].Path.Split('.').Last() == "m3d")
                             {
-                                UData.CurrentScene.GameObjects.Add(new UModel(
-                                    "[New model]",
-                                    Conceptor3D.EnvCamera.Position + GetCameraForward(ref Conceptor3D.EnvCamera) * 5,
-                                    Uniray.Ressource.GetModel(modelKey).Meshes[0],
-                                    modelKey));
-                            }
-                            else
-                            {
-                                // Reset materials
-                                Model m = LoadModel(UData.SelectedFiles[0].Path);
-                                for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                                    m.Meshes[0].Colors[j] = 255;
-                                UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
-                                // Add model
-                                Uniray.Ressource.AddModel(m, modelKey);
-                                UData.CurrentScene.GameObjects.Add(new UModel(
-                                    "[New model]",
-                                    Conceptor3D.EnvCamera.Position + GetCameraForward(ref Conceptor3D.EnvCamera) * 5,
-                                    Uniray.Ressource.GetModel(modelKey).Meshes[0],
-                                    modelKey));
+                                string modelKey = UData.SelectedFiles[0].Name;
+                                // Import model into the scene
+                                if (Uniray.Ressource.ModelExists(modelKey))
+                                {
+                                    UData.CurrentScene.GameObjects.Add(new UModel(
+                                        "[New model]",
+                                        Conceptor3D.EnvCamera.Position + GetCameraForward(ref Conceptor3D.EnvCamera) * 5,
+                                        Uniray.Ressource.GetModel(modelKey).Meshes[0],
+                                        modelKey));
+                                }
+                                else
+                                {
+                                    // Reset materials
+                                    Model m = LoadModel(UData.SelectedFiles[0].Path);
+                                    for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                                        m.Meshes[0].Colors[j] = 255;
+                                    UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+                                    // Add model
+                                    Uniray.Ressource.AddModel(m, modelKey);
+                                    UData.CurrentScene.GameObjects.Add(new UModel(
+                                        "[New model]",
+                                        Conceptor3D.EnvCamera.Position + GetCameraForward(ref Conceptor3D.EnvCamera) * 5,
+                                        Uniray.Ressource.GetModel(modelKey).Meshes[0],
+                                        modelKey));
+                                }
                             }
                         }
                     }
