@@ -43,11 +43,21 @@ namespace Uniray
         /// <summary>Built-in shaders of the engine.</summary>
         public static UShaders Shaders = new UShaders();
 
+        /// <summary>Defines whether a project is running or not.</summary>
+        public static bool RunningProject = false;
+
+        /// <summary>Render texture of the game simulation.</summary>
+        public static RenderTexture2D GameSimView;
+
+        /// <summary>Render rectangle of the game simulation.</summary>
+        public static Rectangle GameSimDestRectangle;
+
         // -----------------------------------------------------------
         // Private and internal instances
         // -----------------------------------------------------------
         private static RenderTexture2D _cameraView;
         private static Rectangle _cameraViewRec;
+        private static Rectangle _gameSimSourceRec;
         private static List<GameObject3D> _clipboard = new List<GameObject3D>();
 
         /// <summary>Initializes the <see cref="Uniray"/> engine.</summary>
@@ -77,6 +87,9 @@ namespace Uniray
             // Create the render texture for preview of a camera's POV
             _cameraView = LoadRenderTexture(Program.Width / 2, Program.Height / 2);
             _cameraViewRec = new Rectangle(0, 0, Program.Width / 2, -(Program.Height / 2));
+
+            // Simulation View
+            GenSimulationView();
 
             // Set default asset folder
             FileManager.CurrentFolder = FileManager.ModelFolder;
@@ -275,7 +288,8 @@ namespace Uniray
             {
                 Program.Width = GetScreenWidth();
                 Program.Height = GetScreenHeight();
-                UI = new UI();   
+                UI = new UI();
+                GenSimulationView();
             }
             // Draw the outline rectangles that appear behind the main panels
             DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.25f), Program.Height, BACKGROUND_COLOR);
@@ -291,10 +305,14 @@ namespace Uniray
             FileManager.Draw();
 
             // Render the selected camera POV to the top right corner of the screen
-            if (Selection.Count == 1 && Selection.First() is UCamera cam)
+            if (Selection.Count == 1 && Selection.First() is UCamera cam && !RunningProject)
             {
                 DrawRectangleLinesEx(new Rectangle(Program.Width - Program.Width / 5 - 11, 9, Program.Width / 5 + 2, Program.Height / 5 + 2), 2, Color.White);
                 DrawTexturePro(_cameraView.Texture, _cameraViewRec, new Rectangle(Program.Width - Program.Width / 5 - 10, 10, Program.Width / 5, Program.Height / 5), Vector2.Zero, 0, Color.White);
+            }
+            if (RunningProject)
+            {
+                DrawTexturePro(GameSimView.Texture, _gameSimSourceRec, GameSimDestRectangle, Vector2.Zero, 0, Color.White);
             }
 
             // Draw the currently displayed modal and define its state
@@ -327,11 +345,6 @@ namespace Uniray
                             break;
                     }
                 }
-            }
-            // Check the shortcut for game building
-            if (IsKeyPressed(KeyboardKey.F5))
-            {
-                CurrentProject?.Build();
             }
         }
 
@@ -472,6 +485,30 @@ namespace Uniray
                 scenes.Add(scene);
             }
             return scenes;
+        }
+
+        /// <summary>Generates the simulation view for game simulation.</summary>
+        private static void GenSimulationView()
+        {
+            // Game simulation view
+            _gameSimSourceRec = new Rectangle(0, 0, Program.Width, -Program.Height);
+            int renderHeight = Program.Height - (UI.Components["fileManager"].Height + 20);
+            float renderRatio = (float)Program.Height / renderHeight;
+            float renderWidth = Program.Width / (float)renderRatio;
+            GameSimView = LoadRenderTexture(Program.Width, Program.Height);
+            GameSimDestRectangle = new Rectangle(UI.Components["gameManager"].Width + 20, 0,
+                renderWidth,
+                renderHeight);
+        }
+
+        /// <summary>Runs the current project's game.</summary>
+        public static void RunGame()
+        {
+            // Draw scene game objects
+            foreach (UModel model in CurrentScene.GameObjects.Where(x => x is UModel))
+            {
+                DrawMesh(model.Mesh, model.Material, model.Transform);
+            }
         }
     }
 }

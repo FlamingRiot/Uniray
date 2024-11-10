@@ -83,7 +83,7 @@ namespace Uniray
 
             // Play/Build button
             Button playButton = new Button("Play", (Program.Width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, "play");
-            playButton.Event = BuildProject;
+            playButton.Event = StartGame;
             Components.Add("playButton", playButton);
 
             // Upstream folder button
@@ -245,15 +245,11 @@ namespace Uniray
             }
             ((Label)Components["ressourceInfoLabel"]).Text = "File type: .cs";
         }
-        private void BuildProject()
+
+        /// <summary>Starts game simulation.</summary>
+        private void StartGame()
         {
-            if (UData.CurrentProject is not null)
-            {
-                // Build and run project here...
-                string projectPath = UData.CurrentProject.ProjectFolder;
-                string commmand = "/C cd " + projectPath + " && dotnet run --project uniray_Project.csproj";
-                System.Diagnostics.Process.Start("CMD.exe", commmand);
-            }
+            if (UData.CurrentProject is not null) Uniray.RunningProject = true;
         }
 
         /// <summary>

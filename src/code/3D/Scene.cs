@@ -9,6 +9,9 @@ namespace Uniray
         /// <summary>Name of the scene.</summary>
         public string Name;
 
+        /// <summary>Camera of the scene.</summary>
+        public UCamera Camera;
+
         /// <summary>Game objects of the scene.</summary>
         public List<GameObject3D> GameObjects;
 
@@ -16,6 +19,7 @@ namespace Uniray
         public Scene()
         {
             GameObjects = new List<GameObject3D>();
+            Camera = new UCamera();
             Name = "";
         }
 
@@ -24,6 +28,8 @@ namespace Uniray
         public Scene(string name, List<GameObject3D> gameObjects)
         {
             GameObjects = gameObjects;
+            if (gameObjects.Count != 0) Camera = (UCamera)gameObjects.Where(x => x is UCamera).ToList().First();
+            else Camera = new UCamera();
             Name = name;
         }
 

@@ -73,6 +73,11 @@ namespace Uniray
 #endif
             while (!WindowShouldClose())
             {
+                if (IsKeyPressed(KeyboardKey.F5))
+                {
+                    if (UData.CurrentProject is not null) Uniray.RunningProject = true;
+                }
+
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.S))
                 {
                     Uniray.SaveProject();
@@ -123,22 +128,26 @@ namespace Uniray
 
                 BeginDrawing();
 
-                ClearBackground(new Color(70, 70, 70, 255));
+                ClearBackground(Uniray.APPLICATION_COLOR);
 
-                BeginMode3D(camera);
-
-                DrawGrid(10, 10);
-
-                // Draw the external skybox 
-                Rlgl.DisableBackfaceCulling();
-                Rlgl.DisableDepthMask();
-                DrawMesh(Skybox, Uniray.Shaders.SkyboxMaterial, Raymath.MatrixIdentity());
-                Rlgl.EnableBackfaceCulling();
-                Rlgl.EnableDepthMask();
-
-                if (UData.CurrentProject is not null) Uniray.DrawScene();
-
-                EndMode3D();
+                if (Uniray.RunningProject)
+                {
+                    BeginTextureMode(Uniray.GameSimView);
+                    ClearBackground(Uniray.APPLICATION_COLOR);
+                    BeginMode3D(UData.CurrentScene.Camera.Camera);
+                    DrawSkybox();
+                    Uniray.RunGame();
+                    EndMode3D();
+                    EndTextureMode();
+                }
+                else
+                {
+                    BeginMode3D(camera);
+                    DrawSkybox();
+                    DrawGrid(10, 10);
+                    Uniray.DrawScene();
+                    EndMode3D();
+                }
 
                 Uniray.DrawUI();
 
@@ -246,6 +255,17 @@ namespace Uniray
                 Thread.CurrentThread.CurrentCulture = clone;
                 Thread.CurrentThread.CurrentUICulture = clone;
             }
+        }
+        
+        /// <summary>Draws a skybox into a 3D context.</summary>
+        static void DrawSkybox()
+        {
+            // Draw the external skybox 
+            Rlgl.DisableBackfaceCulling();
+            Rlgl.DisableDepthMask();
+            DrawMesh(Skybox, Uniray.Shaders.SkyboxMaterial, Raymath.MatrixIdentity());
+            Rlgl.EnableBackfaceCulling();
+            Rlgl.EnableDepthMask();
         }
     }
 }
