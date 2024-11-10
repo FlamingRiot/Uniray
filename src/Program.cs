@@ -4,6 +4,7 @@ using Raylib_cs;
 using System.Numerics;
 using System.Globalization;
 using Uniray.Managment;
+using System.Security.Permissions;
 
 namespace Uniray
 {
@@ -26,6 +27,12 @@ namespace Uniray
         /// <param name="args">Passed arguments from the outside.</param>
         unsafe static void Main(string[] args)
         {
+            if (args.Length > 0) // Change working directory if opened externally
+            {
+                string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                Environment.CurrentDirectory = appDirectory;
+            }
+
             // Initialize window and set mode
             InitWindow(1800, 900, "Uniray - New Project");
             SetWindowState(ConfigFlags.ResizableWindow);
@@ -52,6 +59,9 @@ namespace Uniray
             
             // Set camera motion object
             CameraMotion motion = new(2f, (short)Width, (short)Height);
+
+            // Load project if opened externally
+            if (args.Length > 0) Uniray.LoadProject(args[0]);
 
             // Maximize window
             SetWindowState(ConfigFlags.MaximizedWindow);
