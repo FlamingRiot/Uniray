@@ -1,7 +1,0 @@
-<Project>
-	<name>{PROJECT_NAME}</name>
-	<Scene>
-		<name>new_scene</name>
-		<GameObjects>{JSON_PATH}</GameObjects>
-	</Scene>
-</Project>

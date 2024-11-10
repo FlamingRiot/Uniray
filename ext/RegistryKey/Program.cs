@@ -24,7 +24,6 @@ class Program
         openKey.SetValue("", $"\"{appPath}\" \"%1\"");
 
 
-
         // Création des clés de registre pour l'extension de fichier
         Registry.SetValue($@"HKEY_CLASSES_ROOT\{fileExtension}", "", appName);
         Registry.SetValue($@"HKEY_CLASSES_ROOT\{appName}\DefaultIcon", "", iconPath);
