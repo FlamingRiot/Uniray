@@ -3,6 +3,7 @@ using System.Numerics;
 
 namespace Uniray
 {
+    /// <summary>Represents an instance of <see cref="UCamera"/>.</summary>
     public class UCamera : GameObject3D
     {
         /// <summary>Default <see cref="Camera3D"/> configuration.</summary>
@@ -15,50 +16,25 @@ namespace Uniray
             FovY = 90
         };
 
-        /// <summary>
-        /// Yaw rotation
-        /// </summary>
-        private float yaw;
-        /// <summary>
-        /// Pitch rotation
-        /// </summary>
-        private float pitch;
-        /// <summary>
-        /// Roll rotation
-        /// </summary>
-        private float roll;
-        /// <summary>
-        /// 3-Dimensional camera
-        /// </summary>
-        private Camera3D camera;
-        /// <summary>
-        /// Model transform matrix
-        /// </summary>
-        private Matrix4x4 transform;
-        /// <summary>
-        /// Yaw rotation
-        /// </summary>
-        public float Yaw { get { return yaw; } set { yaw = value; } }
-        /// <summary>
-        /// Pitch rotation
-        /// </summary>
-        public float Pitch { get { return pitch; } set { pitch = value; } }
-        /// <summary>
-        /// Roll rotation
-        /// </summary>
-        public float Roll { get { return roll; } set { roll = value; } }
-        /// <summary>
-        /// 3-Dimensional camera
-        /// </summary>
-        public Camera3D Camera { get { return camera; } set { camera = value; } }
-        /// <summary>
-        /// 3-Dimensional target of the camera
-        /// </summary>
-        public Vector3 Target { get { return camera.Target; } set { camera.Target = value; } }
-        /// <summary>
-        /// Model transform matrix
-        /// </summary>
-        public Matrix4x4 Transform { get { return transform; } set { transform = value; } }
+        // -----------------------------------------------------------
+        // Private attributes
+        // -----------------------------------------------------------
+
+        private Vector3 _rotation;
+        private Camera3D _camera;
+
+        // -----------------------------------------------------------
+        // Public properties
+        // -----------------------------------------------------------
+
+        /// <summary>Pitch rotation.</summary>
+        public float Pitch { get { return _rotation.X; } set { _rotation.X = value; } }
+        /// <summary>Yaw rotation.</summary>
+        public float Yaw { get { return _rotation.Y; } set { _rotation.Y = value; } }
+        /// <summary>Roll rotation.</summary>
+        public float Roll { get { return _rotation.Z; } set { _rotation.Z = value; } }
+        /// <summary>3-Dimensional camera.</summary>
+        public Camera3D Camera { get { return _camera; } set { _camera = value; } }
         /// <summary>
         /// 3-Dimensional position of the camera
         /// </summary>
@@ -76,25 +52,20 @@ namespace Uniray
                 transform.M34 = value.Z;
             }
         }
-        /// <summary>
-        /// UCamera default Constructor
-        /// </summary>
+        /// <summary>Creates an empty instance of <see cref="UCamera"/>.</summary>
         public UCamera() : base() { }
-        /// <summary>
-        /// UCamera Constructor
-        /// </summary>
+
+        /// <summary>Creates an instance of <see cref="UCamera"/>.</summary>
         /// <param name="name">Object name</param>
         /// <param name="position">Object position</param>
         /// <param name="camera">Object camera</param>
         public UCamera(string name, Camera3D camera):base(name, camera.Position) 
         {
             Camera = camera;
-            transform = Matrix4x4.Identity;
         }
-        /// <summary>
-        /// Send object informations
-        /// </summary>
-        /// <returns></returns>
+
+        /// <summary>Returns informations about the current instance.</summary>
+        /// <returns>Informations as a <see langword="string"/>.</returns>
         public override string ToString()
         {
             return "Name: " + Name + " Position: " + Position + " Target: " + Camera.Target;

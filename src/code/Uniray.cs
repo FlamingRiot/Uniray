@@ -8,16 +8,14 @@ using static RayGUI_cs.RayGUI;
 using RayGUI_cs;
 // Other
 using System.Numerics;
-using Newtonsoft.Json;
 using Uniray.DatFiles;
 using static Uniray.UData;
-using System.Diagnostics;
 
 namespace Uniray
 {
     /// <summary>Represents an instance of the Uniray application.</summary>
     public static unsafe class Uniray
-    { 
+    {
         // -----------------------------------------------------------
         // Constants and static instances
         // -----------------------------------------------------------

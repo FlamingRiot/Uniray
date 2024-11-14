@@ -1,78 +1,67 @@
-﻿using System.Numerics;
+﻿using Raylib_cs;
+using System.Numerics;
 
 namespace Uniray
 {
+    /// <summary>Reprsents an instance of <see cref="GameObject3D"/>.</summary>
     public abstract class GameObject3D
     {
-        /// <summary>
-        /// Name of the object
-        /// </summary>
-        private string name;
-        /// <summary>
-        /// Behaviour of the object
-        /// </summary>
-        private Behaviour? behaviour;
-        /// <summary>
-        /// Name of the object
-        /// </summary>
-        public string Name { get { return name; } set { name = value; } }
-        /// <summary>
-        /// 3-Dimensional position of the object
-        /// </summary>
+        // -----------------------------------------------------------
+        // Public attributes
+        // -----------------------------------------------------------
+        /// <summary>Transformative matrix of the object.</summary>
+        public Matrix4x4 Transform;
+        /// <summary>Name of the object.</summary>
+        public string Name;
+        /// <summary>Behvior of the object.</summary>
+        public Behavior? Behavior;
+        /// <summary>3-Dimensional object position.</summary>
         abstract public Vector3 Position { get; set; }
-        /// <summary>
-        /// Behaviour of the object
-        /// </summary>
-        public Behaviour? Behaviour { get { return behaviour; } set { behaviour = value; } }
-        /// <summary>
-        /// X Position of the vector
-        /// </summary>
-        public float X { get { return Position.X; } set { Position = new Vector3(value, Position.Y, Position.Z); } }
-        /// <summary>
-        /// Y Position of the vector
-        /// </summary>
-        public float Y { get { return Position.Y; } set { Position = new Vector3(Position.X, value, Position.Z); } }
-        /// <summary>
-        /// Z Position of the vector
-        /// </summary>
-        public float Z { get { return Position.Z; } set { Position = new Vector3(Position.X, Position.Y, value); } }
-        /// <summary>
-        /// GameObject3D default constructor
-        /// </summary>
+
+        // -----------------------------------------------------------
+        // Public properties
+        // -----------------------------------------------------------
+        /// <summary>X Position of the object.</summary>
+        public float X { get { return Transform.M14; } set { Transform.M14 = value; } }
+        /// <summary>X Position of the object.</summary>
+        public float Y { get { return Transform.M24; } set { Transform.M24 = value; } }
+        /// <summary>X Position of the object.</summary>
+        public float Z { get { return Transform.M34; } set { Transform.M34 = value; } }
+
+        /// <summary>Creates an instance of <see cref="GameObject3D"/>.</summary>
         public GameObject3D() 
         {
-            this.name = "";
-            this.Position = new Vector3();
+            Name = "";
+            Transform = Raymath.MatrixIdentity(); // Get identity (default) matrix
         }
-        /// <summary>
-        /// GameObject3D Constructor
-        /// </summary>
+
+        /// <summary>Creates an instance of <see cref="GameObject3D"/>.</summary>
         /// <param name="name">Object name</param>
         /// <param name="position">Object position</param>
         public GameObject3D(string name, Vector3 position)
         {
-            this.name = name;
-            this.Position = position;
+            Name = name;
+            Transform = Raymath.MatrixIdentity(); // Get identity (default) matrix
+            Position = position;
         }
-        /// <summary>
-        /// GameObject3D Constructor
-        /// </summary>
+
+        /// <summary>Creates an instance of <see cref="GameObject3D"/>.</summary>
         /// <param name="name">Object name</param>
         /// <param name="position">Object position</param>
         /// <param name="behaviour">Object behaviour script</param>
-        public GameObject3D(string name, Vector3 position, Behaviour? behaviour)
+        public GameObject3D(string name, Vector3 position, Behavior? behavior)
         {
-            this.name = name;
-            this.Position = position;
-            this.behaviour = behaviour;
+            Name = name;
+            Transform = Raymath.MatrixIdentity(); // Get identity (default) matrix
+            Position = position;
+            Behavior = behavior;
         }
-        /// <summary>
-        /// Send object informations
-        /// </summary>
-        /// <returns>Stringified informations</returns>
+
+        /// <summary>Returns informations about the current instance.</summary>
+        /// <returns>Informations as a <see langword="string"/>.</returns>
         public override string ToString()
         {
-            return "Name : " + this.name + " Position : ";
+            return "Name : " + Name + " Position : ";
         }
     }
 }

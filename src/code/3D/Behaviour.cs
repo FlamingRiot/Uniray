@@ -1,6 +1,6 @@
 ﻿namespace Uniray
 {
-    public class Behaviour
+    public class Behavior
     {
         public void Start()
         {
