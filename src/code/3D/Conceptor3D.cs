@@ -116,27 +116,45 @@ namespace Uniray
 
         /// <summary>Checks whether a collision between the mouse and a <see cref="GameObject3D"/> occurs or not.</summary>
         /// <param name="go"><see cref="GameObject3D"/> to use.</param>
-        /// <param name="mesh">Mesh to use</param>
-        /// <param name="transform">Transform to use.</param>
         /// <returns><see langword="true"/> if a collision occurs. <see langword="false"/> otherwise.</returns>
-        public static int CheckCollisionScreenToWorld(GameObject3D go, Mesh mesh, Matrix4x4 transform)
+        public static int CheckCollisionScreenToWorld(GameObject3D go)
         {
-            if (mouse.X > Uniray.UI.Components["gameManager"].X + Uniray.UI.Components["gameManager"].Width && mouse.Y < Uniray.UI.Components["fileManager"].Y - 10 && IsMouseButtonPressed(MouseButton.Left))
+            if (IsMouseButtonPressed(MouseButton.Left))
             {
-                _mouseRayCollision = GetRayCollisionMesh(_mouseRay, mesh, transform);
-                if (_mouseRayCollision.Hit)
+                if (mouse.X > Uniray.UI.Components["gameManager"].X + Uniray.UI.Components["gameManager"].Width && mouse.Y < Uniray.UI.Components["fileManager"].Y - 10)
                 {
-                    return UData.CurrentScene.GameObjects.IndexOf(go);
+                    // Type cast
+                    switch (go)
+                    {
+                        case UModel model:
+                            for (int i = 0; i < model.MeshCount; i++)
+                            {
+                                if (!_mouseRayCollision.Hit) _mouseRayCollision = GetRayCollisionMesh(_mouseRay, model.Meshes[i], model.Transform);
+                            }
+                            break;
+                        case UCamera camera:
+                            unsafe
+                            {
+                                _mouseRayCollision = GetRayCollisionMesh(_mouseRay, HardRessource.Models["camera"].Meshes[0], camera.Transform);
+                            }
+                            break;
+                    }
+                    // Return hit information
+                    if (_mouseRayCollision.Hit)
+                    {
+                        return UData.CurrentScene.GameObjects.IndexOf(go);
+                    }
+                    else
+                    {
+                        return -1;
+                    }
                 }
                 else
                 {
                     return -1;
                 }
             }
-            else
-            {
-                return -1;
-            }
+            return -1;
         }
 
         /// <summary>Checks the distance between two <see cref="GameObject3D"/> and returns the closest index.</summary>

@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Globalization;
 using Uniray.Managment;
 using System.Security.Permissions;
+using Raylib_cs.Complements;
 
 namespace Uniray
 {
@@ -170,7 +171,7 @@ namespace Uniray
                 // Unload materials
                 foreach (GameObject3D go in UData.CurrentScene.GameObjects)
                 {
-                    if (go is UModel m) UnloadMaterial(m.Material);
+                    if (go is UModel m) RaylibComplements.UnloadUModel(m);
                 }
             }
             // Unload shaders

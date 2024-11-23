@@ -356,7 +356,6 @@ namespace Uniray
                                     UData.CurrentScene.GameObjects.Add(new UModel(
                                         "[New model]",
                                         Conceptor3D.EnvCamera.Position + GetCameraForward(ref Conceptor3D.EnvCamera) * 5,
-                                        Uniray.Ressource.GetModel(modelKey).Meshes[0],
                                         modelKey));
                                 }
                                 else
@@ -371,7 +370,6 @@ namespace Uniray
                                     UData.CurrentScene.GameObjects.Add(new UModel(
                                         "[New model]",
                                         Conceptor3D.EnvCamera.Position + GetCameraForward(ref Conceptor3D.EnvCamera) * 5,
-                                        Uniray.Ressource.GetModel(modelKey).Meshes[0],
                                         modelKey));
                                 }
                             }
@@ -388,7 +386,7 @@ namespace Uniray
                             {
                                 if (UData.Selection.Count == 1 && UData.Selection.First() is UModel)
                                 {
-                                    ((UModel)UData.Selection.First()).SetTexture(UData.SelectedFiles[0].Name, Uniray.Ressource.GetTexture(UData.SelectedFiles[0].Name));
+                                    ((UModel)UData.Selection.First()).SetTexture(UData.SelectedFiles[0].Name, 0);
                                 }
                             }
                         }

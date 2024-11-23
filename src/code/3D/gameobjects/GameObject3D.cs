@@ -15,12 +15,12 @@ namespace Uniray
         public string Name;
         /// <summary>Behvior of the object.</summary>
         public Behavior? Behavior;
-        /// <summary>3-Dimensional object position.</summary>
-        abstract public Vector3 Position { get; set; }
 
         // -----------------------------------------------------------
         // Public properties
         // -----------------------------------------------------------
+        /// <summary>3-Dimensional object position.</summary>
+        abstract public Vector3 Position { get; set; }
         /// <summary>X Position of the object.</summary>
         public float X { get { return Transform.M14; } set { Transform.M14 = value; } }
         /// <summary>X Position of the object.</summary>
@@ -32,7 +32,7 @@ namespace Uniray
         public GameObject3D() 
         {
             Name = "";
-            Transform = Raymath.MatrixIdentity(); // Get identity (default) matrix
+            Transform = Matrix4x4.Identity; // Get identity (default) matrix
         }
 
         /// <summary>Creates an instance of <see cref="GameObject3D"/>.</summary>
@@ -41,7 +41,7 @@ namespace Uniray
         public GameObject3D(string name, Vector3 position)
         {
             Name = name;
-            Transform = Raymath.MatrixIdentity(); // Get identity (default) matrix
+            Transform = Matrix4x4.Identity; // Get identity (default) matrix
             Position = position;
         }
 
@@ -52,7 +52,7 @@ namespace Uniray
         public GameObject3D(string name, Vector3 position, Behavior? behavior)
         {
             Name = name;
-            Transform = Raymath.MatrixIdentity(); // Get identity (default) matrix
+            Transform = Matrix4x4.Identity; // Get identity (default) matrix
             Position = position;
             Behavior = behavior;
         }

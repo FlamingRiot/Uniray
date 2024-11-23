@@ -10,6 +10,8 @@ using RayGUI_cs;
 using System.Numerics;
 using Uniray.DatFiles;
 using static Uniray.UData;
+using System.Reflection;
+using Uniray;
 
 namespace Uniray
 {
@@ -101,7 +103,10 @@ namespace Uniray
                 switch (go)
                 {
                     case UModel model:
-                        DrawMesh(model.Mesh, Shaders.OutlineMaterial, model.Transform);
+                        for (int i = 0; i < model.MeshCount; i++)
+                        {
+                            DrawMesh(model.Meshes[i], model.Materials[i], model.Transform);
+                        }
                         break;
                     case UCamera camera:
                         DrawMesh(HardRessource.Models["camera"].Meshes[0], Shaders.OutlineMaterial, camera.Transform);
@@ -115,16 +120,19 @@ namespace Uniray
             foreach (GameObject3D go in CurrentScene.GameObjects)
             {
                 // Manage objects drawing + object selection (according to the object type)
-                if (go is UModel)
+                if (go is UModel model)
                 {
-                    DrawMesh(((UModel)go).Mesh, ((UModel)go).Material, ((UModel)go).Transform);
-                    int i = Conceptor3D.CheckCollisionScreenToWorld(go, ((UModel)go).Mesh, ((UModel)go).Transform);
+                    for (int j = 0; j < model.MeshCount; j++)
+                    {
+                        DrawMesh(model.Meshes[j], model.Materials[j], model.Transform);
+                    }
+                    int i = Conceptor3D.CheckCollisionScreenToWorld(go);
                     index = Conceptor3D.CheckDistance(index, i);
                 }
                 else if (go is UCamera)
                 {
                     DrawMesh(HardRessource.Models["camera"].Meshes[0], HardRessource.Materials["camera"], ((UCamera)go).Transform);
-                    int i = Conceptor3D.CheckCollisionScreenToWorld(go, HardRessource.Models["camera"].Meshes[0], ((UCamera)go).Transform);
+                    int i = Conceptor3D.CheckCollisionScreenToWorld(go);
                     index = Conceptor3D.CheckDistance(index, i);
                 }
             }
@@ -179,7 +187,6 @@ namespace Uniray
                         UModel go = new UModel(
                             _clipboard[i].Name,
                             _clipboard[i].Position,
-                            Ressource.GetModel(((UModel)_clipboard[i]).ModelID).Meshes[0],
                             ((UModel)_clipboard[i]).ModelID,
                             ((UModel)_clipboard[i]).TextureID);
                         // Set the rotations of the model
@@ -252,13 +259,14 @@ namespace Uniray
                 EnableBackfaceCulling();
                 EnableDepthMask();
 
-                foreach (UModel go in CurrentScene.GameObjects.Where(x => x is UModel))
+                foreach (UModel model in CurrentScene.GameObjects.Where(x => x is UModel))
                 {
-                     DrawMesh(go.Mesh, go.Material, go.Transform);
+                    for (int j = 0; j < model.MeshCount; j++)
+                    {
+                        DrawMesh(model.Meshes[j], model.Materials[j], model.Transform);
+                    }
                 }
-
                 EndMode3D();
-                
                 EndTextureMode();
 
                 BeginMode3D(Conceptor3D.EnvCamera);
@@ -461,7 +469,7 @@ namespace Uniray
         /// <summary>Loads the scenes from a given directory.</summary>
         /// <param name="directory">Directory to retrives scenes from.</param>
         /// <returns>The list of scenes contained in the given directory.</returns>
-        public static List<Scene> LoadProjectScenes(string directory, byte[] key, byte[] iv)
+        private static List<Scene> LoadProjectScenes(string directory, byte[] key, byte[] iv)
         {
             string[] scenesPath = Directory.GetFiles(directory + "/scenes"); // Gets all .DAT files paths
             List<Scene> scenes = new List<Scene>();
@@ -473,8 +481,8 @@ namespace Uniray
                 {
                     if (model.ModelID != "")
                     {
-                        model.Mesh = Ressource.GetModel(model.ModelID).Meshes[0];
-                        if (model.TextureID != "") model.LoadTexture();
+                        model.LoadMeshes();
+                        model.LoadTextures();
                     }
                 }
                 scenes.Add(scene);
@@ -519,7 +527,10 @@ namespace Uniray
             // Draw scene game objects
             foreach (UModel model in CurrentScene.GameObjects.Where(x => x is UModel))
             {
-                DrawMesh(model.Mesh, model.Material, model.Transform);
+                for (int j = 0; j < model.MeshCount; j++)
+                {
+                    DrawMesh(model.Meshes[j], model.Materials[j], model.Transform);
+                }
             }
         }
     }
@@ -553,6 +564,22 @@ namespace Raylib_cs.Complements
                 return false;
             }
             return false;
+        }
+
+        /// <summary>Unloads a <see cref="UModel"/>'s ressources from the vRAM.</summary>
+        /// <param name="model"></param>
+        public static void UnloadUModel(UModel model)
+        {
+            // Unload meshes
+            for (int i = 0; i < model.MeshCount; i++) 
+            {
+                UnloadMesh(model.Meshes[i]);
+            }
+            // Unload materials
+            for (int i = 0; i < model.Materials.Length; i++) 
+            { 
+                UnloadMaterial(model.Materials[i]);
+            }
         }
     }
 }

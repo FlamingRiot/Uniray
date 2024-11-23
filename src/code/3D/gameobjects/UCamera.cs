@@ -17,48 +17,44 @@ namespace Uniray
         };
 
         // -----------------------------------------------------------
-        // Private attributes
+        // Public attributes
         // -----------------------------------------------------------
+        /// <summary>X Axis rotation.</summary>
+        public float Pitch;
+        /// <summary>Y Axis rotation</summary>
+        public float Yaw;
+        /// <summary>Z Axis rotation.</summary>
+        public float Roll;
 
-        private Vector3 _rotation;
-        private Camera3D _camera;
+        /// <summary>3-Dimensional camera.</summary>
+        public Camera3D Camera;
 
         // -----------------------------------------------------------
         // Public properties
         // -----------------------------------------------------------
 
-        /// <summary>Pitch rotation.</summary>
-        public float Pitch { get { return _rotation.X; } set { _rotation.X = value; } }
-        /// <summary>Yaw rotation.</summary>
-        public float Yaw { get { return _rotation.Y; } set { _rotation.Y = value; } }
-        /// <summary>Roll rotation.</summary>
-        public float Roll { get { return _rotation.Z; } set { _rotation.Z = value; } }
-        /// <summary>3-Dimensional camera.</summary>
-        public Camera3D Camera { get { return _camera; } set { _camera = value; } }
-        /// <summary>
-        /// 3-Dimensional position of the camera
-        /// </summary>
+        /// <summary>3-Dimensional position of the camera.</summary>
         public override Vector3 Position 
         { 
             get 
             { 
-                return camera.Position; 
+                return Camera.Position; 
             } 
             set 
             { 
-                camera.Position = value;
-                transform.M14 = value.X;
-                transform.M24 = value.Y;
-                transform.M34 = value.Z;
+                Camera.Position = value;
+                Transform.M14 = value.X;
+                Transform.M24 = value.Y;
+                Transform.M34 = value.Z;
             }
         }
+
         /// <summary>Creates an empty instance of <see cref="UCamera"/>.</summary>
-        public UCamera() : base() { }
+        public UCamera() : base() { Camera = DefaultCamera; }
 
         /// <summary>Creates an instance of <see cref="UCamera"/>.</summary>
-        /// <param name="name">Object name</param>
-        /// <param name="position">Object position</param>
-        /// <param name="camera">Object camera</param>
+        /// <param name="name">Object name.</param>
+        /// <param name="camera">Object camera.</param>
         public UCamera(string name, Camera3D camera):base(name, camera.Position) 
         {
             Camera = camera;
