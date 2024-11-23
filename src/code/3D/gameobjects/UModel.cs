@@ -184,12 +184,8 @@ namespace Uniray
             Roll = roll;
             // Calculate matrix rotation
             Matrix4x4 nm = Raymath.MatrixRotateXYZ(new Vector3(pitch / Raylib.RAD2DEG, yaw / Raylib.RAD2DEG, roll / Raylib.RAD2DEG));
-
-            nm.M14 = Position.X;
-            nm.M24 = Position.Y;
-            nm.M34 = Position.Z;
-
-            Transform = nm;
+            // Multiply matrices
+            Transform = Raymath.MatrixMultiply(Transform, nm);
         }
     }
 }

@@ -386,7 +386,7 @@ namespace Uniray
                             {
                                 if (UData.Selection.Count == 1 && UData.Selection.First() is UModel)
                                 {
-                                    ((UModel)UData.Selection.First()).SetTexture(UData.SelectedFiles[0].Name, 0);
+                                    ((UModel)UData.Selection.First()).SetTexture(UData.SelectedFiles[0].Name, 0); // INDEX 0 IS A PLACEHOLDER
                                 }
                             }
                         }
