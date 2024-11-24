@@ -162,10 +162,10 @@ namespace Uniray
             fileDD = new DropDown(10, 35, 160, fileDDS);
             fileDD.BackgroundColor = Uniray.SPECIAL_COLOR;
             // Set events
-            fileDD.SetButtonEvent("Create project", NewProject);
-            fileDD.SetButtonEvent("Open project", OpenProject);
-            fileDD.SetButtonEvent("Save project", Uniray.SaveProject);
-            fileDD.SetButtonEvent("Publish project", Project.Build);
+            fileDD.SetButtonEvent(0, NewProject);
+            fileDD.SetButtonEvent(1, OpenProject);
+            fileDD.SetButtonEvent(2, Uniray.SaveProject);
+            fileDD.SetButtonEvent(3, Project.Build);
         }
 
         /// <summary>Draws the full 2D UI of the application.</summary>
