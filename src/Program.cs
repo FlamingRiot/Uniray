@@ -4,7 +4,6 @@ using Raylib_cs;
 using System.Numerics;
 using System.Globalization;
 using Uniray.Managment;
-using System.Security.Permissions;
 using Raylib_cs.Complements;
 
 namespace Uniray

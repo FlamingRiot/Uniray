@@ -362,9 +362,9 @@ namespace Uniray
                                 {
                                     // Reset materials
                                     Model m = LoadModel(UData.SelectedFiles[0].Path);
-                                    for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                                        m.Meshes[0].Colors[j] = 255;
-                                    UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+                                    //for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                                    //    m.Meshes[0].Colors[j] = 255;
+                                    //UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
                                     // Add model
                                     Uniray.Ressource.AddModel(m, modelKey);
                                     UData.CurrentScene.GameObjects.Add(new UModel(

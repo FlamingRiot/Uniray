@@ -52,12 +52,7 @@ namespace Uniray
                         // Loop over every scene
                         UData.CurrentProject?.Scenes.ForEach(scene =>
                         {
-                            // Get objects with corresponding keys
-                            scene.GameObjects.Where(obj => obj is UModel).Where(obj => ((UModel)obj).TextureID == oldKey).ToList().ForEach(obj =>
-                            {
-                                // Replace with new key/name
-                                ((UModel)obj).TextureID = Name;
-                            });
+                            // Update something (created before removing TextureID)
                         });
                         break;
                 }

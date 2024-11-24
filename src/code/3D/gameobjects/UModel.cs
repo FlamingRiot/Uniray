@@ -23,8 +23,6 @@ namespace Uniray
         /// <summary>Z Axis rotation.</summary>
         public float Roll;
 
-        /// <summary>Texture ID in the dictionary.</summary>
-        public string TextureID;
         /// <summary>Model ID in the dictionary.</summary>
         public string ModelID;
 
@@ -54,7 +52,6 @@ namespace Uniray
         /// <summary>Creates an empty instance of <see cref="UModel"/>.</summary>
         public UModel() : base()
         {
-            TextureID = "";
             ModelID = "";
         }
 
@@ -66,44 +63,20 @@ namespace Uniray
             // Apply Model
             ModelID = modelID;
             LoadMeshes();
+            LoadMaterials();
 
-            // Load default textures
-            TextureID = "";
-            Materials = new Material[1];
-            Materials[0] = Raylib.LoadMaterialDefault();
-
+            // Position
             Transform = Matrix4x4.Identity;
             Position = position;
-        }
-
-        /// <summary>Creates an instance of <see cref="UModel"/>.</summary>
-        /// <param name="name">Object name</param>
-        /// <param name="position">Object position</param>
-        /// <param name="textureID">Object texture ID</param>
-        public UModel(string name, Vector3 position, string modelID, string textureID) : base(name, position)
-        {
-            // Apply Model
-            ModelID = modelID;
-            LoadMeshes();
-
-            // Load textures
-            TextureID = textureID;
-            LoadTextures();
-
-            Transform = Matrix4x4.Identity;
-            Position = position;
-            // Set the texture to the mesh
-            SetTexture(textureID, 0);
         }
 
         /// <summary>Sets the model texture.</summary>
         /// <param name="textureID">Texture ID to apply.</param>
         public void SetTexture(string textureID, int materialIndex)
         {
-            TextureID = textureID;
             try
             {
-                Texture2D texture = Uniray.Ressource.GetTexture(TextureID);
+                Texture2D texture = Uniray.Ressource.GetTexture(textureID);
                 Raylib.SetMaterialTexture(ref Materials[materialIndex], MaterialMapIndex.Diffuse, texture);
             }
             catch
@@ -111,34 +84,8 @@ namespace Uniray
 #if !DEBUG
                 ErrorHandler.Send(new Error(3, $"No texture found at given location -> {TextureID}"));
 #elif DEBUG
-                Raylib.TraceLog(TraceLogLevel.Warning, $"No texture found at given location -> {TextureID}");
+                Raylib.TraceLog(TraceLogLevel.Warning, $"No texture found at given location -> {textureID}");
 #endif
-            }
-        }
-
-        /// <summary>Applies the corresponding texture to the model (from ressources).</summary>
-        internal void LoadTextures()
-        {
-            if (TextureID != "")
-            {
-                try
-                {
-                    // Load default materials
-                    int materialCount = Uniray.Ressource.GetModel(ModelID).MeshCount;
-                    Materials = new Material[materialCount];
-                    for (int i = 0; i < materialCount; i++) Materials[i] = Raylib.LoadMaterialDefault();
-                    // Apply textures to loaded materials
-                    Texture2D texture = Uniray.Ressource.GetTexture(TextureID);
-                    Raylib.SetMaterialTexture(ref Materials[0], MaterialMapIndex.Diffuse, texture);
-                }
-                catch
-                {
-#if !DEBUG
-                ErrorHandler.Send(new Error(3, $"No texture found at registered location -> {TextureID}"));
-#elif DEBUG
-                    Raylib.TraceLog(TraceLogLevel.Warning, $"No texture found at registered location -> {TextureID}");
-#endif
-                }
             }
         }
 
@@ -157,12 +104,21 @@ namespace Uniray
                 catch
                 {
 #if !DEBUG
-                ErrorHandler.Send(new Error(3, $"No model found at registered location -> {ModelID}"));
+                    ErrorHandler.Send(new Error(3, $"No model found at registered location -> {ModelID}"));
 #elif DEBUG
                     Raylib.TraceLog(TraceLogLevel.Warning, $"No model found at registered location -> {ModelID}");
 #endif
                 }
             }
+        }
+
+        /// <summary>Loads personal materials (used for applying different shaders and effects).</summary>
+        internal void LoadMaterials()
+        {
+            int materialCount = Uniray.Ressource.GetModel(ModelID).MeshCount;
+            Materials = new Material[materialCount];
+            Material* materials = Uniray.Ressource.GetModel(ModelID).Materials;
+            for (int i = 0; i < materialCount; i++) Materials[i] = materials[i];
         }
 
         /// <summary>Returns informations about the current instance.</summary>

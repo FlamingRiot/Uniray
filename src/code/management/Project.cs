@@ -57,11 +57,14 @@ namespace Uniray
             return Scenes[index];
         }
 
-        /// <summary>Builds the project from an external window.</summary>
-        public void Build()
+        /// <summary>Builds the project to run externally.</summary>
+        public static void Build()
         {
-            string command = $"/C cd \"{ProjectFolder}\" && dotnet run --project uniray_Project.csproj";
-            System.Diagnostics.Process.Start("CMD.exe", command); // Run project externally
+            if (UData.CurrentProject is not null)
+            {
+                string command = $"/C cd \"{UData.CurrentProject.ProjectFolder}\" && dotnet run --project uniray_Project.csproj";
+                System.Diagnostics.Process.Start("CMD.exe", command); // Run project externally
+            }
         }
 
         /// <summary>Returns informations about the current instance.</summary>

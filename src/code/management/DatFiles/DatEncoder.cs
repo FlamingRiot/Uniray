@@ -219,7 +219,7 @@ namespace Uniray.DatFiles
                 if (go is UModel model)
                 {
                     modelsJson += "{" + "X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
-                    ",Pitch: " + model.Pitch + ",Roll: " + model.Roll + ",ModelID: \"" + model.ModelID + "\",TextureID: \"" + model.TextureID + "\", Transform:";
+                    ",Pitch: " + model.Pitch + ",Roll: " + model.Roll + ",ModelID: \"" + model.ModelID + "\", Transform:";
                     modelsJson += JsonConvert.SerializeObject(model.Transform);
                     modelsJson += "}, ";
                 }

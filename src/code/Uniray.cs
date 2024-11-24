@@ -10,7 +10,6 @@ using RayGUI_cs;
 using System.Numerics;
 using Uniray.DatFiles;
 using static Uniray.UData;
-using System.Reflection;
 using Uniray;
 
 namespace Uniray
@@ -108,7 +107,7 @@ namespace Uniray
                     case UModel model:
                         for (int i = 0; i < model.MeshCount; i++)
                         {
-                            DrawMesh(model.Meshes[i], model.Materials[i], model.Transform);
+                            DrawMesh(model.Meshes[i], Shaders.OutlineMaterial, model.Transform);
                         }
                         break;
                     case UCamera camera:
@@ -190,8 +189,7 @@ namespace Uniray
                         UModel go = new UModel(
                             _clipboard[i].Name,
                             _clipboard[i].Position,
-                            ((UModel)_clipboard[i]).ModelID,
-                            ((UModel)_clipboard[i]).TextureID);
+                            ((UModel)_clipboard[i]).ModelID);
                         // Set the rotations of the model
                         go.SetRotation(((UModel)_clipboard[i]).Pitch, ((UModel)_clipboard[i]).Yaw, ((UModel)_clipboard[i]).Roll);
                         // Set final position of the model
@@ -485,7 +483,7 @@ namespace Uniray
                     if (model.ModelID != "")
                     {
                         model.LoadMeshes();
-                        model.LoadTextures();
+                        model.LoadMaterials();
                     }
                 }
                 scenes.Add(scene);

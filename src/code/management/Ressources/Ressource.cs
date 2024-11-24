@@ -65,9 +65,9 @@ namespace Uniray
                 {
                     // Load the model and fix the material issue
                     Model m = Raylib.LoadModel(models[i].Path);
-                    for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
-                        m.Meshes[0].Colors[j] = 255;
-                    Raylib.UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
+                    //for (int j = 0; j < m.Meshes[0].VertexCount * 4; j++)
+                    //    m.Meshes[0].Colors[j] = 255;
+                    //Raylib.UpdateMeshBuffer(m.Meshes[0], 3, m.Meshes[0].Colors, m.Meshes[0].VertexCount * 4, 0);
 
                     // Add the model
                     _models.Add(models[i].Path.Split('/').Last().Split('.')[0], m);

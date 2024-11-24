@@ -156,6 +156,7 @@ namespace Uniray
                 "Create project",
                 "Open project",
                 "Save project",
+                "Publish project",
             };
 
             fileDD = new DropDown(10, 35, 160, fileDDS);
@@ -164,6 +165,7 @@ namespace Uniray
             fileDD.SetButtonEvent("Create project", NewProject);
             fileDD.SetButtonEvent("Open project", OpenProject);
             fileDD.SetButtonEvent("Save project", Uniray.SaveProject);
+            fileDD.SetButtonEvent("Publish project", Project.Build);
         }
 
         /// <summary>Draws the full 2D UI of the application.</summary>
