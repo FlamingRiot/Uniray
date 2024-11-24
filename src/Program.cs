@@ -37,7 +37,11 @@ namespace Uniray
             // Initialize window and set mode
             InitWindow(1800, 900, "Uniray - New Project");
             SetWindowState(ConfigFlags.ResizableWindow);
-            SetWindowIcon(LoadImageFromTexture(LoadTexture("data/logo.png")));
+
+            // Set window icon
+            Image icon = LoadImage("data/img/logo.png");
+            SetWindowIcon(icon);
+            UnloadImage(icon);
 
             // Set program state
             Uniray.State = ProgramState.Loading;
