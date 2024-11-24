@@ -14,6 +14,12 @@ namespace Uniray
         /// <summary>The list of every modal in the UI</summary>
         public Dictionary<string, Modal> Modals;
 
+        // -----------------------------------------------------------
+        // Background storred DropDown lists (to avoid GB overflow on show/hide)
+        // -----------------------------------------------------------
+
+        DropDown fileDD;
+
         /// <summary>Creates an instance of a <see cref="UI"/>.</summary>
         public UI()
         {
@@ -35,13 +41,17 @@ namespace Uniray
             Components.Add("fileManager", fileManager);
 
             // GameManager
-            Container gameManager = new Container(10, 10, cont1X - 20, Program.Height - 20, "gameManager");
+            Container gameManager = new Container(10, 40, cont1X - 20, Program.Height - 20, "gameManager");
             Components.Add("gameManager", gameManager);
 
             // Template modal
             _modalTemplate = new Container(Program.Width / 2 - Program.Width / 6, Program.Height / 2 - Program.Height / 6, Program.Width / 3, Program.Height / 3, "modal");
 
             // Buttons
+            Button fileDDButton = new Button("File", 10, 10, 60, 25, "fileDDButton");
+            fileDDButton.Event = ToggleFileDD;
+            Components.Add("fileDDButton", fileDDButton);
+
             // Models section
             Button modelButton = new Button("Models", fileManager.X + 10, fileManager.Y, 60, 25, "modelsSection");
             modelButton.Event = UpdateToModel;
@@ -68,18 +78,9 @@ namespace Uniray
             Components.Add("scriptsButton", scriptsButton);
 
             // Open File button
-            Button openFileButton = new Button("Open", fileManager.X + fileManager.Width - 70, fileManager.Y, 60, 25, "openExplorer"); //{ Type = ButtonType.PathFinder };
+            Button openFileButton = new Button("Open", fileManager.X + fileManager.Width - 70, fileManager.Y, 60, 25, "openExplorer");
+            openFileButton.Type = ButtonType.PathFinder;
             Components.Add("openFileButton", openFileButton);
-
-            // Open project button
-            Button openProjectButton = new Button("Open project", fileManager.X + fileManager.Width - 200, fileManager.Y, 125, 25, "openProject");
-            openProjectButton.Event = OpenProject;
-            Components.Add("openProjectButton", openProjectButton);
-
-            // New project button
-            Button newProjectButton = new Button("New project", fileManager.X + fileManager.Width - 328, fileManager.Y, 120, 25, "newProject");
-            newProjectButton.Event = NewProject;
-            Components.Add("newProjectButton", newProjectButton);
 
             // Play/Build button
             Button playButton = new Button("Play", (Program.Width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, "play");
@@ -146,6 +147,23 @@ namespace Uniray
             newProjModalComponents.Add("okModalButton", okModalButton);
 
             Modals.Add("newProjectModal", new Modal(newProjModalComponents));
+
+            // -----------------------------------------------------------
+            // DropDown lists instanciation
+            // -----------------------------------------------------------
+            List<string> fileDDS = new List<string>()
+            {
+                "Create project",
+                "Open project",
+                "Save project",
+            };
+
+            fileDD = new DropDown(10, 35, 160, fileDDS);
+            fileDD.BackgroundColor = Uniray.SPECIAL_COLOR;
+            // Set events
+            fileDD.SetButtonEvent("Create project", NewProject);
+            fileDD.SetButtonEvent("Open project", OpenProject);
+            fileDD.SetButtonEvent("Save project", Uniray.SaveProject);
         }
 
         /// <summary>Draws the full 2D UI of the application.</summary>
@@ -273,6 +291,13 @@ namespace Uniray
         private void NewProject()
         {
             UData.CurrentModal = "newProjectModal";
+        }
+
+        /// <summary>Toggles file DropDown list</summary>
+        private void ToggleFileDD()
+        {
+            if (Components.ContainsValue(fileDD)) Components.Remove("fileDD");
+            else Components.Add("fileDD", fileDD);
         }
     }
 }

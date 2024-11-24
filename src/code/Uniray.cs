@@ -32,6 +32,9 @@ namespace Uniray
         /// <summary>Primary color of the application.</summary>
         public static readonly Color APPLICATION_COLOR = new(41, 41, 41, 255);
 
+        /// <summary>Special color of the application.</summary>
+        public static readonly Color SPECIAL_COLOR = new(51, 51, 51, 255);
+
         /// <summary>Secondary color of the application.</summary>
         public static readonly Color FOCUS_COLOR = new(25, 25, 25, 255);
 
