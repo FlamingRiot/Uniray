@@ -24,6 +24,8 @@ namespace Uniray
         internal static int Height;
         internal static Mesh Skybox;
 
+        internal static int SPLASH_SIZE = 162; // Splash screen size (square)
+
         /// <summary>Enters the entrypoint of the program.</summary>
         /// <param name="args">Passed arguments from the outside.</param>
         unsafe static void Main(string[] args)
@@ -35,13 +37,21 @@ namespace Uniray
             }
 
             // Initialize window and set mode
-            InitWindow(1800, 900, "Uniray - New Project");
+            InitWindow(SPLASH_SIZE, SPLASH_SIZE, "Uniray - New Project");
             SetWindowState(ConfigFlags.ResizableWindow);
+            SetWindowState(ConfigFlags.UndecoratedWindow);
 
             // Set window icon
             Image icon = LoadImage("data/img/logo.png");
             SetWindowIcon(icon);
             UnloadImage(icon);
+
+            // Load splash screen
+            Texture2D splash = LoadTexture("data/img/splash.png");
+            BeginDrawing();
+            DrawTexture(splash, 0, 0, Color.White);
+            EndDrawing();
+            UnloadTexture(splash);
 
             // Set program state
             Uniray.State = ProgramState.Loading;
@@ -70,6 +80,7 @@ namespace Uniray
             if (args.Length > 0) Uniray.LoadProject(args[0]);
 
             // Maximize window
+            ClearWindowState(ConfigFlags.UndecoratedWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
 
             // Disable exit key
