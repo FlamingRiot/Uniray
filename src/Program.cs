@@ -55,8 +55,8 @@ namespace Uniray
             // Set program state
             Uniray.State = ProgramState.Loading;
 
-            Width = GetScreenWidth();
-            Height = GetScreenHeight();
+            Width = 1800;
+            Height = 900;
             Skybox = GenMeshCube(1.0f, 1.0f, 1.0f);
 
             // Change CultureInfo
@@ -81,6 +81,10 @@ namespace Uniray
             // Maximize window
             ClearWindowState(ConfigFlags.UndecoratedWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
+
+            // Get definitive size
+            Width = GetScreenWidth();
+            Height = GetScreenHeight();
 
             // Disable exit key
             SetExitKey(KeyboardKey.Null);
