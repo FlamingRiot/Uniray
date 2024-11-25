@@ -13,7 +13,6 @@ namespace Uniray
         public const int FontSize = 12;
 
         private static Dictionary<string, Color> _logs = new Dictionary<string, Color>();
-        private static Color _consoleColor = Color.White;
         private static Font _font;
         private static float _textHeight;
         private static Vector2 _position;
@@ -33,7 +32,6 @@ namespace Uniray
         public static void Close()
         {
             _logs.Clear();
-            _consoleColor = Color.White;
         }
 
         /// <summary>Updates game debugger.</summary>
