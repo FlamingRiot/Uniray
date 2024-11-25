@@ -61,15 +61,11 @@ namespace Uniray
             Texture2D panorama = LoadTexture("data/shaders/skyboxes/industrial.hdr");
             Texture2D cubemap = Shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
             Shaders.SetCubemap(cubemap);
-
             // Unload useless texture
             UnloadTexture(panorama);
 
             // Load hard ressources
             HardRessource.Init();
-
-            // Init error handler
-            ErrorHandler.Init(RayGUI.Font, new Vector2(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2 - 150, UI.Components["fileManager"].Y - 60));
 
             // Init the 3D conceptor
             Conceptor3D.Init();
@@ -288,6 +284,9 @@ namespace Uniray
                 Program.Height = GetScreenHeight();
                 UI = new UI();
                 GenSimulationView();
+
+                // Re-Init error handler
+                ErrorHandler.Init(RayGUI.Font, new Vector2(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2 - 150, UI.Components["fileManager"].Y - 60));
             }
             // Draw the outline rectangles that appear behind the main panels
             DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.25f), Program.Height, BACKGROUND_COLOR);
