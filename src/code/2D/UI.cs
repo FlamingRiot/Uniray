@@ -33,7 +33,7 @@ namespace Uniray
             Modals = new Dictionary<string, Modal>();
 
             // Create the UI components
-            int cont1X = (int)(Program.Width - Program.Width / 1.18f);
+            int cont1X = (int)(Program.Width - Program.Width / 1.25f);
             int cont1Y = (int)(Program.Height - Program.Height / 3f);
             // Containers
             // FileManager
@@ -187,34 +187,53 @@ namespace Uniray
         public void DisplayComponents(PropertyInfo[] props, GameObject3D obj)
         {
             Component reference = Components["gameObjectLabel"];
-            int groupIndex = 0;
-
+            // Retrieve different groups
+            // Create grouping
+            Dictionary<string, List<PropertyInfo>> grouping = new Dictionary<string, List<PropertyInfo>>();
             for (int i = 0; i < props.Length; i++) 
             {
                 ComponentField? attribute = props[i].GetCustomAttribute<ComponentField>(); // Get the attribute
                 string group = ""; // Get the group
                 if (attribute != null) group = attribute.Group;
-                // Add group label
-                string lblName = $"{group}{COMPONENT_GROUP_IDENTIFIER}";
-                if (!Components.ContainsKey(lblName)) 
-                { 
-                    Components.Add(lblName, new Label(reference.X, reference.Y + 25 + i * 24 + groupIndex * 24, group));
-                    groupIndex++;
-                }
+                if (!grouping.ContainsKey(group)) grouping.Add(group, new List<PropertyInfo>());
+                grouping[group].Add(props[i]);
+            }
 
-                string txbName = $"{props[i].Name}{COMPONENT_IDENTIFIER}";
-                Textbox component = new Textbox(reference.X, reference.Y + 25 + i * 24 + groupIndex * 24, 150, 19, $"{props[i].GetValue(obj)}");
-                component.Args = new string[] { props[i].Name, $"{props[i].GetValue(obj)}", obj.GetType().ToString(), props[i].PropertyType.ToString(), txbName };
-                /* Argument list
-                 * Property name [0]
-                 * Property initial value [1]
-                 * Object type [2]
-                 * Property type [3]
-                 * Refered textbox name [4]
-                 */
-                // Prepare function arguments
-                component.OnEntry = UpdateComponent;
-                Components.Add(txbName, component);
+            int index = 0;
+            int groupIndex = 0;
+            foreach (List<PropertyInfo> gProps in grouping.Values)
+            {
+                gProps.Reverse();
+                for (int i = 0; i < gProps.Count; i++)
+                {
+                    ComponentField? attribute = gProps[i].GetCustomAttribute<ComponentField>(); // Get the attribute
+                    string group = ""; // Get the group
+                    if (attribute != null) group = attribute.Group;
+                    // Add group label
+                    string lblName = $"{group}{COMPONENT_GROUP_IDENTIFIER}";
+                    if (!Components.ContainsKey(lblName))
+                    {
+                        Components.Add(lblName, new Label(reference.X, reference.Y + 25 + index * 24 + groupIndex * 24, group));
+                        groupIndex++;
+                    }
+
+                    string txbName = $"{gProps[i].Name}{COMPONENT_IDENTIFIER}";
+                    Textbox component = new Textbox(reference.X, reference.Y + 25 + index * 24 + groupIndex * 24, 135, 19, $"{gProps[i].GetValue(obj)}");
+                    component.Args = new string[] { gProps[i].Name, $"{gProps[i].GetValue(obj)}", obj.GetType().ToString(), gProps[i].PropertyType.ToString(), txbName };
+                    /* Argument list
+                     * Property name [0]
+                     * Property initial value [1]
+                     * Object type [2]
+                     * Property type [3]
+                     * Refered textbox name [4]
+                     */
+                    // Prepare function arguments
+                    component.OnEntry = UpdateComponent;
+                    Components.Add(txbName, component);
+
+                    // Increment total index
+                    index++;
+                }
             }
         }
 
