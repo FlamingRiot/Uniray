@@ -178,23 +178,59 @@ namespace Uniray
             if (!focus && !oModal) Raylib.SetMouseCursor(MouseCursor.Default);
         }
 
-        public void DisplayComponents(PropertyInfo[] props, FieldInfo[] fields, GameObject3D obj)
+        /// <summary>Displays the components.</summary>
+        /// <param name="props">Component elligible properties of the object.</param>
+        /// <param name="obj">Object to use.</param>
+        public void DisplayComponents(PropertyInfo[] props, GameObject3D obj)
         {
             Component reference = Components["gameObjectLabel"];
 
             for (int i = 0; i < props.Length; i++) 
             {
-                Textbox xTxb = new Textbox(reference.X, reference.Y + 25 + i * 24, 120, 19, $"{props[i].GetValue(obj)}");
-                xTxb.Args = new string[] { props[i].Name, $"{props[i].GetValue(obj)}"};
+                string txbName = $"{props[i].Name}Component";
+                Textbox component = new Textbox(reference.X, reference.Y + 25 + i * 24, 120, 19, $"{props[i].GetValue(obj)}");
+                component.Args = new string[] { props[i].Name, $"{props[i].GetValue(obj)}", obj.GetType().ToString(), props[i].PropertyType.ToString(), txbName };
+                /* Argument list
+                 * Property name [0]
+                 * Property initial value [1]
+                 * Object type [2]
+                 * Property type [3]
+                 * Refered textbox name [4]
+                 */
                 // Prepare function arguments
-                xTxb.OnEntry = UpdateComponent;
-                Components.Add($"{props[i].Name}Component", xTxb);
+                component.OnEntry = UpdateComponent;
+                Components.Add(txbName, component);
             }
         }
 
-        public void UpdateComponent(string[] args)
+        /// <summary>Updates a component's values to the <see cref="GameObject3D"/>.</summary>
+        /// <param name="args">Arguments of the component.</param>
+        /// <param name="value">New value of the component.</param>
+        public void UpdateComponent(string[] args, string value)
         {
             Console.WriteLine($"Property {args[0]} updated");
+            Type? type = Type.GetType(args[2]);
+            if (type is not null)
+            {
+                PropertyInfo? prop = type.GetProperty(args[0]);
+                var obj = Convert.ChangeType(UData.Selection.First(), type);
+                // Try convert value
+                Type? propType = Type.GetType(args[3]);
+                if (propType is not null) 
+                {
+                    try
+                    {
+                        var convertedValue = Convert.ChangeType(value, propType);
+                        prop?.SetValue(obj, convertedValue);
+                        // Update arguments
+                        args[1] = value;
+                    }
+                    catch
+                    {
+                        ((Textbox)Components[args[4]]).Text = args[1];
+                    }
+                }
+            }
         }
 
         /// <summary>Draws a modal and its components.</summary>

@@ -152,8 +152,7 @@ namespace Uniray
                     // Add UI component
                     Type type = obj.GetType();
                     PropertyInfo[] props = type.GetProperties().Where(prop => prop.IsDefined(typeof(ComponentField), false)).ToArray();
-                    FieldInfo[] fields = type.GetFields().Where(field => field.IsDefined(typeof(ComponentField), false)).ToArray();
-                    UI.DisplayComponents(props, fields, obj); // Display components informations
+                    UI.DisplayComponents(props, obj); // Display components informations
                 }
             }
             
