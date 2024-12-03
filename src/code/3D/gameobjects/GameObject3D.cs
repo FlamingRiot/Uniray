@@ -22,10 +22,13 @@ namespace Uniray
         /// <summary>3-Dimensional object position.</summary>
         abstract public Vector3 Position { get; set; }
         /// <summary>X Position of the object.</summary>
+        [ComponentField]
         public float X { get { return Transform.M14; } set { Transform.M14 = value; } }
         /// <summary>X Position of the object.</summary>
+        [ComponentField]
         public float Y { get { return Transform.M24; } set { Transform.M24 = value; } }
         /// <summary>X Position of the object.</summary>
+        [ComponentField]
         public float Z { get { return Transform.M34; } set { Transform.M34 = value; } }
 
         /// <summary>Creates an instance of <see cref="GameObject3D"/>.</summary>

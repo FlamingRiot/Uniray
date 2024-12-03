@@ -1,0 +1,6 @@
+﻿namespace Uniray
+{
+    /// <summary>Defines whether a field or a property can be used as a component field.</summary>
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+    public class ComponentField : Attribute { }
+}

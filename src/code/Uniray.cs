@@ -11,6 +11,7 @@ using System.Numerics;
 using Uniray.DatFiles;
 using static Uniray.UData;
 using Uniray;
+using System.Reflection;
 
 namespace Uniray
 {
@@ -148,8 +149,15 @@ namespace Uniray
                 }
                 else
                 {
+                    GameObject3D obj = CurrentScene.GameObjects[index];
+
                     Selection.Clear();
-                    Selection.Add(CurrentScene.GameObjects[index]);
+                    Selection.Add(obj);
+                    // Add UI component
+                    Type type = obj.GetType();
+                    PropertyInfo[] props = type.GetProperties().Where(prop => prop.IsDefined(typeof(ComponentField), false)).ToArray();
+                    FieldInfo[] fields = type.GetFields().Where(field => field.IsDefined(typeof(ComponentField), false)).ToArray();
+                    UI.DisplayComponents(props, fields, obj); // Display components informations
                 }
             }
             

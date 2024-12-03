@@ -1,5 +1,6 @@
 ﻿using RayGUI_cs;
 using Raylib_cs;
+using System.Reflection;
 
 namespace Uniray
 {
@@ -102,18 +103,9 @@ namespace Uniray
             Label gameLayersLabel = new Label(Components["gameManager"].X + 10, Components["gameManager"].Y + 10, "Game Layers");
             Components.Add("gameLayerLabel", gameLayersLabel);
 
-            // Texture field label
-            Label goTextureLabel = new Label(Components["gameManager"].X + 20, Components["gameManager"].Y + Components["gameManager"].Height / 2 + 300, "Texture");
-            Components.Add("textureLabel", goTextureLabel);
-
             // Game object label
             Label gameObjectLabel = new Label(Components["gameManager"].X + 10, Components["gameManager"].Y + Program.Height / 2, "Game Object");
             Components.Add("gameObjectLabel", gameObjectLabel);
-
-            // Textboxes
-            // Texture field textbox
-            Textbox txb = new Textbox(Components["gameManager"].X + 100, Components["gameManager"].Y + Components["gameManager"].Height / 2 + 290, Components["gameManager"].Width - 120, 40, "");
-            Components.Add("textureTextbox", txb);
 
             // Modals
             Button okModalButton = new Button("Proceed", _modalTemplate.X + _modalTemplate.Width - 70, _modalTemplate.Y + _modalTemplate.Height - 30, 60, 20);
@@ -184,6 +176,25 @@ namespace Uniray
 
             // Check focus
             if (!focus && !oModal) Raylib.SetMouseCursor(MouseCursor.Default);
+        }
+
+        public void DisplayComponents(PropertyInfo[] props, FieldInfo[] fields, GameObject3D obj)
+        {
+            Component reference = Components["gameObjectLabel"];
+
+            for (int i = 0; i < props.Length; i++) 
+            {
+                Textbox xTxb = new Textbox(reference.X, reference.Y + 25 + i * 24, 120, 19, $"{props[i].GetValue(obj)}");
+                xTxb.Args = new string[] { props[i].Name, $"{props[i].GetValue(obj)}"};
+                // Prepare function arguments
+                xTxb.OnEntry = UpdateComponent;
+                Components.Add($"{props[i].Name}Component", xTxb);
+            }
+        }
+
+        public void UpdateComponent(string[] args)
+        {
+            Console.WriteLine($"Property {args[0]} updated");
         }
 
         /// <summary>Draws a modal and its components.</summary>

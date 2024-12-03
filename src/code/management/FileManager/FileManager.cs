@@ -376,7 +376,7 @@ namespace Uniray
                         }
                     }
                     // Check if component field
-                    Component box = Uniray.UI.Components["textureTextbox"];
+                    /*Component box = Uniray.UI.Components["textureTextbox"];
                     if (Hover(box.X, box.Y, box.Width, box.Height))
                     {
                         if (UData.GameSimulation is null)
@@ -390,7 +390,7 @@ namespace Uniray
                                 }
                             }
                         }
-                    }
+                    }*/
                     // Check if over folder
                     foreach (UFolder folder in CurrentFolder.Files.Where(x => x is UFolder))
                     {
