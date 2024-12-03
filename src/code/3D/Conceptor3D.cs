@@ -77,13 +77,13 @@ namespace Uniray
             {
                 model.Yaw += mouse.X;
             }
-            // Set the model tranform
-            Matrix4x4 nm = MatrixRotateXYZ(new Vector3(model.Pitch / RAD2DEG, model.Yaw / RAD2DEG, model.Roll / RAD2DEG));
-            nm.M14 = model.Position.X;
-            nm.M24 = model.Position.Y;
-            nm.M34 = model.Position.Z;
+            //// Set the model tranform
+            //Matrix4x4 nm = MatrixRotateXYZ(new Vector3(model.Pitch / RAD2DEG, model.Yaw / RAD2DEG, model.Roll / RAD2DEG));
+            //nm.M14 = model.Position.X;
+            //nm.M24 = model.Position.Y;
+            //nm.M34 = model.Position.Z;
 
-            model.Transform = nm;
+            //model.Transform = nm;
         }
 
         /// <summary>Rotates a camera object and modifies its target.</summary>

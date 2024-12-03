@@ -7,6 +7,10 @@ namespace Uniray
     /// <summary>Represents an instance of <see cref="UModel"/>, inheriting <see cref="GameObject3D"/>.</summary>
     public unsafe class UModel : GameObject3D
     {
+        private float _pitch;
+        private float _yaw;
+        private float _roll;
+
         // -----------------------------------------------------------
         // Public attributes
         // -----------------------------------------------------------
@@ -17,11 +21,47 @@ namespace Uniray
         public Material[] Materials = new Material[0];
 
         /// <summary>X Axis rotation.</summary>
-        public float Pitch;
+        [ComponentField]
+        public float Pitch { get { return _pitch; } set
+            {
+                _pitch = value;
+                SetRotation();
+            } 
+        }
         /// <summary>Y Axis rotation</summary>
-        public float Yaw;
+        [ComponentField]
+        public float Yaw
+        {
+            get { return _yaw; }
+            set
+            {
+                _yaw = value;
+                SetRotation();
+            }
+        }
         /// <summary>Z Axis rotation.</summary>
-        public float Roll;
+        [ComponentField]
+        public float Roll
+        {
+            get { return _roll; }
+            set
+            {
+                _roll = value;
+                SetRotation();
+            }
+        }
+
+        public Vector3 Rotation
+        {
+            get
+            {
+                return new Vector3(Pitch, Yaw, Roll);
+            }
+            set
+            {
+                SetRotation(value.X, value.Y, value.Z);
+            }
+        }
 
         /// <summary>Model ID in the dictionary.</summary>
         public string ModelID;
@@ -129,19 +169,30 @@ namespace Uniray
         }
 
         /// <summary>Rotates the object with new rotation angles.</summary>
+        private void SetRotation()
+        {
+            // Calculate matrix rotation
+            Matrix4x4 rm = Raymath.MatrixRotateXYZ(new Vector3(_pitch / Raylib.RAD2DEG, _yaw / Raylib.RAD2DEG, _roll / Raylib.RAD2DEG));
+            Matrix4x4 pm = Raymath.MatrixTranslate(X, Y, Z);
+            // Multiply matrices
+            Transform = Raymath.MatrixMultiply(rm, pm);
+        }
+
+        /// <summary>Rotates the object with new rotation angles.</summary>
         /// <param name="pitch">X Axis rotation.</param>
         /// <param name="yaw">Y Axis rotation.</param>
         /// <param name="roll">Z Axis rotation</param>
-        public void SetRotation(float pitch, float yaw, float roll)
+        private void SetRotation(float pitch, float yaw, float roll)
         {
-            // Set the camera model Transform
             Pitch = pitch;
             Yaw = yaw;
             Roll = roll;
+
             // Calculate matrix rotation
-            Matrix4x4 nm = Raymath.MatrixRotateXYZ(new Vector3(pitch / Raylib.RAD2DEG, yaw / Raylib.RAD2DEG, roll / Raylib.RAD2DEG));
+            Matrix4x4 rm = Raymath.MatrixRotateXYZ(new Vector3(pitch / Raylib.RAD2DEG, yaw / Raylib.RAD2DEG, roll / Raylib.RAD2DEG));
+            Matrix4x4 pm = Raymath.MatrixTranslate(X, Y, Z);
             // Multiply matrices
-            Transform = Raymath.MatrixMultiply(Transform, nm);
+            Transform = Raymath.MatrixMultiply(rm, pm);
         }
     }
 }

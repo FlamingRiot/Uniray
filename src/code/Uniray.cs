@@ -186,21 +186,25 @@ namespace Uniray
                 // Paste action on the active selection of game objects
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.V))
                 {
-                    Vector3 dir = GetCameraForward(ref Conceptor3D.EnvCamera) * 5f;
-                    for (int i = 0; i < _clipboard.Count; i++)
+                    Vector2 mouse = GetMousePosition();
+                    if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width && mouse.Y < UI.Components["fileManager"].Y - 10)
                     {
-                        UModel go = new UModel(
-                            _clipboard[i].Name,
-                            _clipboard[i].Position,
-                            ((UModel)_clipboard[i]).ModelID);
-                        // Set the rotations of the model
-                        go.SetRotation(((UModel)_clipboard[i]).Pitch, ((UModel)_clipboard[i]).Yaw, ((UModel)_clipboard[i]).Roll);
-                        // Set final position of the model
-                        go.Position -= dir;
-                        // Add the copied object to the list
-                        CurrentScene.GameObjects.Add(go);
-                    }
-                    Selection.Clear();
+                        Vector3 dir = GetCameraForward(ref Conceptor3D.EnvCamera) * 5f;
+                        for (int i = 0; i < _clipboard.Count; i++)
+                        {
+                            UModel go = new UModel(
+                                _clipboard[i].Name,
+                                _clipboard[i].Position,
+                                ((UModel)_clipboard[i]).ModelID);
+                            // Set the rotations of the model
+                            go.Rotation = ((UModel)_clipboard[i]).Rotation;
+                            // Set final position of the model
+                            go.Position -= dir;
+                            // Add the copied object to the list
+                            CurrentScene.GameObjects.Add(go);
+                        }
+                        Selection.Clear();
+                    }   
                 }
 
                 // -----------------------------------------------------------
