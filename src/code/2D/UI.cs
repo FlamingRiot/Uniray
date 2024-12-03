@@ -10,6 +10,7 @@ namespace Uniray
         private static Container _modalTemplate = new Container(0, 0, 0, 0);
 
         public const string COMPONENT_IDENTIFIER = "UxComponent";
+        public const string COMPONENT_GROUP_IDENTIFIER = "UxComponentGroup";
 
         /// <summary>The list of every components in the UI</summary>
         public Dictionary<string, Component> Components;
@@ -32,7 +33,7 @@ namespace Uniray
             Modals = new Dictionary<string, Modal>();
 
             // Create the UI components
-            int cont1X = (int)(Program.Width - Program.Width / 1.25f);
+            int cont1X = (int)(Program.Width - Program.Width / 1.18f);
             int cont1Y = (int)(Program.Height - Program.Height / 3f);
             // Containers
             // FileManager
@@ -44,7 +45,7 @@ namespace Uniray
             Components.Add("fileManager", fileManager);
 
             // GameManager
-            Container gameManager = new Container(10, 40, cont1X - 20, Program.Height - 20, "gameManager");
+            Container gameManager = new Container(10, 40, cont1X - 20, Program.Height - 50, "gameManager");
             Components.Add("gameManager", gameManager);
 
             // Template modal
@@ -186,11 +187,23 @@ namespace Uniray
         public void DisplayComponents(PropertyInfo[] props, GameObject3D obj)
         {
             Component reference = Components["gameObjectLabel"];
+            int groupIndex = 0;
 
             for (int i = 0; i < props.Length; i++) 
             {
+                ComponentField? attribute = props[i].GetCustomAttribute<ComponentField>(); // Get the attribute
+                string group = ""; // Get the group
+                if (attribute != null) group = attribute.Group;
+                // Add group label
+                string lblName = $"{group}{COMPONENT_GROUP_IDENTIFIER}";
+                if (!Components.ContainsKey(lblName)) 
+                { 
+                    Components.Add(lblName, new Label(reference.X, reference.Y + 25 + i * 24 + groupIndex * 24, group));
+                    groupIndex++;
+                }
+
                 string txbName = $"{props[i].Name}{COMPONENT_IDENTIFIER}";
-                Textbox component = new Textbox(reference.X, reference.Y + 25 + i * 24, 120, 19, $"{props[i].GetValue(obj)}");
+                Textbox component = new Textbox(reference.X, reference.Y + 25 + i * 24 + groupIndex * 24, 150, 19, $"{props[i].GetValue(obj)}");
                 component.Args = new string[] { props[i].Name, $"{props[i].GetValue(obj)}", obj.GetType().ToString(), props[i].PropertyType.ToString(), txbName };
                 /* Argument list
                  * Property name [0]

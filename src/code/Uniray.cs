@@ -300,7 +300,7 @@ namespace Uniray
                 ErrorHandler.Init(RayGUI.Font, new Vector2(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2 - 150, UI.Components["fileManager"].Y - 60));
             }
             // Draw the outline rectangles that appear behind the main panels
-            DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.25f), Program.Height, BACKGROUND_COLOR);
+            DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.18f), Program.Height, BACKGROUND_COLOR);
             DrawRectangle(0, Program.Height - Program.Height / 3 - 10, Program.Width, Program.Height - (Program.Height - Program.Height / 3) + 10, BACKGROUND_COLOR);
 
             // Draw the entire UI and handle the events related to it

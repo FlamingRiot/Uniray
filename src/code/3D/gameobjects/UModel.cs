@@ -20,7 +20,7 @@ namespace Uniray
         public Material[] Materials = new Material[0];
 
         /// <summary>X Axis rotation.</summary>
-        [ComponentField]
+        [ComponentField(Group = "Rotation")]
         public float Pitch { get { return _pitch; } set
             {
                 _pitch = value;
@@ -28,7 +28,7 @@ namespace Uniray
             } 
         }
         /// <summary>Y Axis rotation</summary>
-        [ComponentField]
+        [ComponentField(Group = "Rotation")]
         public float Yaw
         {
             get { return _yaw; }
@@ -39,7 +39,7 @@ namespace Uniray
             }
         }
         /// <summary>Z Axis rotation.</summary>
-        [ComponentField]
+        [ComponentField(Group = "Rotation")]
         public float Roll
         {
             get { return _roll; }
