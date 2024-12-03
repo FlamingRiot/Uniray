@@ -147,7 +147,7 @@ namespace Uniray
                 {
                     GameObject3D obj = CurrentScene.GameObjects[index];
 
-                    Selection.Clear();
+                    Conceptor3D.ClearSelection();
                     Selection.Add(obj);
                     // Add UI component
                     Type type = obj.GetType();
@@ -169,14 +169,14 @@ namespace Uniray
                     foreach (GameObject3D go in Selection)
                     {
                         CurrentScene.GameObjects.Remove(go);
-                        Selection.Clear();
+                        Conceptor3D.ClearSelection();
                         break;
                     }
                 }
                 // Escape action on the active selection of game objects
                 if (IsKeyPressed(KeyboardKey.Escape))
                 {
-                    Selection.Clear();
+                    Conceptor3D.ClearSelection();
                 }
                 // Copy action on the active selection of game objects
                 if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyPressed(KeyboardKey.C))
@@ -203,7 +203,7 @@ namespace Uniray
                             // Add the copied object to the list
                             CurrentScene.GameObjects.Add(go);
                         }
-                        Selection.Clear();
+                        Conceptor3D.ClearSelection();
                     }   
                 }
 

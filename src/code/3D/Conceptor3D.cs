@@ -2,6 +2,7 @@
 using static Raylib_cs.Raylib;
 using static Raylib_cs.Raymath;
 using System.Numerics;
+using RayGUI_cs;
 namespace Uniray
 {
     /// <summary>Represents an instance of <see cref="Conceptor3D"/>.</summary>
@@ -77,13 +78,6 @@ namespace Uniray
             {
                 model.Yaw += mouse.X;
             }
-            //// Set the model tranform
-            //Matrix4x4 nm = MatrixRotateXYZ(new Vector3(model.Pitch / RAD2DEG, model.Yaw / RAD2DEG, model.Roll / RAD2DEG));
-            //nm.M14 = model.Position.X;
-            //nm.M24 = model.Position.Y;
-            //nm.M34 = model.Position.Z;
-
-            //model.Transform = nm;
         }
 
         /// <summary>Rotates a camera object and modifies its target.</summary>
@@ -155,6 +149,13 @@ namespace Uniray
                 }
             }
             return -1;
+        }
+
+        /// <summary>Clears the active selection and removes displayed components.</summary>
+        public static void ClearSelection()
+        {
+            UData.Selection.Clear();
+            Uniray.UI.HideComponents();
         }
 
         /// <summary>Checks the distance between two <see cref="GameObject3D"/> and returns the closest index.</summary>

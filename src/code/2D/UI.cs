@@ -9,6 +9,8 @@ namespace Uniray
     {
         private static Container _modalTemplate = new Container(0, 0, 0, 0);
 
+        public const string COMPONENT_IDENTIFIER = "UxComponent";
+
         /// <summary>The list of every components in the UI</summary>
         public Dictionary<string, Component> Components;
 
@@ -187,7 +189,7 @@ namespace Uniray
 
             for (int i = 0; i < props.Length; i++) 
             {
-                string txbName = $"{props[i].Name}Component";
+                string txbName = $"{props[i].Name}{COMPONENT_IDENTIFIER}";
                 Textbox component = new Textbox(reference.X, reference.Y + 25 + i * 24, 120, 19, $"{props[i].GetValue(obj)}");
                 component.Args = new string[] { props[i].Name, $"{props[i].GetValue(obj)}", obj.GetType().ToString(), props[i].PropertyType.ToString(), txbName };
                 /* Argument list
@@ -201,6 +203,15 @@ namespace Uniray
                 component.OnEntry = UpdateComponent;
                 Components.Add(txbName, component);
             }
+        }
+
+        /// <summary>Removes the component fields from the UI.</summary>
+        public void HideComponents()
+        {
+            Components.ToList().ForEach(pair =>
+            {
+                if (pair.Key.Contains(COMPONENT_IDENTIFIER)) Components.Remove(pair.Key);
+            });
         }
 
         /// <summary>Updates a component's values to the <see cref="GameObject3D"/>.</summary>
