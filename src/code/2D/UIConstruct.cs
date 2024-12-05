@@ -13,7 +13,7 @@ namespace Uniray
         public const string COMPONENT_GROUP_IDENTIFIER = "UxComponentGroup";
 
         /// <summary>The list of every components in the UI</summary>
-        public SortedList<string, Component> Components;
+        public Dictionary<string, Component> Components;
 
         /// <summary>The list of every modal in the UI</summary>
         public Dictionary<string, Modal> Modals;
@@ -28,7 +28,7 @@ namespace Uniray
         public UI()
         {
             // Instanciate the components dictionary
-            Components = new SortedList<string, Component>();
+            Components = new Dictionary<string, Component>();
             // Instanciate the modals dictionary
             Modals = new Dictionary<string, Modal>();
 
@@ -40,7 +40,14 @@ namespace Uniray
             Container fileManager = new Container(cont1X, cont1Y, Program.Width - cont1X - 10, Program.Height - cont1Y - 10, "models");
             fileManager.Type = ContainerType.FileDropper;
             fileManager.ExtensionFile = "m3d";
-            fileManager.OutputFilePath = "/assets/models";
+            if (UData.CurrentProject is not null) // Direct project opening config
+            {
+                fileManager.OutputFilePath = UData.CurrentProject.ProjectFolder + "/assets/models";
+            }
+            else // Default config
+            {
+                fileManager.OutputFilePath = "/assets/models";
+            }
             FileManager.CurrentFolder = FileManager.ModelFolder;
             Components.Add("fileManager", fileManager);
 

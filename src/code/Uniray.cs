@@ -368,6 +368,7 @@ namespace Uniray
         {
             try
             {
+                path = path.Replace('\\', '/'); // Linux parsing
                 // Read project informations from .uproj
                 FileStream stream = new FileStream(path, FileMode.Open);
                 using BinaryReader reader = new BinaryReader(stream);
@@ -379,7 +380,11 @@ namespace Uniray
                 string? directory = Path.GetDirectoryName(path);
 
                 // Load assets from the given project's assets folder
-                if (directory is not null) FileManager.Init(directory);
+                if (directory is not null)
+                {
+                    FileManager.Init(directory);
+                    directory = directory.Replace('\\', '/'); // Linux parsing
+                }
                 else throw new Exception($"Could not load the assets of project {path}");
 
                 // Change to default assets page of the manager container
