@@ -1,13 +1,13 @@
 ## Uniray Changelog
 
-# [v1.0.1]
+# [1.0.1-alpha]
 
 - Improved file manager actions
 - Changed overall application look
 - Improved global optimization
 - Various bug and fixes
 
-# [v1.0.0]
+# [1.0.0-alpha]
 
 - The engine is usable and can build projects
 - Objects can be moved around
@@ -16,5 +16,5 @@
 
 ---
 
-[v1.0.0]: https://git.s2.rpn.ch/ComtesseE1/uniray/-/tags/v1.0.0
-[v1.0.1]: https://git.s2.rpn.ch/ComtesseE1/uniray/-/tags/v1.0.1
+[1.0.0-alpha]: https://git.s2.rpn.ch/ComtesseE1/uniray/-/tags/1.0.0-alpha
+[1.0.1-alpha]: https://git.s2.rpn.ch/ComtesseE1/uniray/-/tags/1.0.1-alpha
