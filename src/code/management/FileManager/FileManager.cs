@@ -68,23 +68,22 @@ namespace Uniray
 
             ClickOnSelection = true;
 
-            // Test if clicked on selection
-            for (int i = 0; i < _units.Count; i++) 
+            // If not over clicked units
+            ClickOnSelection = false;
+            ClickedUnits.ForEach(unit =>
             {
+                // Get index and name
+                int index = CurrentFolder.Files.IndexOf(unit);
+
                 // Define file row
-                short row = (short)(i / 10);
+                short row = (short)(index / 10);
                 // Define drawing position
-                int xPos = Uniray.UI.Components["fileManager"].X + 150 * (i % 10 + 1) - 100;
+                int xPos = Uniray.UI.Components["fileManager"].X + 150 * (index % 10 + 1) - 100;
                 int yPos = Uniray.UI.Components["fileManager"].Y + 60 + row * 120;
 
-                if (IsMouseButtonPressed(MouseButton.Left))
-                {
-                    if (!ClickedUnits.Contains(_units[i]) && Hover(xPos, yPos, 65, 65))
-                    {
-                        ClickOnSelection = false;
-                    }
-                }
-            }
+                // Test if over clicked unit
+                if (Hover(xPos, yPos, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height)) ClickOnSelection = true;
+            });
 
             // Loop over files
             for (int i = 0; i < _units.Count; i++) 
@@ -247,13 +246,21 @@ namespace Uniray
                 }
             }
 
+
             // Selection action
             if (IsMouseButtonPressed(MouseButton.Left)) 
             {
                 // If over current unit
                 if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {
-                    if (IsKeyUp(KeyboardKey.LeftControl) && !ClickOnSelection) ClickedUnits.Clear();
+                    if (IsKeyUp(KeyboardKey.LeftControl))
+                    {
+                        ClickedUnits.Clear();
+                        if (ClickOnSelection) // If clicked on selection while not holding ctrl
+                        {
+                            ClickedUnits.Add(unit);
+                        }
+                    }
                     if (!ClickedUnits.Contains(unit)) ClickedUnits.Add(unit);
                 }
                 // If not hover renming text
@@ -266,26 +273,6 @@ namespace Uniray
                         UData.CurrentRenaming = null;
                     }
                 }
-                // If not over clicked units
-                bool clickedUnit = false;
-                ClickedUnits.ForEach(unit =>
-                {
-                    // Get index and name
-                    int index = CurrentFolder.Files.IndexOf(unit);
-
-                    // Define file row
-                    short row = (short)(index / 10);
-                    // Define drawing position
-                    int xPos = Uniray.UI.Components["fileManager"].X + 150 * (index % 10 + 1) - 100;
-                    int yPos = Uniray.UI.Components["fileManager"].Y + 60 + row * 120;
-
-                    // Test if over clicked unit
-                    if (Hover(xPos, yPos, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height)) clickedUnit = true;
-                });
-                if (!clickedUnit)  
-                {
-                    ClickedUnits.Clear();
-                }
             }
 
             // Drag action
@@ -297,7 +284,11 @@ namespace Uniray
                     {
                         foreach (UStorage file in ClickedUnits)
                         {
-                            if ((UData.SelectedFiles.Count == 0 || ClickedUnits.Count > 1) && !UData.SelectedFiles.Contains(file)) UData.SelectedFiles.Add(file);
+                            if ((UData.SelectedFiles.Count == 0 || ClickedUnits.Count > 1) && !UData.SelectedFiles.Contains(file))
+                            {
+                                UData.SelectedFiles.Clear();
+                                UData.SelectedFiles.AddRange(ClickedUnits);
+                            }
                         }
                     }
                     SetMouseCursor(MouseCursor.PointingHand);
