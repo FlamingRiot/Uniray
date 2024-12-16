@@ -77,6 +77,9 @@ namespace Uniray
             playButton.Event = Uniray.StartGameSimulation;
             Components.Add("playButton", playButton);
 
+            Button helpButton = new Button("Help", 305, 5, 70, 19, "helpButton");
+            Components.Add("helpButton", helpButton);
+
             // Models section
             Button modelButton = new Button("Models", fileManager.X + 10, fileManager.Y, 60, 25, "modelsSection");
             modelButton.Event = UpdateToModel;

@@ -513,6 +513,12 @@ namespace Uniray
             UI = new UI();
             GenSimulationView();
 
+            // Project tool bar info
+            string txtInfo;
+            if (CurrentProject is null) txtInfo = "Uniray - Empty";
+            else txtInfo = $"Uniray - {CurrentProject.Name}";
+            ((Label)UI.Components["projectNameLabel"]).Text = txtInfo;
+
             // Re-Init error handler
             ErrorHandler.Init(RayGUI.Font, new Vector2(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2 - 150, UI.Components["fileManager"].Y - 60));
 
@@ -529,9 +535,9 @@ namespace Uniray
             float renderRatio = (float)Program.Height / renderHeight;
             float renderWidth = Program.Width / (float)renderRatio;
             GameSimulation.GameSimView = LoadRenderTexture(Program.Width, Program.Height);
-            GameSimulation.DestinationRectangle = new Rectangle(UI.Components["gameManager"].Width + 20, 0,
+            GameSimulation.DestinationRectangle = new Rectangle(UI.Components["gameManager"].Width + 20, 33,
                 renderWidth,
-                renderHeight);
+                renderHeight - 33);
         }
 
         /// <summary>Starts the game simulation.</summary>
@@ -540,7 +546,7 @@ namespace Uniray
             if (CurrentProject is not null)
             {
                 UData.GameSimulation = new GameSimulation(); // Start game simulation
-                GameDebugger.Init(RayGUI.Font, new Vector2(GameSimulation.DestinationRectangle.X + GameSimulation.DestinationRectangle.Width, 0)); // Init game debugger
+                GameDebugger.Init(RayGUI.Font, new Vector2(GameSimulation.DestinationRectangle.X + GameSimulation.DestinationRectangle.Width, 35)); // Init game debugger
             }
             else
             {
