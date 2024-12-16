@@ -1,5 +1,6 @@
 ﻿using RayGUI_cs;
 using Raylib_cs;
+using System.Numerics;
 using System.Reflection;
 
 namespace Uniray
@@ -59,7 +60,7 @@ namespace Uniray
             _modalTemplate = new Container(Program.Width / 2 - Program.Width / 6, Program.Height / 2 - Program.Height / 6, Program.Width / 3, Program.Height / 3, "modal");
 
             // Buttons
-            Button fileDDButton = new Button("File", 10, 10, 60, 25, "fileDDButton");
+            Button fileDDButton = new Button("File", 10, 5, 60, 19, "fileDDButton");
             fileDDButton.Event = ToggleFileDD;
             Components.Add("fileDDButton", fileDDButton);
 
@@ -94,9 +95,32 @@ namespace Uniray
             Components.Add("openFileButton", openFileButton);
 
             // Play/Build button
-            Button playButton = new Button("Play", (Program.Width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 80, 23, "play");
+            Button playButton = new Button("Play", (Program.Width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 5, 80, 19, "play");
             playButton.Event = Uniray.StartGameSimulation;
             Components.Add("playButton", playButton);
+
+            // App quitting button
+            Button quitAppButton = new Button("x", Program.Width - 35, 0, 35, 29);
+            quitAppButton.FontSize = 19;
+            quitAppButton.BaseColor = Uniray.TOOLBAR_COLOR;
+            quitAppButton.HoverColor = Color.Red;
+            quitAppButton.Event = Program.CloseUniray;
+            Components.Add("quitAppButton", quitAppButton);
+
+            // App ToggleFullScreen
+            Button toggleFullScreenButton = new Button("::", Program.Width - 70, 0, 35, 29);
+            toggleFullScreenButton.BaseColor = Uniray.TOOLBAR_COLOR;
+            toggleFullScreenButton.HoverColor = Color.Gray;
+            toggleFullScreenButton.Event = Program.ReduceUniray;
+            Components.Add("toggleFullScreenButton", toggleFullScreenButton);
+
+            // App Reduce button
+            Button reduceAppButton = new Button("-", Program.Width - 105, 0, 35, 29);
+            reduceAppButton.FontSize = 19;
+            reduceAppButton.BaseColor = Uniray.TOOLBAR_COLOR;
+            reduceAppButton.HoverColor = Color.Gray;
+            reduceAppButton.Event = Raylib.MinimizeWindow;
+            Components.Add("reduceAppButton", reduceAppButton);
 
             // Upstream folder button
             Button returnButton = new Button("<", fileManager.X + 10, fileManager.Y + 40, 20, 20);
@@ -162,6 +186,7 @@ namespace Uniray
             };
 
             fileDD = new DropDown(10, 35, 160, fileDDS);
+            //fileDD.RepeatedHeight = 5;
             fileDD.BackgroundColor = Uniray.SPECIAL_COLOR;
             // Set events
             fileDD.SetButtonEvent(0, NewProject);

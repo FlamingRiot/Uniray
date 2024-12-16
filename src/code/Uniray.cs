@@ -38,6 +38,9 @@ namespace Uniray
         /// <summary>Secondary color of the application.</summary>
         public static readonly Color FOCUS_COLOR = new(25, 25, 25, 255);
 
+        /// <summary>Secondary color of the application.</summary>
+        public static readonly Color TOOLBAR_COLOR = new(27, 27, 27, 255);
+
         /// <summary>Instance containing the ressources of the loaded project.</summary>
         public static Ressource Ressource = new Ressource();
 
@@ -291,17 +294,11 @@ namespace Uniray
             // Check if the window has been resized to adjust the size of the UI
             if (IsWindowResized())
             {
-                Program.Width = GetScreenWidth();
-                Program.Height = GetScreenHeight();
-                UI = new UI();
-                GenSimulationView();
-
-                // Re-Init error handler
-                ErrorHandler.Init(RayGUI.Font, new Vector2(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2 - 150, UI.Components["fileManager"].Y - 60));
+                Resize();
             }
             // Draw the outline rectangles that appear behind the main panels
             DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.25f), Program.Height, BACKGROUND_COLOR);
-            DrawRectangle(0, 0, Program.Width, 40, BACKGROUND_COLOR);
+            DrawRectangle(0, 0, Program.Width, 30, TOOLBAR_COLOR);
             DrawRectangle(0, Program.Height - Program.Height / 3 - 10, Program.Width, Program.Height - (Program.Height - Program.Height / 3) + 10, BACKGROUND_COLOR);
 
             // Draw the entire UI and handle the events related to it
@@ -507,9 +504,24 @@ namespace Uniray
             return scenes;
         }
 
+        /// <summary>Resized the UI of the application.</summary>
+        public static void Resize()
+        {
+            Program.Width = GetScreenWidth();
+            Program.Height = GetScreenHeight();
+            UI = new UI();
+            GenSimulationView();
+
+            // Re-Init error handler
+            ErrorHandler.Init(RayGUI.Font, new Vector2(UI.Components["fileManager"].X + UI.Components["fileManager"].Width / 2 - 150, UI.Components["fileManager"].Y - 60));
+
+        }
+
         /// <summary>Generates the simulation view for game simulation.</summary>
         private static void GenSimulationView()
         {
+            // Unload if loaded
+            if (IsRenderTextureReady(GameSimulation.GameSimView)) UnloadRenderTexture(GameSimulation.GameSimView);
             // Game simulation view
             GameSimulation.SourceRectangle = new Rectangle(0, 0, Program.Width, -Program.Height);
             int renderHeight = Program.Height - (UI.Components["fileManager"].Height + 20);
@@ -528,6 +540,10 @@ namespace Uniray
             {
                 UData.GameSimulation = new GameSimulation(); // Start game simulation
                 GameDebugger.Init(RayGUI.Font, new Vector2(GameSimulation.DestinationRectangle.X + GameSimulation.DestinationRectangle.Width, 0)); // Init game debugger
+            }
+            else
+            {
+                ErrorHandler.Send(new Error(3, "No project loaded, unabled to start simulation"));
             }
         }
 

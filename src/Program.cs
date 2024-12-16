@@ -21,6 +21,8 @@ namespace Uniray
     {
         internal static int Width;
         internal static int Height;
+        private static int MaxWidth;
+        private static int MaxHeight;
         internal static Mesh Skybox;
 
         internal static int SPLASH_SIZE = 162; // Splash screen size (square)
@@ -79,12 +81,13 @@ namespace Uniray
             if (args.Length > 0) Uniray.LoadProject(args[0]);
 
             // Maximize window
-            ClearWindowState(ConfigFlags.UndecoratedWindow);
             SetWindowState(ConfigFlags.MaximizedWindow);
 
             // Get definitive size
             Width = GetScreenWidth();
             Height = GetScreenHeight();
+            MaxWidth = Width;
+            MaxHeight = Height;
 
             // Disable exit key
             SetExitKey(KeyboardKey.Null);
@@ -174,26 +177,8 @@ namespace Uniray
                 DrawFPS(40, 200);
 
                 EndDrawing();
-
             }
-            // Close window
-            CloseWindow();
-
-            if (UData.CurrentProject is not null)
-            {
-                // Save project beforehand
-                Uniray.SaveProject();
-
-                // Unload all used ressources
-                Uniray.Ressource.UnloadRessources();
-                // Unload materials
-                foreach (GameObject3D go in UData.CurrentScene.GameObjects)
-                {
-                    if (go is UModel m) RaylibComplements.UnloadUModel(m);
-                }
-            }
-            // Unload shaders
-            Uniray.Shaders.UnloadShaders();
+            CloseUniray();
         }
 
         /// <summary>Moves the editor's camera.</summary>
@@ -286,6 +271,52 @@ namespace Uniray
             DrawMesh(Skybox, Uniray.Shaders.SkyboxMaterial, Raymath.MatrixIdentity());
             Rlgl.EnableBackfaceCulling();
             Rlgl.EnableDepthMask();
+        }
+
+        public static void CloseUniray()
+        {
+            // Close window
+            CloseWindow();
+
+            if (UData.CurrentProject is not null)
+            {
+                // Save project beforehand
+                Uniray.SaveProject();
+
+                // Unload all used ressources
+                Uniray.Ressource.UnloadRessources();
+                // Unload materials
+                foreach (GameObject3D go in UData.CurrentScene.GameObjects)
+                {
+                    if (go is UModel m) RaylibComplements.UnloadUModel(m);
+                }
+            }
+            // Unload shaders
+            Uniray.Shaders.UnloadShaders();
+
+            Environment.Exit(0);
+        }
+
+        /// <summary>Reduces Uniray application.</summary>
+        public static void ReduceUniray()
+        {
+            if (Width < MaxWidth)
+            {
+                Width = MaxWidth;
+                Height = MaxHeight;
+                SetWindowPosition(0, 0);
+            }
+            else
+            {
+                Width = Width / 10 * 8; // 80% from now
+                Height = Height / 10 * 8; // 80% from now
+                // Define position
+                int x = (MaxWidth - Width) / 2;
+                int y = (MaxHeight - Height) / 2;
+                SetWindowPosition(x, y);
+            }
+            SetWindowSize(Width, Height);
+            Uniray.Resize(); // Update App UI
         }
     }
 }
