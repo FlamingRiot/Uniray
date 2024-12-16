@@ -94,7 +94,7 @@ namespace Uniray
             Components.Add("openFileButton", openFileButton);
 
             // Play/Build button
-            Button playButton = new Button("Play", (Program.Width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 100, 30, "play");
+            Button playButton = new Button("Play", (Program.Width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 10, 80, 23, "play");
             playButton.Event = Uniray.StartGameSimulation;
             Components.Add("playButton", playButton);
 
@@ -105,7 +105,7 @@ namespace Uniray
 
             // Labels
             // Ressource info label
-            Label ressourceInfoLabel = new Label(Components["fileManager"].X + Components["fileManager"].Width / 2, Components["fileManager"].Y + Components["fileManager"].Height / 2, "");
+            Label ressourceInfoLabel = new Label(Components["fileManager"].X + 20, Program.Height - 40, "File Type: .m3d");
             ressourceInfoLabel.Text = "File type: .m3d";
             Components.Add("ressourceInfoLabel", ressourceInfoLabel);
 
@@ -225,7 +225,7 @@ namespace Uniray
                     }
 
                     string txbName = $"{gProps[i].Name}{COMPONENT_IDENTIFIER}";
-                    Textbox component = new Textbox(reference.X, reference.Y + 25 + index * 24 + groupIndex * 24, 135, 19, $"{gProps[i].GetValue(obj)}");
+                    Textbox component = new Textbox(reference.X, reference.Y + 25 + index * 24 + groupIndex * 24, 90, 19, $"{gProps[i].GetValue(obj)}");
                     component.Args = new string[] { gProps[i].Name, $"{gProps[i].GetValue(obj)}", obj.GetType().ToString(), gProps[i].PropertyType.ToString(), txbName };
                     /* Argument list
                      * Property name [0]

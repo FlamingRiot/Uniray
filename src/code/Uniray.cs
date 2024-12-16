@@ -301,6 +301,7 @@ namespace Uniray
             }
             // Draw the outline rectangles that appear behind the main panels
             DrawRectangle(0, 0, (int)(Program.Width - Program.Width / 1.25f), Program.Height, BACKGROUND_COLOR);
+            DrawRectangle(0, 0, Program.Width, 40, BACKGROUND_COLOR);
             DrawRectangle(0, Program.Height - Program.Height / 3 - 10, Program.Width, Program.Height - (Program.Height - Program.Height / 3) + 10, BACKGROUND_COLOR);
 
             // Draw the entire UI and handle the events related to it
@@ -315,8 +316,8 @@ namespace Uniray
             // Render the selected camera POV to the top right corner of the screen
             if (Selection.Count == 1 && Selection.First() is UCamera cam && UData.GameSimulation is null)
             {
-                DrawRectangleLinesEx(new Rectangle(Program.Width - Program.Width / 5 - 11, 9, Program.Width / 5 + 2, Program.Height / 5 + 2), 2, Color.White);
-                DrawTexturePro(_cameraView.Texture, _cameraViewRec, new Rectangle(Program.Width - Program.Width / 5 - 10, 10, Program.Width / 5, Program.Height / 5), Vector2.Zero, 0, Color.White);
+                DrawRectangleLinesEx(new Rectangle(Program.Width - Program.Width / 5 - 11, 49, Program.Width / 5 + 2, Program.Height / 5 + 2), 2, Color.White);
+                DrawTexturePro(_cameraView.Texture, _cameraViewRec, new Rectangle(Program.Width - Program.Width / 5 - 10, 50, Program.Width / 5, Program.Height / 5), Vector2.Zero, 0, Color.White);
             }
             if (UData.GameSimulation is not null)
             {
