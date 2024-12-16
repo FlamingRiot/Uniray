@@ -12,6 +12,7 @@ using Uniray.DatFiles;
 using static Uniray.UData;
 using Uniray;
 using System.Reflection;
+using System.Xml.Linq;
 
 namespace Uniray
 {
@@ -394,7 +395,7 @@ namespace Uniray
                 // Load scenes along with their game objects
                 CurrentProject = new Project(_projectName, path, LoadProjectScenes(directory, _aesKey, _aesIv), _aesKey, _aesIv);
                 CurrentScene = CurrentProject.GetScene(0); // Set default scene
-                SetWindowTitle("Uniray - " + _projectName);
+                ((Label)UI.Components["projectNameLabel"]).Text = "Uniray - " + _projectName;
 
                 TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
             }
@@ -460,7 +461,7 @@ namespace Uniray
                 // Set file manager output to new project directory
                 ((Container)UI.Components["fileManager"]).OutputFilePath = path + "/assets/models/";
                 // Set new window title
-                SetWindowTitle("Uniray - " + name);
+                ((Label)UI.Components["projectNameLabel"]).Text = "Uniray - " + name;
 
                 // Create new empty scene (except camera)
                 UCamera ucamera = new UCamera("Default camera", UCamera.DefaultCamera);

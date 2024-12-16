@@ -64,6 +64,19 @@ namespace Uniray
             fileDDButton.Event = ToggleFileDD;
             Components.Add("fileDDButton", fileDDButton);
 
+            Button displayDDButton = new Button("Display", 80, 5, 75, 19, "displayDDButton");
+
+            Components.Add("displayDDButton", displayDDButton);
+
+            Button addDDButton = new Button("Add", 165, 5, 60, 19, "addDDButton");
+
+            Components.Add("addDDButton", addDDButton);
+
+            // Play/Build button
+            Button playButton = new Button("Play", 235, 5, 60, 19, "play");
+            playButton.Event = Uniray.StartGameSimulation;
+            Components.Add("playButton", playButton);
+
             // Models section
             Button modelButton = new Button("Models", fileManager.X + 10, fileManager.Y, 60, 25, "modelsSection");
             modelButton.Event = UpdateToModel;
@@ -94,11 +107,6 @@ namespace Uniray
             openFileButton.Type = ButtonType.PathFinder;
             Components.Add("openFileButton", openFileButton);
 
-            // Play/Build button
-            Button playButton = new Button("Play", (Program.Width - gameManager.Width - 20) / 2 + gameManager.Width + 20, 5, 80, 19, "play");
-            playButton.Event = Uniray.StartGameSimulation;
-            Components.Add("playButton", playButton);
-
             // App quitting button
             Button quitAppButton = new Button("x", Program.Width - 35, 0, 35, 29);
             quitAppButton.FontSize = 19;
@@ -128,9 +136,14 @@ namespace Uniray
             Components.Add("returnButton", returnButton);
 
             // Labels
+
+            // Project name info label
+            Label projectNameLabel = new Label(Program.Width / 2, 7, "Uniray - Empty");
+            projectNameLabel.TextColor = Color.Gray;
+            Components.Add("projectNameLabel", projectNameLabel); 
+
             // Ressource info label
             Label ressourceInfoLabel = new Label(Components["fileManager"].X + 20, Program.Height - 40, "File Type: .m3d");
-            ressourceInfoLabel.Text = "File type: .m3d";
             Components.Add("ressourceInfoLabel", ressourceInfoLabel);
 
             // Game layer label
