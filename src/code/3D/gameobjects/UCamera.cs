@@ -4,8 +4,15 @@ using System.Numerics;
 namespace Uniray
 {
     /// <summary>Represents an instance of <see cref="UCamera"/>.</summary>
-    public class UCamera : GameObject3D
+    public class UCamera : GameObject3D, IRotation
     {
+        // -----------------------------------------------------------
+        // Private attributes
+        // -----------------------------------------------------------
+        private float _pitch;
+        private float _yaw;
+        private float _roll;
+
         /// <summary>Default <see cref="Camera3D"/> configuration.</summary>
         public static readonly Camera3D DefaultCamera = new Camera3D()
         {
@@ -19,13 +26,6 @@ namespace Uniray
         // -----------------------------------------------------------
         // Public attributes
         // -----------------------------------------------------------
-        /// <summary>X Axis rotation.</summary>
-        public float Pitch;
-        /// <summary>Y Axis rotation</summary>
-        public float Yaw;
-        /// <summary>Z Axis rotation.</summary>
-        public float Roll;
-
         /// <summary>3-Dimensional camera.</summary>
         public Camera3D Camera;
 
@@ -48,6 +48,16 @@ namespace Uniray
                 Transform.M34 = value.Z;
             }
         }
+
+        /// <summary>X Axis rotation angle.</summary>
+        [ComponentField(Group = "Rotation")]
+        public float Pitch { get { return _pitch; } set { _pitch = value; } }
+        /// <summary>Y Axis rotation angle.</summary>
+        [ComponentField(Group = "Rotation")]
+        public float Yaw { get { return _yaw; } set { _yaw = value; } }
+        /// <summary>Z Axis rotation angle.</summary>
+        [ComponentField(Group = "Rotation")]
+        public float Roll { get { return _roll; } set {  _roll = value; } }
 
         /// <summary>Creates an empty instance of <see cref="UCamera"/>.</summary>
         public UCamera() : base() { Camera = DefaultCamera; }

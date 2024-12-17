@@ -18,7 +18,7 @@ namespace Uniray
     }
 
     /// <summary>Represents a <see cref="UShape"/> game object.</summary>
-    public class UShape : GameObject3D
+    public class UShape : GameObject3D, IRotation
     {
         // -----------------------------------------------------------
         // Private attributes

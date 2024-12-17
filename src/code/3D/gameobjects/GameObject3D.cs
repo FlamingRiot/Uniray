@@ -9,6 +9,14 @@ namespace Uniray
         void Draw(); // Draw method
     }
 
+    /// <summary>Defines the ability of an object to rotate.</summary>
+    public interface IRotation
+    {
+        float Pitch { get; set; }
+        float Yaw { get; set; }
+        float Roll { get; set; }
+    }
+
     /// <summary>Reprsents an instance of <see cref="GameObject3D"/>.</summary>
     public abstract class GameObject3D : IDrawable
     {

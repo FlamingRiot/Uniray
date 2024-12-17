@@ -203,25 +203,7 @@ namespace Uniray
                 // Rotate the currently selected game object
                 else if (IsKeyDown(KeyboardKey.R))
                 {
-                    foreach (GameObject3D go in Selection)
-                    {
-                        // Cast the object to apply the appropriate rotation effects
-                        switch (go)
-                        {
-                            case UModel:
-                                UModel model = (UModel)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
-                                Conceptor3D.RotateObject(ref model);
-                                break;
-                            case UCamera:
-                                UCamera camera = (UCamera)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
-                                Conceptor3D.RotateObject(ref camera);
-                                break;
-                            case UShape:
-                                UShape shape = (UShape)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
-                                Conceptor3D.RotateObject(ref shape);
-                                break;
-                        }
-                    }
+                    Selection.Where(x => x is IRotation).ToList().ForEach(go => Conceptor3D.RotateObject((IRotation)go));
                     HideCursor();
                 }
                 else ShowCursor();

@@ -2,8 +2,6 @@
 using static Raylib_cs.Raylib;
 using static Raylib_cs.Raymath;
 using System.Numerics;
-using RayGUI_cs;
-using System.Reflection;
 namespace Uniray
 {
     /// <summary>Represents an instance of <see cref="Conceptor3D"/>.</summary>
@@ -70,72 +68,15 @@ namespace Uniray
             return position;
         }
 
-        /// <summary>Rotates a model object.</summary>
-        /// <param name="model">Model object.</param>
-        public static void RotateObject(ref UModel model)
+        /// <summary>Rotates a game object.</summary>
+        /// <param name="go">Objec to rotate. (must implement <see cref="IRotation>"/>.</param>
+        public static void RotateObject(IRotation go)
         {
             // Rotate the model according to the 3-Dimensional axes
             Vector2 mouse = GetMouseDelta();
-            if (IsKeyDown(KeyboardKey.X))
-            {
-                model.Pitch += mouse.Y;
-            }
-            if (IsKeyDown(KeyboardKey.Y))
-            {
-                model.Roll += mouse.Y;
-            }
-            if (IsKeyDown(KeyboardKey.Z))
-            {
-                model.Yaw += mouse.X;
-            }
-        }
-
-        /// <summary>Rotates a shape object.</summary>
-        /// <param name="shape">Shape object.</param>
-        public static void RotateObject(ref UShape shape)
-        {
-            // Rotate the model according to the 3-Dimensional axes
-            Vector2 mouse = GetMouseDelta();
-            if (IsKeyDown(KeyboardKey.X))
-            {
-                shape.Pitch += mouse.Y;
-            }
-            if (IsKeyDown(KeyboardKey.Y))
-            {
-                shape.Roll += mouse.Y;
-            }
-            if (IsKeyDown(KeyboardKey.Z))
-            {
-                shape.Yaw += mouse.X;
-            }
-        }
-
-        /// <summary>Rotates a camera object and modifies its target.</summary>
-        /// <param name="camera">Camera object.</param>
-        public static void RotateObject(ref UCamera camera)
-        {
-            // Rotate the camera according to the 3-Dimensional axes
-            Vector2 mouse = GetMouseDelta();
-            if (IsKeyDown(KeyboardKey.X))
-            {
-                camera.Pitch += mouse.Y;
-            }
-            if (IsKeyDown(KeyboardKey.Y))
-            {
-                camera.Roll += mouse.Y;
-            }
-            if (IsKeyDown(KeyboardKey.Z))
-            {
-                camera.Yaw += mouse.X;
-            }
-            // Set the camera model Transform
-            Matrix4x4 nm = MatrixRotateXYZ(new Vector3(camera.Pitch / RAD2DEG, camera.Yaw / RAD2DEG, camera.Roll / RAD2DEG));
-
-            nm.M14 = camera.Position.X;
-            nm.M24 = camera.Position.Y;
-            nm.M34 = camera.Position.Z;
-
-            camera.Transform = nm;
+            if (IsKeyDown(KeyboardKey.X)) go.Pitch += mouse.Y;
+            if (IsKeyDown(KeyboardKey.Y)) go.Roll += mouse.Y;
+            if (IsKeyDown(KeyboardKey.Z)) go.Yaw += mouse.X;
         }
 
         /// <summary>Checks whether a collision between the mouse and a <see cref="GameObject3D"/> occurs or not.</summary>

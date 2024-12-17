@@ -5,7 +5,7 @@ using Raylib_cs;
 namespace Uniray
 {
     /// <summary>Represents an instance of <see cref="UModel"/>, inheriting <see cref="GameObject3D"/>.</summary>
-    public unsafe class UModel : GameObject3D
+    public unsafe class UModel : GameObject3D, IRotation
     {
         private float _pitch;
         private float _yaw;
