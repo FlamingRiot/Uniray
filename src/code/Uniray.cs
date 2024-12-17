@@ -114,6 +114,9 @@ namespace Uniray
                     case UCamera camera:
                         DrawMesh(HardRessource.Models["camera"].Meshes[0], Shaders.OutlineMaterial, camera.Transform);
                         break;
+                    case UShape shape:
+                        DrawMesh(shape.Mesh, shape.Material, shape.Transform);
+                        break;
                 }
             }
             SetCullFace(ONE);
@@ -123,20 +126,26 @@ namespace Uniray
             foreach (GameObject3D go in CurrentScene.GameObjects)
             {
                 // Manage objects drawing + object selection (according to the object type)
-                if (go is UModel model)
+                switch (go)
                 {
-                    for (int j = 0; j < model.MeshCount; j++)
-                    {
-                        DrawMesh(model.Meshes[j], model.Materials[j], model.Transform);
-                    }
-                    int i = Conceptor3D.CheckCollisionScreenToWorld(go);
-                    index = Conceptor3D.CheckDistance(index, i);
-                }
-                else if (go is UCamera)
-                {
-                    DrawMesh(HardRessource.Models["camera"].Meshes[0], HardRessource.Materials["camera"], ((UCamera)go).Transform);
-                    int i = Conceptor3D.CheckCollisionScreenToWorld(go);
-                    index = Conceptor3D.CheckDistance(index, i);
+                    case UModel model:
+                        for (int j = 0; j < model.MeshCount; j++)
+                        {
+                            DrawMesh(model.Meshes[j], model.Materials[j], model.Transform);
+                        }
+                        int i = Conceptor3D.CheckCollisionScreenToWorld(go);
+                        index = Conceptor3D.CheckDistance(index, i);
+                        break;
+                    case UCamera camera:
+                        DrawMesh(HardRessource.Models["camera"].Meshes[0], HardRessource.Materials["camera"], camera.Transform);
+                        i = Conceptor3D.CheckCollisionScreenToWorld(camera);
+                        index = Conceptor3D.CheckDistance(index, i);
+                        break;
+                    case UShape shape:
+                        DrawMesh(shape.Mesh, shape.Material, shape.Transform);
+                        i = Conceptor3D.CheckCollisionScreenToWorld(shape);
+                        index = Conceptor3D.CheckDistance(index, i);
+                        break;
                 }
             }
 

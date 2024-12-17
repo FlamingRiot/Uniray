@@ -1,4 +1,5 @@
-﻿using RayGUI_cs;
+﻿using System.Numerics;
+using RayGUI_cs;
 
 namespace Uniray
 {
@@ -110,6 +111,21 @@ namespace Uniray
         {
             if (Components.ContainsValue(fileDD)) Components.Remove("fileDD");
             else Components.Add("fileDD", fileDD);
+        }
+
+        private void ToggleAddDD()
+        {
+            if (Components.ContainsValue(addDD)) Components.Remove("addDD");
+            else Components.Add("addDD", addDD);
+        }
+
+        // -----------------------------------------------------------
+        // Add DropDown list events
+        // -----------------------------------------------------------
+        
+        private void AddCube()
+        {
+            UData.CurrentScene.GameObjects.Add(new UShape("Cube", Vector3.UnitY, ShapeType.Cube));
         }
     }
 }

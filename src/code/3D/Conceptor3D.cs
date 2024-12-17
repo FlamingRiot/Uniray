@@ -142,6 +142,9 @@ namespace Uniray
                                 _mouseRayCollision = GetRayCollisionMesh(_mouseRay, HardRessource.Models["camera"].Meshes[0], camera.Transform);
                             }
                             break;
+                        case UShape shape:
+                            _mouseRayCollision = GetRayCollisionMesh(_mouseRay, shape.Mesh, shape.Transform);
+                            break;
                     }
                     // Return hit information
                     if (_mouseRayCollision.Hit)

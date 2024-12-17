@@ -28,6 +28,7 @@ namespace Uniray
         // Public attributes
         // -----------------------------------------------------------
         public Mesh Mesh;
+        public Material Material;
 
         // -----------------------------------------------------------
         // Public properties
@@ -55,6 +56,8 @@ namespace Uniray
         {
             // Empty shape object
             Type = ShapeType.Cube; // Default
+            Mesh = GenMesh(Type);
+            Material = Raylib.LoadMaterialDefault();
         }
 
         /// <summary>Creates an instance of <see cref="UShape"/>.</summary>
@@ -64,6 +67,8 @@ namespace Uniray
         public UShape(string name, Vector3 position, ShapeType type) : base(name, position)
         {
             Type = type;
+            Mesh = GenMesh(Type);
+            Material = Raylib.LoadMaterialDefault();
         }
 
         /// <summary>Generates the shape mesh from type.</summary>

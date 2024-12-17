@@ -24,6 +24,7 @@ namespace Uniray
         // -----------------------------------------------------------
 
         DropDown fileDD;
+        DropDown addDD;
 
         /// <summary>Creates an instance of a <see cref="UI"/>.</summary>
         public UI()
@@ -69,7 +70,7 @@ namespace Uniray
             Components.Add("displayDDButton", displayDDButton);
 
             Button addDDButton = new Button("Add", 165, 5, 60, 19, "addDDButton");
-
+            addDDButton.Event = ToggleAddDD;
             Components.Add("addDDButton", addDDButton);
 
             // Play/Build button
@@ -193,6 +194,7 @@ namespace Uniray
             // -----------------------------------------------------------
             // DropDown lists instanciation
             // -----------------------------------------------------------
+            // File DropDown
             List<string> fileDDS = new List<string>()
             {
                 "Create project",
@@ -209,6 +211,21 @@ namespace Uniray
             fileDD.SetButtonEvent(1, OpenProject);
             fileDD.SetButtonEvent(2, Uniray.SaveProject);
             fileDD.SetButtonEvent(3, Project.Build);
+
+            // Add DropDown
+            List<string> addDDS = new List<string>()
+            {
+                "Cube",
+                "Sphere",
+                "Cylinder",
+                "Cone",
+                "Hemisphere",
+                "Torus",
+                "Knot"
+            };
+            addDD = new DropDown(165, 30, 140, addDDS);
+            addDD.BackgroundColor = Uniray.SPECIAL_COLOR;
+            addDD.SetButtonEvent(0, AddCube);
         }
 
         /// <summary>Draws the full 2D UI of the application.</summary>
