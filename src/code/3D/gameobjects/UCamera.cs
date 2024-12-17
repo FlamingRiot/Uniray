@@ -51,13 +51,13 @@ namespace Uniray
 
         /// <summary>X Axis rotation angle.</summary>
         [ComponentField(Group = "Rotation")]
-        public float Pitch { get { return _pitch; } set { _pitch = value; } }
+        public float Pitch { get { return _pitch; } set { _pitch = value; UpdateRotation(); } }
         /// <summary>Y Axis rotation angle.</summary>
         [ComponentField(Group = "Rotation")]
-        public float Yaw { get { return _yaw; } set { _yaw = value; } }
+        public float Yaw { get { return _yaw; } set { _yaw = value; UpdateRotation(); } }
         /// <summary>Z Axis rotation angle.</summary>
         [ComponentField(Group = "Rotation")]
-        public float Roll { get { return _roll; } set {  _roll = value; } }
+        public float Roll { get { return _roll; } set {  _roll = value; UpdateRotation(); } }
 
         /// <summary>Creates an empty instance of <see cref="UCamera"/>.</summary>
         public UCamera() : base() { Camera = DefaultCamera; }
@@ -73,7 +73,16 @@ namespace Uniray
         /// <summary>Draws the camera object to the screen.</summary>
         public unsafe override void Draw()
         {
-            Raylib.DrawMesh(HardRessource.Models["camera"].Meshes[0], Uniray.Shaders.OutlineMaterial, Transform);
+            Raylib.DrawMesh(HardRessource.Models["camera"].Meshes[0], HardRessource.Materials["camera"], Transform);
+        }
+
+        /// <summary>Updates the rotation of the camera model.</summary>
+        private void UpdateRotation()
+        {
+            Matrix4x4 rm = Raymath.MatrixRotateXYZ(new Vector3(_pitch / Raylib.RAD2DEG, _yaw / Raylib.RAD2DEG, _roll / Raylib.RAD2DEG));
+            Matrix4x4 pm = Raymath.MatrixTranslate(X, Y, Z);
+            // Multiply matrices
+            Transform = pm * rm;
         }
 
         /// <summary>Returns informations about the current instance.</summary>

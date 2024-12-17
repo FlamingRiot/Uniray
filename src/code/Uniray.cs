@@ -12,7 +12,6 @@ using Uniray.DatFiles;
 using static Uniray.UData;
 using Uniray;
 using System.Reflection;
-using System.Xml.Linq;
 
 namespace Uniray
 {
@@ -101,7 +100,7 @@ namespace Uniray
 
             // Render the outlined selected GameObjects and deactivate the Raylib culling to make it possible
             SetCullFace(ZERO);
-            Selection.ForEach(go => go.Draw());
+            Selection.ForEach(go => go.Draw()); // TEMPORARY, NEED TO FIND BETTER METHOD
             SetCullFace(ONE);
 
             // Draw 3-Dimensional models of the current scene and check for a hypothetical new selected object
