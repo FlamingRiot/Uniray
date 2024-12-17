@@ -60,6 +60,12 @@ namespace Uniray
             Camera = camera;
         }
 
+        /// <summary>Draws the camera object to the screen.</summary>
+        public unsafe override void Draw()
+        {
+            Raylib.DrawMesh(HardRessource.Models["camera"].Meshes[0], Uniray.Shaders.OutlineMaterial, Transform);
+        }
+
         /// <summary>Returns informations about the current instance.</summary>
         /// <returns>Informations as a <see langword="string"/>.</returns>
         public override string ToString()

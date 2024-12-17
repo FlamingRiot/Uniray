@@ -3,6 +3,7 @@ using static Raylib_cs.Raylib;
 using static Raylib_cs.Raymath;
 using System.Numerics;
 using RayGUI_cs;
+using System.Reflection;
 namespace Uniray
 {
     /// <summary>Represents an instance of <see cref="Conceptor3D"/>.</summary>
@@ -36,7 +37,6 @@ namespace Uniray
         }
 
         /// <summary>Sets a value to the mouse ray.</summary>
-        /// <param name="ray">Ray to set.</param>
         public static void UpdateMouseRay()
         {
             mouse = GetMousePosition();
@@ -87,6 +87,26 @@ namespace Uniray
             if (IsKeyDown(KeyboardKey.Z))
             {
                 model.Yaw += mouse.X;
+            }
+        }
+
+        /// <summary>Rotates a shape object.</summary>
+        /// <param name="shape">Shape object.</param>
+        public static void RotateObject(ref UShape shape)
+        {
+            // Rotate the model according to the 3-Dimensional axes
+            Vector2 mouse = GetMouseDelta();
+            if (IsKeyDown(KeyboardKey.X))
+            {
+                shape.Pitch += mouse.Y;
+            }
+            if (IsKeyDown(KeyboardKey.Y))
+            {
+                shape.Roll += mouse.Y;
+            }
+            if (IsKeyDown(KeyboardKey.Z))
+            {
+                shape.Yaw += mouse.X;
             }
         }
 

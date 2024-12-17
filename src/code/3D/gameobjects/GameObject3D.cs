@@ -3,8 +3,14 @@ using System.Numerics;
 
 namespace Uniray
 {
+    /// <summary>Defines the necessity to be drawable.</summary>
+    public interface IDrawable
+    {
+        void Draw(); // Draw method
+    }
+
     /// <summary>Reprsents an instance of <see cref="GameObject3D"/>.</summary>
-    public abstract class GameObject3D
+    public abstract class GameObject3D : IDrawable
     {
         // -----------------------------------------------------------
         // Public attributes
@@ -59,6 +65,9 @@ namespace Uniray
             Position = position;
             Behavior = behavior;
         }
+
+        /// <summary>Draws the Game Object to the screen.</summary>
+        public abstract void Draw();
 
         /// <summary>Returns informations about the current instance.</summary>
         /// <returns>Informations as a <see langword="string"/>.</returns>

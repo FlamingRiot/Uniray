@@ -101,53 +101,17 @@ namespace Uniray
 
             // Render the outlined selected GameObjects and deactivate the Raylib culling to make it possible
             SetCullFace(ZERO);
-            foreach (GameObject3D go in Selection)
-            {
-                switch (go)
-                {
-                    case UModel model:
-                        for (int i = 0; i < model.MeshCount; i++)
-                        {
-                            DrawMesh(model.Meshes[i], Shaders.OutlineMaterial, model.Transform);
-                        }
-                        break;
-                    case UCamera camera:
-                        DrawMesh(HardRessource.Models["camera"].Meshes[0], Shaders.OutlineMaterial, camera.Transform);
-                        break;
-                    case UShape shape:
-                        DrawMesh(shape.Mesh, shape.Material, shape.Transform);
-                        break;
-                }
-            }
+            Selection.ForEach(go => go.Draw());
             SetCullFace(ONE);
 
             // Draw 3-Dimensional models of the current scene and check for a hypothetical new selected object
             int index = -1;
-            foreach (GameObject3D go in CurrentScene.GameObjects)
+            CurrentScene.GameObjects.ForEach(go =>
             {
-                // Manage objects drawing + object selection (according to the object type)
-                switch (go)
-                {
-                    case UModel model:
-                        for (int j = 0; j < model.MeshCount; j++)
-                        {
-                            DrawMesh(model.Meshes[j], model.Materials[j], model.Transform);
-                        }
-                        int i = Conceptor3D.CheckCollisionScreenToWorld(go);
-                        index = Conceptor3D.CheckDistance(index, i);
-                        break;
-                    case UCamera camera:
-                        DrawMesh(HardRessource.Models["camera"].Meshes[0], HardRessource.Materials["camera"], camera.Transform);
-                        i = Conceptor3D.CheckCollisionScreenToWorld(camera);
-                        index = Conceptor3D.CheckDistance(index, i);
-                        break;
-                    case UShape shape:
-                        DrawMesh(shape.Mesh, shape.Material, shape.Transform);
-                        i = Conceptor3D.CheckCollisionScreenToWorld(shape);
-                        index = Conceptor3D.CheckDistance(index, i);
-                        break;
-                }
-            }
+                go.Draw();
+                int i = Conceptor3D.CheckCollisionScreenToWorld(go);
+                index = Conceptor3D.CheckDistance(index, i);
+            });
 
             // Assign the newly selected object to the according variable
             if (index != -1)
@@ -242,15 +206,20 @@ namespace Uniray
                     foreach (GameObject3D go in Selection)
                     {
                         // Cast the object to apply the appropriate rotation effects
-                        if (go is UModel)
+                        switch (go)
                         {
-                            UModel model = (UModel)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
-                            Conceptor3D.RotateObject(ref model);
-                        }
-                        else if (go is UCamera)
-                        {
-                            UCamera camera = (UCamera)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
-                            Conceptor3D.RotateObject(ref camera);
+                            case UModel:
+                                UModel model = (UModel)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
+                                Conceptor3D.RotateObject(ref model);
+                                break;
+                            case UCamera:
+                                UCamera camera = (UCamera)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
+                                Conceptor3D.RotateObject(ref camera);
+                                break;
+                            case UShape:
+                                UShape shape = (UShape)CurrentScene.GameObjects.ElementAt(CurrentScene.GameObjects.IndexOf(go));
+                                Conceptor3D.RotateObject(ref shape);
+                                break;
                         }
                     }
                     HideCursor();
@@ -281,14 +250,9 @@ namespace Uniray
                 Shaders.Update(cam.Camera.Position);
 
                 Conceptor3D.DrawGrid();
+                // Draw Models
+                foreach (GameObject3D go in CurrentScene.GameObjects.Where(x => x is UModel || x is UShape)) go.Draw();
 
-                foreach (UModel model in CurrentScene.GameObjects.Where(x => x is UModel))
-                {
-                    for (int j = 0; j < model.MeshCount; j++)
-                    {
-                        DrawMesh(model.Meshes[j], model.Materials[j], model.Transform);
-                    }
-                }
                 EndMode3D();
                 EndTextureMode();
 

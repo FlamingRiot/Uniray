@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using Raylib_cs;
 
@@ -23,6 +24,9 @@ namespace Uniray
         // Private attributes
         // -----------------------------------------------------------
         private ShapeType shapeType;
+        private float _pitch;
+        private float _yaw;
+        private float _roll;
 
         // -----------------------------------------------------------
         // Public attributes
@@ -45,6 +49,40 @@ namespace Uniray
                 Transform.M14 = value.X;
                 Transform.M24 = value.Y;
                 Transform.M34 = value.Z;
+            }
+        }
+
+        /// <summary>X Axis rotation.</summary>
+        [ComponentField(Group = "Rotation")]
+        public float Pitch
+        {
+            get { return _pitch; }
+            set
+            {
+                _pitch = value;
+                SetRotation();
+            }
+        }
+        /// <summary>Y Axis rotation</summary>
+        [ComponentField(Group = "Rotation")]
+        public float Yaw
+        {
+            get { return _yaw; }
+            set
+            {
+                _yaw = value;
+                SetRotation();
+            }
+        }
+        /// <summary>Z Axis rotation.</summary>
+        [ComponentField(Group = "Rotation")]
+        public float Roll
+        {
+            get { return _roll; }
+            set
+            {
+                _roll = value;
+                SetRotation();
             }
         }
 
@@ -71,6 +109,12 @@ namespace Uniray
             Material = Raylib.LoadMaterialDefault();
         }
 
+        /// <summary>Draws a shape object to the screen.</summary>
+        public override void Draw()
+        {
+            Raylib.DrawMesh(Mesh, Material, Transform);
+        }
+
         /// <summary>Generates the shape mesh from type.</summary>
         /// <param name="type">Type of the mesh.</param>
         public static Mesh GenMesh(ShapeType type)
@@ -93,6 +137,33 @@ namespace Uniray
                     return Raylib.GenMeshHemiSphere(0.5f, 15, 15);
             }
             return Raylib.GenMeshCube(1, 1, 1);
+        }
+
+        /// <summary>Rotates the object with new rotation angles.</summary>
+        private void SetRotation()
+        {
+            // Calculate matrix rotation
+            Matrix4x4 rm = Raymath.MatrixRotateXYZ(new Vector3(_pitch / Raylib.RAD2DEG, _yaw / Raylib.RAD2DEG, _roll / Raylib.RAD2DEG));
+            Matrix4x4 pm = Raymath.MatrixTranslate(X, Y, Z);
+            // Multiply matrices
+            Transform = Raymath.MatrixMultiply(rm, pm);
+        }
+
+        /// <summary>Rotates the object with new rotation angles.</summary>
+        /// <param name="pitch">X Axis rotation.</param>
+        /// <param name="yaw">Y Axis rotation.</param>
+        /// <param name="roll">Z Axis rotation</param>
+        private void SetRotation(float pitch, float yaw, float roll)
+        {
+            Pitch = pitch;
+            Yaw = yaw;
+            Roll = roll;
+
+            // Calculate matrix rotation
+            Matrix4x4 rm = Raymath.MatrixRotateXYZ(new Vector3(pitch / Raylib.RAD2DEG, yaw / Raylib.RAD2DEG, roll / Raylib.RAD2DEG));
+            Matrix4x4 pm = Raymath.MatrixTranslate(X, Y, Z);
+            // Multiply matrices
+            Transform = Raymath.MatrixMultiply(rm, pm);
         }
     }
 }

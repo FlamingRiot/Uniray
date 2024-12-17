@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Reflection;
 using Raylib_cs;
 
 namespace Uniray
@@ -107,6 +108,15 @@ namespace Uniray
             // Position
             Transform = Matrix4x4.Identity;
             Position = position;
+        }
+
+        /// <summary>Draws the model's meshes to the screen.</summary>
+        public override void Draw()
+        {
+            for (int j = 0; j < MeshCount; j++)
+            {
+                Raylib.DrawMesh(Meshes[j], Materials[j], Transform);
+            }
         }
 
         /// <summary>Sets the model texture.</summary>
