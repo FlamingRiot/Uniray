@@ -1,11 +1,10 @@
 ﻿using System.Numerics;
-using System.Reflection;
 using Raylib_cs;
 
 namespace Uniray
 {
     /// <summary>Represents an instance of <see cref="UModel"/>, inheriting <see cref="GameObject3D"/>.</summary>
-    public unsafe class UModel : GameObject3D, IRotation
+    public unsafe class UModel : GameObject3D, IRotation, IClonable<UModel>
     {
         private float _pitch;
         private float _yaw;
@@ -117,6 +116,13 @@ namespace Uniray
             {
                 Raylib.DrawMesh(Meshes[j], Materials[j], Transform);
             }
+        }
+
+        /// <summary>Creates a clone of the current game object.</summary>
+        /// <returns>The generated clone.</returns>
+        public UModel Clone()
+        {
+            return (UModel)MemberwiseClone();
         }
 
         /// <summary>Sets the model texture.</summary>

@@ -1,5 +1,4 @@
-﻿using Raylib_cs;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Uniray
 {
@@ -15,6 +14,13 @@ namespace Uniray
         float Pitch { get; set; }
         float Yaw { get; set; }
         float Roll { get; set; }
+    }
+
+    /// <summary>Defines the ability of an object to cloned (copy-paste).</summary>
+    /// <typeparam name="T">Type of the game object. (must inherit from <see cref="GameObject3D"/>.</typeparam>
+    public interface IClonable<out T> where T : GameObject3D
+    {
+        T Clone();
     }
 
     /// <summary>Reprsents an instance of <see cref="GameObject3D"/>.</summary>

@@ -166,19 +166,14 @@ namespace Uniray
                     if (mouse.X > UI.Components["gameManager"].X + UI.Components["gameManager"].Width && mouse.Y < UI.Components["fileManager"].Y - 10)
                     {
                         Vector3 dir = GetCameraForward(ref Conceptor3D.EnvCamera) * 5f;
-                        for (int i = 0; i < _clipboard.Count; i++)
+
+                        _clipboard.Where(x => x is IClonable<GameObject3D>).ToList().ForEach(go =>
                         {
-                            UModel go = new UModel(
-                                _clipboard[i].Name,
-                                _clipboard[i].Position,
-                                ((UModel)_clipboard[i]).ModelID);
-                            // Set the rotations of the model
-                            go.Rotation = ((UModel)_clipboard[i]).Rotation;
-                            // Set final position of the model
-                            go.Position -= dir;
-                            // Add the copied object to the list
-                            CurrentScene.GameObjects.Add(go);
-                        }
+                            var clone = ((IClonable<GameObject3D>)go).Clone();
+                            clone.Position = Conceptor3D.EnvCamera.Position + dir;
+                            CurrentScene.GameObjects.Add(clone);
+                        });
+
                         Conceptor3D.ClearSelection();
                     }   
                 }

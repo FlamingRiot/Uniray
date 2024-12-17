@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
+﻿using System.Numerics;
 using Raylib_cs;
 
 namespace Uniray
@@ -18,7 +16,7 @@ namespace Uniray
     }
 
     /// <summary>Represents a <see cref="UShape"/> game object.</summary>
-    public class UShape : GameObject3D, IRotation
+    public class UShape : GameObject3D, IRotation, IClonable<UShape>
     {
         // -----------------------------------------------------------
         // Private attributes
@@ -113,6 +111,13 @@ namespace Uniray
         public override void Draw()
         {
             Raylib.DrawMesh(Mesh, Material, Transform);
+        }
+
+        /// <summary>Creates a clone of the current game object.</summary>
+        /// <returns>The generated clone.</returns>
+        public UShape Clone()
+        {
+            return (UShape)MemberwiseClone();
         }
 
         /// <summary>Generates the shape mesh from type.</summary>

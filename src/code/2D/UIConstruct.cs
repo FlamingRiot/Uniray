@@ -226,6 +226,12 @@ namespace Uniray
             addDD = new DropDown(165, 30, 140, addDDS);
             addDD.BackgroundColor = Uniray.SPECIAL_COLOR;
             addDD.SetButtonEvent(0, AddCube);
+            addDD.SetButtonEvent(1, AddSphere);
+            addDD.SetButtonEvent(2, AddCylinder);
+            addDD.SetButtonEvent(3, AddCone);
+            addDD.SetButtonEvent(4, AddHemisphere);
+            addDD.SetButtonEvent(5, AddTorus);
+            addDD.SetButtonEvent(6, AddKnot);
         }
 
         /// <summary>Draws the full 2D UI of the application.</summary>

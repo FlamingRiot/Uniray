@@ -127,5 +127,34 @@ namespace Uniray
         {
             UData.CurrentScene.GameObjects.Add(new UShape("Cube", Vector3.UnitY, ShapeType.Cube));
         }
+
+        private void AddSphere()
+        {
+            UData.CurrentScene.GameObjects.Add(new UShape("Sphere", Vector3.UnitY, ShapeType.Sphere));
+        }
+
+        private void AddCylinder()
+        {
+            UData.CurrentScene.GameObjects.Add(new UShape("Cylinder", Vector3.UnitY, ShapeType.Cylinder));
+        }
+
+        private void AddTorus()
+        {
+            UData.CurrentScene.GameObjects.Add(new UShape("Torus", Vector3.UnitY, ShapeType.Torus));
+        }
+
+        private void AddCone()
+        {
+            UData.CurrentScene.GameObjects.Add(new UShape("Cone", Vector3.UnitY, ShapeType.Cone));
+        }
+
+        private void AddHemisphere()
+        {
+            UData.CurrentScene.GameObjects.Add(new UShape("Hemisphere", Vector3.UnitY, ShapeType.HemiSphere));
+        }
+        private void AddKnot()
+        {
+            UData.CurrentScene.GameObjects.Add(new UShape("Knot", Vector3.UnitY, ShapeType.Knot));
+        }
     }
 }
