@@ -274,6 +274,7 @@ namespace Uniray
             Rlgl.EnableDepthMask();
         }
 
+        /// <summary>Closes the Uniray and unloads its data from RAM/VRAM.</summary>
         public static void CloseUniray()
         {
             // Close window
@@ -292,8 +293,8 @@ namespace Uniray
                     if (go is UModel m) RaylibComplements.UnloadUModel(m);
                 }
             }
-            // Unload shaders
-            Uniray.Shaders.UnloadShaders();
+            Uniray.Shaders.UnloadShaders(); // Unload shaders
+            HardRessource.Unload(); // Unload hard ressources
 
             Environment.Exit(0);
         }

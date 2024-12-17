@@ -92,7 +92,7 @@ namespace Uniray
         {
             // Empty shape object
             Type = ShapeType.Cube; // Default
-            Mesh = GenMesh(Type);
+            Mesh = HardRessource.ShapeMeshes[Type];
             Material = Raylib.LoadMaterialDefault();
         }
 
@@ -103,7 +103,7 @@ namespace Uniray
         public UShape(string name, Vector3 position, ShapeType type) : base(name, position)
         {
             Type = type;
-            Mesh = GenMesh(Type);
+            Mesh = HardRessource.ShapeMeshes[Type];
             Material = Raylib.LoadMaterialDefault();
         }
 
@@ -118,30 +118,6 @@ namespace Uniray
         public UShape Clone()
         {
             return (UShape)MemberwiseClone();
-        }
-
-        /// <summary>Generates the shape mesh from type.</summary>
-        /// <param name="type">Type of the mesh.</param>
-        public static Mesh GenMesh(ShapeType type)
-        {
-            switch (type) 
-            { 
-                case ShapeType.Cube:
-                    return Raylib.GenMeshCube(1, 1, 1);
-                case ShapeType.Sphere:
-                    return Raylib.GenMeshSphere(0.5f, 20, 20);
-                case ShapeType.Torus:
-                    return Raylib.GenMeshTorus(0.5f, 1, 20, 20);
-                case ShapeType.Cone:
-                    return Raylib.GenMeshCone(0.5f, 1, 20);
-                case ShapeType.Cylinder:
-                    return Raylib.GenMeshCylinder(0.5f, 1, 20);
-                case ShapeType.Knot:
-                    return Raylib.GenMeshKnot(0.5f, 1, 20, 20);
-                case ShapeType.HemiSphere:
-                    return Raylib.GenMeshHemiSphere(0.5f, 15, 15);
-            }
-            return Raylib.GenMeshCube(1, 1, 1);
         }
 
         /// <summary>Rotates the object with new rotation angles.</summary>

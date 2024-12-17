@@ -8,6 +8,7 @@ namespace Uniray
         public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
         public static Dictionary<string, Model> Models = new Dictionary<string, Model>();
         public static Dictionary<string, Material> Materials = new Dictionary<string, Material>();
+        public static Dictionary<ShapeType, Mesh> ShapeMeshes = new Dictionary<ShapeType, Mesh>();
 
         public static void Init()
         {
@@ -23,12 +24,34 @@ namespace Uniray
             {
                 { "camera", LoadModel("data/camera.m3d")}
             };
+
+            // Load UShape Meshes
+            ShapeMeshes = new Dictionary<ShapeType, Mesh>()
+            {
+                { ShapeType.Cube, GenMeshCube(1, 1, 1) },
+                { ShapeType.Sphere, GenMeshSphere(0.5f, 20, 20) },
+                { ShapeType.Cylinder, GenMeshCylinder(0.5f, 1, 20) },
+                { ShapeType.Cone, GenMeshCone(0.5f, 1, 20) },
+                { ShapeType.Torus, GenMeshTorus(0.5f, 1, 20, 20) },
+                { ShapeType.HemiSphere, GenMeshHemiSphere(0.5f, 15, 15) },
+                { ShapeType.Knot, GenMeshKnot(0.5f, 1, 20, 20) }
+            };
+
             // Load static materials
             Materials = new Dictionary<string, Material>();
             // Camera material
             Material camMat = LoadMaterialDefault();
             SetMaterialTexture(ref camMat, MaterialMapIndex.Albedo, LoadTexture("data/cameraTex.png"));
             Materials.Add("camera", camMat);
+        }
+
+        /// <summary>Unloads Hard Resources from RAM/VRAM</summary>
+        public static void Unload()
+        {
+            ShapeMeshes.ToList().ForEach(x => UnloadMesh(x.Value)); // Unload Shape Meshes
+            Textures.ToList().ForEach(x => UnloadTexture(x.Value)); // Unload textures
+            Models.ToList().ForEach(x => UnloadModel(x.Value)); // Unload models
+            Materials.ToList().ForEach(x => UnloadMaterial(x.Value)); // Unload materials
         }
     }
 }

@@ -3,9 +3,9 @@
 namespace Uniray
 {
     /// <summary>Defines the necessity to be drawable.</summary>
-    public interface IDrawable
-    {
-        void Draw(); // Draw method
+    public interface IDrawable 
+    { 
+        void Draw(); // Draw function
     }
 
     /// <summary>Defines the ability of an object to rotate.</summary>
@@ -24,8 +24,8 @@ namespace Uniray
     }
 
     /// <summary>Reprsents an instance of <see cref="GameObject3D"/>.</summary>
-    public abstract class GameObject3D : IDrawable
-    {
+    public abstract class GameObject3D : IDrawable 
+    { 
         // -----------------------------------------------------------
         // Public attributes
         // -----------------------------------------------------------
