@@ -140,7 +140,14 @@ namespace Uniray
                     }
                     else
                     {
-                        motion.Distance -= GetMouseWheelMove() * 2f * Raymath.Vector3Distance(camera.Position, camera.Target) / 10;
+                        // Manage zoom
+                        float mov = GetMouseWheelMove();
+                        if (mov != 0.0f)
+                        {
+                            // Calculate motion from retrieved data
+                            motion.Distance -= GetMouseWheelMove() * 2f * Raymath.Vector3Distance(camera.Position, camera.Target) / 10;
+                        }
+
                         MoveCamera(motion.Distance, ref camera, camera.Target, motion.YOffset, true, motion.Mouse, motion.MouseOrigin);
                     }
                     Conceptor3D.EnvCamera = camera;
