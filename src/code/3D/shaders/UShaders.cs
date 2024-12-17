@@ -6,81 +6,73 @@ namespace Uniray
 {
     public unsafe class UShaders
     {
-        /// <summary>
-        /// Outline shader used for rendering an outline around the currently selected GameObjects
-        /// </summary>
-        private Shader outlineShader;
-        /// <summary>
-        /// The used material to render the outline shader
-        /// </summary>
-        private Material outlineMaterial;
-        /// <summary>
-        /// Skybox rendering shader
-        /// </summary>
-        private Shader skyboxShader;
-        /// <summary>
-        /// Skybox material
-        /// </summary>
-        private Material skyboxMaterial;
-        /// <summary>
-        /// Cubemap loading shader
-        /// </summary>
-        private Shader cubemapShader;
-        /// <summary>
-        /// Outline shader used for rendering an outline around the currently selected GameObjects
-        /// </summary>
-        public Shader OutlineShader { get { return outlineShader; } set { outlineShader = value; } }
-        /// <summary>
-        /// Skybox rendering shader
-        /// </summary>
-        public Shader SkyboxShader { get { return skyboxShader; } set { skyboxShader = value; } }
-        /// <summary>
-        /// Skybox loading shader
-        /// </summary>
-        public Shader CubemapShader { get { return cubemapShader; } set { cubemapShader = value; } }
-        /// <summary>
-        /// The used material to render the outline shader
-        /// </summary>
-        public Material OutlineMaterial { get { return outlineMaterial; } set { outlineMaterial = value; } }
-        public Material SkyboxMaterial { get { return skyboxMaterial; } set { skyboxMaterial = value; } }
-        /// <summary>
-        /// UShaders constructor
-        /// </summary>
+        /// <summary>Outline shader used for rendering an outline around the currently selected GameObjects.</summary>
+        public Shader OutlineShader;
+        /// <summary>Skybox rendering shader.</summary>
+        public Shader SkyboxShader;
+        /// <summary>Skybox loading shader.</summary>
+        public Shader CubemapShader;
+        /// <summary>Basic lighting shader.</summary>
+        public Shader LightingShader;
+
+        // -----------------------------------------------------------
+        // Shader associated materials
+        // -----------------------------------------------------------
+        public Material OutlineMaterial;
+        public Material SkyboxMaterial;
+
+        // -----------------------------------------------------------
+        // Shader uniforms locations
+        // -----------------------------------------------------------
+        private int _viewPosLoc;
+
+        /// <summary>Creates an instance of Uniray Shaders</summary>
         public UShaders()
         {
             // Outline shader
-            outlineShader = LoadShader("data/shaders/outline.vs", "data/shaders/outline.fs");
-            outlineMaterial = LoadMaterialDefault();
-            outlineMaterial.Shader = outlineShader;
+            OutlineShader = LoadShader("data/shaders/outline.vs", "data/shaders/outline.fs");
+            OutlineMaterial = LoadMaterialDefault();
+            OutlineMaterial.Shader = OutlineShader;
             // Skybox shader
-            skyboxShader = LoadShader("data/shaders/skybox.vs", "data/shaders/skybox.fs");
-            SetShaderValue(skyboxShader, GetShaderLocation(skyboxShader, "environmentMap"), (int)MaterialMapIndex.Cubemap, ShaderUniformDataType.Int);
-            SetShaderValue(skyboxShader, GetShaderLocation(skyboxShader, "doGamma"), 1, ShaderUniformDataType.Int);
-            SetShaderValue(skyboxShader, GetShaderLocation(skyboxShader, "vflipped"), 1, ShaderUniformDataType.Int);
-            skyboxMaterial = LoadMaterialDefault();
-            skyboxMaterial.Shader = skyboxShader;
+            SkyboxShader = LoadShader("data/shaders/skybox.vs", "data/shaders/skybox.fs");
+            SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "environmentMap"), (int)MaterialMapIndex.Cubemap, ShaderUniformDataType.Int);
+            SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "doGamma"), 1, ShaderUniformDataType.Int);
+            SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "vflipped"), 1, ShaderUniformDataType.Int);
+            SkyboxMaterial = LoadMaterialDefault();
+            SkyboxMaterial.Shader = SkyboxShader;
             // Cubemap shader
-            cubemapShader = LoadShader("data/shaders/cubemap.vs", "data/shaders/cubemap.fs");
-            SetShaderValue(cubemapShader, GetShaderLocation(cubemapShader, "equirectangularMap"), 0, ShaderUniformDataType.Int);
+            CubemapShader = LoadShader("data/shaders/cubemap.vs", "data/shaders/cubemap.fs");
+            SetShaderValue(CubemapShader, GetShaderLocation(CubemapShader, "equirectangularMap"), 0, ShaderUniformDataType.Int);
+            // Load lighting shader
+            LightingShader = LoadShader("data/shaders/lighting.vs", "data/shaders/lighting.fs");
+            _viewPosLoc = GetShaderLocation(LightingShader, "viewPos");
         }
-        /// <summary>
-        /// Unload shaders and materials
-        /// </summary>
+
+        /// <summary>Updates the shader values.</summary>
+        /// <param name="viewPos">Camera position (view camera).</param>
+        public void Update(Vector3 viewPos)
+        {
+            SetShaderValue(LightingShader, _viewPosLoc, viewPos, ShaderUniformDataType.Vec3);
+        }
+
+        /// <summary>Unloads shaders and materials</summary>
         public void UnloadShaders()
         {
             // Unload shaders
-            UnloadShader(outlineShader);
+            UnloadShader(OutlineShader);
+            UnloadShader(SkyboxShader);
+            UnloadShader(CubemapShader);
 
             // Unload materials
-            UnloadMaterial(outlineMaterial);
+            UnloadMaterial(OutlineMaterial);
+            UnloadMaterial(SkyboxMaterial);
         }
-        /// <summary>
-        /// Generate Cubemap according to the passed HDR texture
-        /// </summary>
-        /// <param name="panorama">Texture to use/param>
-        /// <param name="size">FrameBuffer size</param>
-        /// <param name="format">Format of the cubemap</param>
-        /// <returns></returns>
+
+        /// <summary>Generate skybox cubemap using the loading shader.</summary>
+        /// <param name="panorama">HDR Texture to use./param>
+        /// <param name="size">FrameBuffer size.</param>
+        /// <param name="format">Format of the cubemap.</param>
+        /// <returns>The loaded cubemap.</returns>
         public Texture2D GenTexureCubemap(Texture2D panorama, int size, PixelFormat format)
         {
             Texture2D cubemap;
@@ -104,11 +96,11 @@ namespace Uniray
             }
 
             // Draw to framebuffer
-            Rlgl.EnableShader(cubemapShader.Id);
+            Rlgl.EnableShader(CubemapShader.Id);
 
             // Define projection matrix and send it to the shader
             Matrix4x4 matFboProjection = Raymath.MatrixPerspective(90.0f * DEG2RAD, 1.0f, Rlgl.CULL_DISTANCE_NEAR, Rlgl.CULL_DISTANCE_FAR);
-            Rlgl.SetUniformMatrix(cubemapShader.Locs[(int)ShaderLocationIndex.MatrixProjection], matFboProjection);
+            Rlgl.SetUniformMatrix(CubemapShader.Locs[(int)ShaderLocationIndex.MatrixProjection], matFboProjection);
 
             // Define view matrix for every side of the cube
             Matrix4x4[] fboViews = new Matrix4x4[]
@@ -131,7 +123,7 @@ namespace Uniray
             for (int i = 0; i < 6; i++)
             {
                 // Set the view matrix for current face
-                Rlgl.SetUniformMatrix(cubemapShader.Locs[(int)ShaderLocationIndex.MatrixView], fboViews[i]);
+                Rlgl.SetUniformMatrix(CubemapShader.Locs[(int)ShaderLocationIndex.MatrixView], fboViews[i]);
 
                 // Select the current cubemap face attachment for the fbo
                 Rlgl.FramebufferAttach(fbo, cubemap.Id, FramebufferAttachType.ColorChannel0, FramebufferAttachTextureType.CubemapPositiveX + i, 0);
@@ -158,13 +150,12 @@ namespace Uniray
 
             return cubemap;
         }
-        /// <summary>
-        /// Set the skybox material texture
-        /// </summary>
-        /// <param name="tex"></param>
+
+        /// <summary>Sets the cubemap texture.</summary>
+        /// <param name="tex">¨Texture to set.</param>
         public void SetCubemap(Texture2D tex)
         {
-            SetMaterialTexture(ref skyboxMaterial, MaterialMapIndex.Cubemap, tex);
+            SetMaterialTexture(ref SkyboxMaterial, MaterialMapIndex.Cubemap, tex);
         }
     }
 }

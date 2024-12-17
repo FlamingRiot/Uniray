@@ -23,7 +23,7 @@ namespace Uniray
         // Constants and static instances
         // -----------------------------------------------------------
         /// <summary>Base FOV of the environment camera.</summary>
-        internal const int CAMERA_FOV = 90;
+        internal const int CAMERA_FOV = 100;
 
         /// <summary>Current state of the program.</summary>
         internal static ProgramState State;
@@ -262,14 +262,16 @@ namespace Uniray
 
                 BeginMode3D(cam.Camera);
 
-                DrawGrid(10, 10);
-
                 // Draw the external skybox 
                 DisableBackfaceCulling();
                 DisableDepthMask();
                 DrawMesh(Program.Skybox, Shaders.SkyboxMaterial, MatrixIdentity());
                 EnableBackfaceCulling();
                 EnableDepthMask();
+
+                Shaders.Update(cam.Camera.Position);
+
+                Conceptor3D.DrawGrid();
 
                 foreach (UModel model in CurrentScene.GameObjects.Where(x => x is UModel))
                 {
@@ -283,6 +285,8 @@ namespace Uniray
 
                 BeginMode3D(Conceptor3D.EnvCamera);
             }
+            // Update shaders
+            Shaders.Update(Conceptor3D.EnvCamera.Position);
         }
 
         /// <summary>Draws 2-Dimensional user interface.</summary>

@@ -18,11 +18,21 @@ namespace Uniray
         private static Ray _mouseRay;
         private static RayCollision _mouseRayCollision;
 
+        private static Mesh _plane = GenMeshPlane(500, 500, 1, 1);
+        private static Material _planeMaterial = LoadMaterialDefault();
+
         /// <summary>Inits the internal variables of the 3D conceptor.</summary>
         public static void Init()
         {
             _mouseRay = new Ray();
             _mouseRayCollision = new RayCollision();
+            SetMaterialTexture(ref _planeMaterial, MaterialMapIndex.Diffuse, LoadTexture("data/img/grid_ground.png"));
+            _planeMaterial.Shader = Uniray.Shaders.LightingShader;
+        }
+
+        public static void DrawGrid()
+        {
+            DrawMesh(_plane, _planeMaterial, Matrix4x4.Identity);
         }
 
         /// <summary>Sets a value to the mouse ray.</summary>

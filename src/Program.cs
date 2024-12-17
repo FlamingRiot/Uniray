@@ -158,6 +158,7 @@ namespace Uniray
                     BeginTextureMode(GameSimulation.GameSimView);
                     ClearBackground(Uniray.APPLICATION_COLOR);
                     BeginMode3D(UData.CurrentScene.Camera.Camera);
+                    Conceptor3D.DrawGrid();
                     DrawSkybox();
                     Uniray.RunGameSimulation();
                     EndMode3D();
@@ -167,7 +168,7 @@ namespace Uniray
                 {
                     BeginMode3D(camera);
                     DrawSkybox();
-                    DrawGrid(10, 10);
+                    Conceptor3D.DrawGrid();
                     Uniray.DrawScene();
                     EndMode3D();
                 }
