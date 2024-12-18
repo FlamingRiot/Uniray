@@ -51,13 +51,13 @@ namespace Uniray
 
         /// <summary>X Axis rotation angle.</summary>
         [ComponentField(Group = "Rotation")]
-        public float Pitch { get { return _pitch; } set { _pitch = value; UpdateRotation(); } }
+        public float Pitch { get { return _pitch; } set { _pitch = ClampAngle(value); UpdateRotation(); } }
         /// <summary>Y Axis rotation angle.</summary>
         [ComponentField(Group = "Rotation")]
-        public float Yaw { get { return _yaw; } set { _yaw = value; UpdateRotation(); } }
+        public float Yaw { get { return _yaw; } set { _yaw = ClampAngle(value); UpdateRotation(); } }
         /// <summary>Z Axis rotation angle.</summary>
         [ComponentField(Group = "Rotation")]
-        public float Roll { get { return _roll; } set {  _roll = value; UpdateRotation(); } }
+        public float Roll { get { return _roll; } set {  _roll = ClampAngle(value); UpdateRotation(); } }
 
         /// <summary>Creates an empty instance of <see cref="UCamera"/>.</summary>
         public UCamera() : base() { Camera = DefaultCamera; }

@@ -23,7 +23,7 @@ namespace Uniray
         [ComponentField(Group = "Rotation")]
         public float Pitch { get { return _pitch; } set
             {
-                _pitch = value;
+                _pitch = ClampAngle(value);
                 SetRotation();
             } 
         }
@@ -34,7 +34,7 @@ namespace Uniray
             get { return _yaw; }
             set
             {
-                _yaw = value;
+                _yaw = ClampAngle(value);
                 SetRotation();
             }
         }
@@ -45,7 +45,7 @@ namespace Uniray
             get { return _roll; }
             set
             {
-                _roll = value;
+                _roll = ClampAngle(value);
                 SetRotation();
             }
         }

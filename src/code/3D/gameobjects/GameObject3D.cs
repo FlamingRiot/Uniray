@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using Raylib_cs;
+using System.Numerics;
 
 namespace Uniray
 {
@@ -82,6 +83,18 @@ namespace Uniray
 
         /// <summary>Draws the Game Object to the screen.</summary>
         public abstract void Draw();
+
+        /// <summary>Clamps a rotation angle.</summary>
+        /// <param name="angle">Angle to clamp.</param>
+        /// <returns>The clamped angle.</returns>
+        public static float ClampAngle(float angle)
+        {
+            if (angle > 360 || angle < 0)
+            {
+                return angle - 360 * MathF.Floor(angle/360);
+            }
+            return angle;
+        }
 
         /// <summary>Returns informations about the current instance.</summary>
         /// <returns>Informations as a <see langword="string"/>.</returns>
