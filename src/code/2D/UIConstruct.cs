@@ -11,7 +11,8 @@ namespace Uniray
         private static Container _modalTemplate = new Container(0, 0, 0, 0);
 
         public const string COMPONENT_IDENTIFIER = "UxComponent";
-        public const string COMPONENT_GROUP_IDENTIFIER = "UxComponentGroup";
+        public const string COMPONENT_LABEL_IDENTIFIER = $"{COMPONENT_IDENTIFIER}Label";
+        public const string COMPONENT_GROUP_IDENTIFIER = $"{COMPONENT_IDENTIFIER}Group";
 
         /// <summary>The list of every components in the UI</summary>
         public Dictionary<string, Component> Components;
@@ -261,6 +262,8 @@ namespace Uniray
             // Retrieve different groups
             // Create grouping
             Dictionary<string, List<PropertyInfo>> grouping = new Dictionary<string, List<PropertyInfo>>();
+            // Reverse grouping to put child props on bottom
+            props = props.Reverse().ToArray();
             for (int i = 0; i < props.Length; i++) 
             {
                 ComponentField? attribute = props[i].GetCustomAttribute<ComponentField>(); // Get the attribute
@@ -281,17 +284,18 @@ namespace Uniray
                     string group = ""; // Get the group
                     if (attribute != null) group = attribute.Group;
                     // Add group label
-                    string lblName = $"{group}{COMPONENT_GROUP_IDENTIFIER}";
-                    if (!Components.ContainsKey(lblName))
+                    string lblGroupName = $"{group}{COMPONENT_GROUP_IDENTIFIER}";
+                    if (!Components.ContainsKey(lblGroupName))
                     {
-                        Components.Add(lblName, new Label(reference.X, reference.Y + 25 + index * 24 + groupIndex * 24, group));
+                        Components.Add(lblGroupName, new Label(reference.X, reference.Y + 25 + index * 24 + groupIndex * 24, group));
                         groupIndex++;
                     }
 
                     string txbName = $"{gProps[i].Name}{COMPONENT_IDENTIFIER}";
-                    Textbox component = new Textbox(reference.X, reference.Y + 25 + index * 24 + groupIndex * 24, 90, 19, $"{gProps[i].GetValue(obj)}");
+                    string lblName = $"{gProps[i].Name}{COMPONENT_LABEL_IDENTIFIER}";
+                    Textbox component = new Textbox(reference.X + 60, reference.Y + 25 + index * 24 + groupIndex * 24, 165, 19, $"{gProps[i].GetValue(obj)}");
                     component.Args = new string[] { gProps[i].Name, $"{gProps[i].GetValue(obj)}", obj.GetType().ToString(), gProps[i].PropertyType.ToString(), txbName };
-                    /* Argument list
+                    /* Argument list (component.Args)
                      * Property name [0]
                      * Property initial value [1]
                      * Object type [2]
@@ -301,7 +305,10 @@ namespace Uniray
                     // Prepare function arguments
                     component.OnEntry = UpdateComponent;
                     Components.Add(txbName, component);
-
+                    // Create label
+                    Label componentLabel = new Label(reference.X, component.Y, $"{gProps[i].Name}:");
+                    componentLabel.TextColor = Color.Gray;
+                    Components.Add(lblName, componentLabel);
                     // Increment total index
                     index++;
                 }
