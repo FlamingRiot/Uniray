@@ -1,6 +1,5 @@
 ﻿using RayGUI_cs;
 using Raylib_cs;
-using System.Numerics;
 using System.Reflection;
 
 namespace Uniray
@@ -258,6 +257,8 @@ namespace Uniray
         /// <param name="obj">Object to use.</param>
         public void DisplayComponents(PropertyInfo[] props, GameObject3D obj)
         {
+            // Hide previous components
+            HideComponents();
             Component reference = Components["gameObjectLabel"];
             // Retrieve different groups
             // Create grouping

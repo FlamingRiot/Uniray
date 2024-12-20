@@ -1,4 +1,4 @@
-﻿using Raylib_cs;
+﻿using System.ComponentModel;
 using System.Numerics;
 
 namespace Uniray
@@ -17,6 +17,14 @@ namespace Uniray
         float Roll { get; set; }
     }
 
+    /// <summary>Defines the ability of an object to be scaled.</summary>
+    public interface IScalable
+    {
+        float Width { get; set; }
+        float Height { get; set; }
+        float Depth { get; set; }
+    }
+
     /// <summary>Defines the ability of an object to cloned (copy-paste).</summary>
     /// <typeparam name="T">Type of the game object. (must inherit from <see cref="GameObject3D"/>.</typeparam>
     public interface IClonable<out T> where T : GameObject3D
@@ -25,7 +33,7 @@ namespace Uniray
     }
 
     /// <summary>Reprsents an instance of <see cref="GameObject3D"/>.</summary>
-    public abstract class GameObject3D : IDrawable 
+    public abstract class GameObject3D : IDrawable
     { 
         // -----------------------------------------------------------
         // Public attributes
@@ -83,6 +91,8 @@ namespace Uniray
 
         /// <summary>Draws the Game Object to the screen.</summary>
         public abstract void Draw();
+
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>Clamps a rotation angle.</summary>
         /// <param name="angle">Angle to clamp.</param>

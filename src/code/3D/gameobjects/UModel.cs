@@ -4,11 +4,15 @@ using Raylib_cs;
 namespace Uniray
 {
     /// <summary>Represents an instance of <see cref="UModel"/>, inheriting <see cref="GameObject3D"/>.</summary>
-    public unsafe class UModel : GameObject3D, IRotation, IClonable<UModel>
+    public unsafe class UModel : GameObject3D, IRotation, IScalable, IClonable<UModel>
     {
         private float _pitch;
         private float _yaw;
         private float _roll;
+
+        private float _width = 1;
+        private float _height = 1;
+        private float _depth = 1;
 
         // -----------------------------------------------------------
         // Public attributes
@@ -24,7 +28,7 @@ namespace Uniray
         public float Pitch { get { return _pitch; } set
             {
                 _pitch = ClampAngle(value);
-                SetRotation();
+                UpdateTransform();
             } 
         }
         /// <summary>Y Axis rotation</summary>
@@ -35,7 +39,7 @@ namespace Uniray
             set
             {
                 _yaw = ClampAngle(value);
-                SetRotation();
+                UpdateTransform();
             }
         }
         /// <summary>Z Axis rotation.</summary>
@@ -46,7 +50,41 @@ namespace Uniray
             set
             {
                 _roll = ClampAngle(value);
-                SetRotation();
+                UpdateTransform();
+            }
+        }
+
+        /// <summary>X Axis Scale.</summary>
+        [ComponentField(Group = "Scale")]
+        public float Width
+        {
+            get { return _width; }
+            set
+            {
+                _width = value;
+                UpdateTransform();
+            }
+        }
+        /// <summary>Y Axis Scale</summary>
+        [ComponentField(Group = "Scale")]
+        public float Height
+        {
+            get { return _height; }
+            set
+            {
+                _height = value;
+                UpdateTransform();
+            }
+        }
+        /// <summary>Z Axis Scale.</summary>
+        [ComponentField(Group = "Scale")]
+        public float Depth
+        {
+            get { return _depth; }
+            set
+            {
+                _depth = value;
+                UpdateTransform();
             }
         }
 
@@ -58,7 +96,7 @@ namespace Uniray
             }
             set
             {
-                SetRotation(value.X, value.Y, value.Z);
+                UpdateTransform();
             }
         }
 
@@ -183,31 +221,16 @@ namespace Uniray
             return "Name: " + Name + " Position: " + Position + " Rotation: < " + Yaw + "; " + Pitch + "; " + Roll + " >";  
         }
 
-        /// <summary>Rotates the object with new rotation angles.</summary>
-        private void SetRotation()
+        /// <summary>Updates the entire transform matrix of the object.</summary>
+
+        private void UpdateTransform()
         {
             // Calculate matrix rotation
             Matrix4x4 rm = Raymath.MatrixRotateXYZ(new Vector3(_pitch / Raylib.RAD2DEG, _yaw / Raylib.RAD2DEG, _roll / Raylib.RAD2DEG));
+            Matrix4x4 sm = Raymath.MatrixScale(_width, _height, _depth);
             Matrix4x4 pm = Raymath.MatrixTranslate(X, Y, Z);
             // Multiply matrices
-            Transform = Raymath.MatrixMultiply(rm, pm);
-        }
-
-        /// <summary>Rotates the object with new rotation angles.</summary>
-        /// <param name="pitch">X Axis rotation.</param>
-        /// <param name="yaw">Y Axis rotation.</param>
-        /// <param name="roll">Z Axis rotation</param>
-        private void SetRotation(float pitch, float yaw, float roll)
-        {
-            Pitch = pitch;
-            Yaw = yaw;
-            Roll = roll;
-
-            // Calculate matrix rotation
-            Matrix4x4 rm = Raymath.MatrixRotateXYZ(new Vector3(pitch / Raylib.RAD2DEG, yaw / Raylib.RAD2DEG, roll / Raylib.RAD2DEG));
-            Matrix4x4 pm = Raymath.MatrixTranslate(X, Y, Z);
-            // Multiply matrices
-            Transform = Raymath.MatrixMultiply(rm, pm);
+            Transform = pm * sm * rm;
         }
     }
 }
