@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Raylib_cs;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -15,6 +16,7 @@ namespace Uniray.DatFiles
 
         private const string MODELS_SECTION = "MODEL";
         private const string CAMERAS_SECTION = "CAMERA";
+        private const string SHAPES_SECTION = "SHAPE";
 
         private static int _offset = 0;
         private static List<DatFileEntry> _entries = new List<DatFileEntry>();
@@ -47,6 +49,9 @@ namespace Uniray.DatFiles
                             break;
                         case 1: // UCamera section
                             name = CAMERAS_SECTION;
+                            break;
+                        case 2: // UShape section
+                            name = SHAPES_SECTION;
                             break;
                     }
 
@@ -130,6 +135,10 @@ namespace Uniray.DatFiles
                         List<UCamera>? cameras = JsonConvert.DeserializeObject<List<UCamera>>(text);
                         if (cameras is not null) objects.AddRange(cameras);
                         break;
+                    case SHAPES_SECTION:
+                        List<UShape>? shapes = JsonConvert.DeserializeObject<List<UShape>>(text);
+                        if (shapes is not null) objects.AddRange(shapes);
+                        break;
                 }
             }
             // Reset entries list
@@ -210,36 +219,49 @@ namespace Uniray.DatFiles
         /// <returns>JSON object under a string format.</returns>
         private static string[] JsonfyGos(List<GameObject3D> gos)
         {
-            // Open the jsons
-            string modelsJson = "[";
-            string cameraJson = "[";
+            // Open the jsons streams
+            string[] json = new string[3];
+            for (int i = 0; i < json.Length; i++) json[i] += "["; // Open JSON streams
+            /* 
+                JSON Mapping:
+                UModels
+                UCameras
+                UShapes
+             */
             // Go through every element of the scene's list
             foreach (GameObject3D go in gos)
             {
-                if (go is UModel model)
+                switch (go)
                 {
-                    modelsJson += "{" + "X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
-                    ",Pitch: " + model.Pitch + ",Roll: " + model.Roll + ",Width: " + model.Width + ",Height: " + model.Height 
-                    + ",Depth: " + model.Depth + ",ModelID: \"" + model.ModelID + "\", Transform:";
-                    modelsJson += JsonConvert.SerializeObject(model.Transform);
-                    modelsJson += "}, ";
+                    case UModel model: // JSON 0
+                        json[0] += "{" + "X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
+                        ",Pitch: " + model.Pitch + ",Roll: " + model.Roll + ",Width: " + model.Width + ",Height: " + model.Height
+                        + ",Depth: " + model.Depth + ",ModelID: \"" + model.ModelID + "\", Transform:";
+                        json[0] += JsonConvert.SerializeObject(model.Transform);
+                        json[0] += "}, ";
+                        break;
+                    case UCamera camera: // JSON 1
+                        json[1] += JsonConvert.SerializeObject(camera);
+                        json[1] += ",";
+                        break;
+                    case UShape shape: // JSON 2
+                        json[2] += "{" + "X: " + shape.X + ",Y: " + shape.Y + ",Z: " + shape.Z + ",Yaw: " + shape.Yaw +
+                        ",Pitch: " + shape.Pitch + ",Roll: " + shape.Roll + ",Width: " + shape.Width + ",Height: " + shape.Height
+                        + ",Depth: " + shape.Depth + ",Type: \"" + shape.Type + "\", Transform:";
+                        json[2] += JsonConvert.SerializeObject(shape.Transform);
+                        json[2] += "}, ";
+                        break;
                 }
-                else if (go is UCamera camera)
-                {
-                    cameraJson += JsonConvert.SerializeObject(camera);
-                    cameraJson += ",";
-                }
-
             }
-            // Delete the last comma of the jsons
+            // Delete the last comma from JSON streams
+            for (int i = 0; i < json.Length; i++)
+            {
+                if (json[i] != "[") json[i] = json[i][.. json[i].LastIndexOf(',')];
+                // Close JSON stream
+                json[i] += "]";
+            }
 
-            if (modelsJson != "[") modelsJson = modelsJson.Substring(0, modelsJson.LastIndexOf(','));
-            if (cameraJson != "[") cameraJson = cameraJson.Substring(0, cameraJson.LastIndexOf(','));
-
-            // Close the jsons
-            modelsJson += "]";
-            cameraJson += "]";
-            return new string[] { modelsJson, cameraJson };
+            return json;
         }
     }
 }
