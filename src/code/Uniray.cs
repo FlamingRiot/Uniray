@@ -194,9 +194,7 @@ namespace Uniray
                         // Add the position of the current object
                         Vector3 finalPos = Vector3Add(newPos, go.Position);
                         // Call individual properties to trigger UI Components
-                        go.X = finalPos.X;
-                        go.Y = finalPos.Y;
-                        go.Z = finalPos.Z;
+                        go.Position = finalPos;
                     }
                 }
                 // Rotate the currently selected game object

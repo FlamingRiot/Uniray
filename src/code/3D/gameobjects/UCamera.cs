@@ -43,9 +43,9 @@ namespace Uniray
             set 
             { 
                 Camera.Position = value;
-                Transform.M14 = value.X;
-                Transform.M24 = value.Y;
-                Transform.M34 = value.Z;
+                X = value.X;
+                Y = value.Y;
+                Z = value.Z;
             }
         }
 
