@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Uniray
 {
@@ -52,13 +51,13 @@ namespace Uniray
         abstract public Vector3 Position { get; set; }
         /// <summary>X Position of the object.</summary>
         [ComponentField(Group = "Position")]
-        public float X { get { return Transform.M14; } set { Transform.M14 = value; } }
+        public float X { get { return Transform.M14; } set { ComponentField.SetProperty(value, ref Transform.M14, nameof(X)); } }
         /// <summary>X Position of the object.</summary>
         [ComponentField(Group = "Position")]
-        public float Y { get { return Transform.M24; } set { Transform.M24 = value; } }
+        public float Y { get { return Transform.M24; } set { ComponentField.SetProperty(value, ref Transform.M24, nameof(Y)); } }
         /// <summary>X Position of the object.</summary>
         [ComponentField(Group = "Position")]
-        public float Z { get { return Transform.M34; } set { Transform.M34 = value; } }
+        public float Z { get { return Transform.M34; } set { ComponentField.SetProperty(value, ref Transform.M34, nameof(Z)); } }
 
         /// <summary>Creates an instance of <see cref="GameObject3D"/>.</summary>
         public GameObject3D() 
@@ -91,8 +90,6 @@ namespace Uniray
 
         /// <summary>Draws the Game Object to the screen.</summary>
         public abstract void Draw();
-
-        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>Clamps a rotation angle.</summary>
         /// <param name="angle">Angle to clamp.</param>

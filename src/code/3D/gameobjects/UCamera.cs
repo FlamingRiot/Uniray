@@ -49,15 +49,39 @@ namespace Uniray
             }
         }
 
-        /// <summary>X Axis rotation angle.</summary>
+        /// <summary>X Axis rotation.</summary>
         [ComponentField(Group = "Rotation")]
-        public float Pitch { get { return _pitch; } set { _pitch = ClampAngle(value); UpdateRotation(); } }
-        /// <summary>Y Axis rotation angle.</summary>
+        public float Pitch
+        {
+            get { return _pitch; }
+            set
+            {
+                ComponentField.SetProperty(ClampAngle(value), ref _pitch, nameof(Pitch));
+                UpdateRotation();
+            }
+        }
+        /// <summary>Y Axis rotation</summary>
         [ComponentField(Group = "Rotation")]
-        public float Yaw { get { return _yaw; } set { _yaw = ClampAngle(value); UpdateRotation(); } }
-        /// <summary>Z Axis rotation angle.</summary>
+        public float Yaw
+        {
+            get { return _yaw; }
+            set
+            {
+                ComponentField.SetProperty(ClampAngle(value), ref _yaw, nameof(Yaw));
+                UpdateRotation();
+            }
+        }
+        /// <summary>Z Axis rotation.</summary>
         [ComponentField(Group = "Rotation")]
-        public float Roll { get { return _roll; } set {  _roll = ClampAngle(value); UpdateRotation(); } }
+        public float Roll
+        {
+            get { return _roll; }
+            set
+            {
+                ComponentField.SetProperty(ClampAngle(value), ref _roll, nameof(Roll));
+                UpdateRotation();
+            }
+        }
 
         /// <summary>Creates an empty instance of <see cref="UCamera"/>.</summary>
         public UCamera() : base() { Camera = DefaultCamera; }

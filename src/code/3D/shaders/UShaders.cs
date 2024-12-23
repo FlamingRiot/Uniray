@@ -6,8 +6,6 @@ namespace Uniray
 {
     public unsafe class UShaders
     {
-        /// <summary>Outline shader used for rendering an outline around the currently selected GameObjects.</summary>
-        public Shader OutlineShader;
         /// <summary>Skybox rendering shader.</summary>
         public Shader SkyboxShader;
         /// <summary>Skybox loading shader.</summary>
@@ -18,21 +16,16 @@ namespace Uniray
         // -----------------------------------------------------------
         // Shader associated materials
         // -----------------------------------------------------------
-        public Material OutlineMaterial;
         public Material SkyboxMaterial;
 
         // -----------------------------------------------------------
         // Shader uniforms locations
         // -----------------------------------------------------------
-        private int _viewPosLoc;
+        private readonly int _viewPosLoc;
 
         /// <summary>Creates an instance of Uniray Shaders</summary>
         public UShaders()
         {
-            // Outline shader
-            OutlineShader = LoadShader("data/shaders/outline.vs", "data/shaders/outline.fs");
-            OutlineMaterial = LoadMaterialDefault();
-            OutlineMaterial.Shader = OutlineShader;
             // Skybox shader
             SkyboxShader = LoadShader("data/shaders/skybox.vs", "data/shaders/skybox.fs");
             SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "environmentMap"), (int)MaterialMapIndex.Cubemap, ShaderUniformDataType.Int);
@@ -59,12 +52,10 @@ namespace Uniray
         public void UnloadShaders()
         {
             // Unload shaders
-            UnloadShader(OutlineShader);
             UnloadShader(SkyboxShader);
             UnloadShader(CubemapShader);
 
             // Unload materials
-            UnloadMaterial(OutlineMaterial);
             UnloadMaterial(SkyboxMaterial);
         }
 

@@ -61,7 +61,7 @@ namespace Uniray
             get { return _pitch; }
             set
             {
-                _pitch = ClampAngle(value);
+                ComponentField.SetProperty(ClampAngle(value), ref _pitch, nameof(Pitch));
                 UpdateTransform();
             }
         }
@@ -72,7 +72,7 @@ namespace Uniray
             get { return _yaw; }
             set
             {
-                _yaw = ClampAngle(value);
+                ComponentField.SetProperty(ClampAngle(value), ref _yaw, nameof(Yaw));
                 UpdateTransform();
             }
         }
@@ -83,7 +83,7 @@ namespace Uniray
             get { return _roll; }
             set
             {
-                _roll = ClampAngle(value);
+                ComponentField.SetProperty(ClampAngle(value), ref _roll, nameof(Roll));
                 UpdateTransform();
             }
         }
@@ -95,7 +95,7 @@ namespace Uniray
             get { return _width; }
             set
             {
-                _width = value;
+                ComponentField.SetProperty(value, ref _width, nameof(Width));
                 UpdateTransform();
             }
         }
@@ -106,7 +106,7 @@ namespace Uniray
             get { return _height; }
             set
             {
-                _height = value;
+                ComponentField.SetProperty(value, ref _height, nameof(Height));
                 UpdateTransform();
             }
         }
@@ -117,7 +117,7 @@ namespace Uniray
             get { return _depth; }
             set
             {
-                _depth = value;
+                ComponentField.SetProperty(value, ref _depth, nameof(Depth));
                 UpdateTransform();
             }
         }

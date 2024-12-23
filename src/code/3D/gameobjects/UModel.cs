@@ -27,7 +27,7 @@ namespace Uniray
         [ComponentField(Group = "Rotation")]
         public float Pitch { get { return _pitch; } set
             {
-                _pitch = ClampAngle(value);
+                ComponentField.SetProperty(ClampAngle(value), ref _pitch, nameof(Pitch));
                 UpdateTransform();
             } 
         }
@@ -38,7 +38,7 @@ namespace Uniray
             get { return _yaw; }
             set
             {
-                _yaw = ClampAngle(value);
+                ComponentField.SetProperty(ClampAngle(value), ref _yaw, nameof(Yaw));
                 UpdateTransform();
             }
         }
@@ -49,7 +49,7 @@ namespace Uniray
             get { return _roll; }
             set
             {
-                _roll = ClampAngle(value);
+                ComponentField.SetProperty(ClampAngle(value), ref _roll, nameof(Roll));
                 UpdateTransform();
             }
         }
@@ -61,7 +61,7 @@ namespace Uniray
             get { return _width; }
             set
             {
-                _width = value;
+                ComponentField.SetProperty(value, ref _width, nameof(Width));
                 UpdateTransform();
             }
         }
@@ -72,7 +72,7 @@ namespace Uniray
             get { return _height; }
             set
             {
-                _height = value;
+                ComponentField.SetProperty(value, ref _height, nameof(Height));
                 UpdateTransform();
             }
         }
@@ -83,7 +83,7 @@ namespace Uniray
             get { return _depth; }
             set
             {
-                _depth = value;
+                ComponentField.SetProperty(value, ref _depth, nameof(Depth));
                 UpdateTransform();
             }
         }
@@ -111,13 +111,13 @@ namespace Uniray
         {
             get 
             {
-                return new Vector3(Transform.M14, Transform.M24, Transform.M34);
+                return new Vector3(X, Y, Z);
             } 
             set 
             {
-                Transform.M14 = value.X; 
-                Transform.M24 = value.Y; 
-                Transform.M34 = value.Z;
+                X = value.X; 
+                Y = value.Y; 
+                Z = value.Z;
             } 
         }
 

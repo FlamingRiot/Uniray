@@ -86,6 +86,8 @@ namespace Uniray
 
             // Set default asset folder
             FileManager.CurrentFolder = FileManager.ModelFolder;
+
+            //ComponentFieldValidator.Validate<UCamera>();
         }
 
         /// <summary>Draws the currently displayed <see cref="Scene"/>.</summary>
@@ -100,7 +102,7 @@ namespace Uniray
 
             // Render the outlined selected GameObjects and deactivate the Raylib culling to make it possible
             SetCullFace(ZERO);
-            Selection.ForEach(go => go.Draw()); // TEMPORARY, NEED TO FIND BETTER METHOD
+            //if (Selection.Count == 1) Conceptor3D.DrawOutlineTools(); // TEMPORARY, NEED TO FIND BETTER METHOD
             SetCullFace(ONE);
 
             // Draw 3-Dimensional models of the current scene and check for a hypothetical new selected object
@@ -191,7 +193,10 @@ namespace Uniray
                     {
                         // Add the position of the current object
                         Vector3 finalPos = Vector3Add(newPos, go.Position);
-                        go.Position = finalPos;
+                        // Call individual properties to trigger UI Components
+                        go.X = finalPos.X;
+                        go.Y = finalPos.Y;
+                        go.Z = finalPos.Z;
                     }
                 }
                 // Rotate the currently selected game object
