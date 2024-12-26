@@ -101,9 +101,9 @@ namespace Uniray
             Conceptor3D.UpdateMouseRay();
 
             // Render the outlined selected GameObjects and deactivate the Raylib culling to make it possible
-            SetCullFace(ZERO);
-            //if (Selection.Count == 1) Conceptor3D.DrawOutlineTools(); // TEMPORARY, NEED TO FIND BETTER METHOD
-            SetCullFace(ONE);
+            EnableBackfaceCulling();
+            if (Selection.Count == 1) Selection.First().DrawOutline();
+            DisableBackfaceCulling();
 
             // Draw 3-Dimensional models of the current scene and check for a hypothetical new selected object
             int index = -1;

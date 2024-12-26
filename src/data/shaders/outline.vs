@@ -7,16 +7,19 @@ in vec3 vertexNormal;
 in vec4 vertexColor;
 
 // Input uniform values
-uniform mat4 mvp;
 uniform mat4 matModel;
-uniform mat4 matNormal;
+uniform mat4 matView;
+uniform mat4 matProjection;
 
 // NOTE: Add here your custom variables
 
+
 void main()
 {
-    vec3 inflatedPosition = vertexPosition + vertexNormal * 0.03;
+    // Expanding on vertex position (from model space)
+    vec4 worldPos = matModel * vec4(vertexPosition + normalize(vertexNormal) * 0.025, 1.0);
+
 
     // Calculate final vertex position
-    gl_Position = mvp*vec4(inflatedPosition, 1.0);
+    gl_Position = matProjection * matView * worldPos;
 }

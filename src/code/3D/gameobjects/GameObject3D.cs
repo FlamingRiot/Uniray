@@ -6,6 +6,7 @@ namespace Uniray
     public interface IDrawable 
     { 
         void Draw(); // Draw function
+        void DrawOutline(); // Outline Draw function
     }
 
     /// <summary>Defines the ability of an object to rotate.</summary>
@@ -90,6 +91,8 @@ namespace Uniray
 
         /// <summary>Draws the Game Object to the screen.</summary>
         public abstract void Draw();
+        /// <summary>Draws the Game Object's outline to the screen.</summary>
+        public abstract void DrawOutline();
 
         /// <summary>Clamps a rotation angle.</summary>
         /// <param name="angle">Angle to clamp.</param>

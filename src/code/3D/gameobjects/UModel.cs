@@ -156,6 +156,17 @@ namespace Uniray
             }
         }
 
+        /// <summary>Draws the model's outline to the screen.</summary>
+        public override void DrawOutline()
+        {
+            Rlgl.SetCullFace(Rlgl.ZERO);
+            for (int j = 0; j < MeshCount; j++)
+            {
+                Raylib.DrawMesh(Meshes[j], Uniray.Shaders.OutlineMaterial, Transform);
+            }
+            Rlgl.SetCullFace(Rlgl.ONE);
+        }
+
         /// <summary>Creates a clone of the current game object.</summary>
         /// <returns>The generated clone.</returns>
         public UModel Clone()

@@ -100,6 +100,14 @@ namespace Uniray
             Raylib.DrawMesh(HardRessource.Models["camera"].Meshes[0], HardRessource.Materials["camera"], Transform);
         }
 
+        /// <summary>Draws the camera's outline to the screen.</summary>
+        public unsafe override void DrawOutline()
+        {
+            Rlgl.SetCullFace(Rlgl.ZERO);
+            Raylib.DrawMesh(HardRessource.Models["camera"].Meshes[0], HardRessource.Materials["camera"], Transform);
+            Rlgl.SetCullFace(Rlgl.ONE);
+        }
+
         /// <summary>Updates the rotation of the camera model.</summary>
         private void UpdateRotation()
         {

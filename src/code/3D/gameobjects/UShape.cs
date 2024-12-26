@@ -48,9 +48,9 @@ namespace Uniray
             }
             set
             {
-                Transform.M14 = value.X;
-                Transform.M24 = value.Y;
-                Transform.M34 = value.Z;
+                X = value.X;
+                Y = value.Y;
+                Z = value.Z;
             }
         }
 
@@ -149,6 +149,14 @@ namespace Uniray
         public override void Draw()
         {
             Raylib.DrawMesh(Mesh, Material, Transform);
+        }
+
+        /// <summary>Draws the shape's outline to the screen.</summary>
+        public override void DrawOutline()
+        {
+            Rlgl.SetCullFace(Rlgl.ZERO);
+            Raylib.DrawMesh(Mesh, Uniray.Shaders.OutlineMaterial, Transform);
+            Rlgl.SetCullFace(Rlgl.ONE);
         }
 
         /// <summary>Creates a clone of the current game object.</summary>

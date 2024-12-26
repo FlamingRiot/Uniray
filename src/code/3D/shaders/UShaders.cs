@@ -12,11 +12,14 @@ namespace Uniray
         public Shader CubemapShader;
         /// <summary>Basic lighting shader.</summary>
         public Shader LightingShader;
+        /// <summary>Game Object outline shader.</summary>
+        public Shader OutlineShader;
 
         // -----------------------------------------------------------
         // Shader associated materials
         // -----------------------------------------------------------
         public Material SkyboxMaterial;
+        public Material OutlineMaterial;
 
         // -----------------------------------------------------------
         // Shader uniforms locations
@@ -39,6 +42,10 @@ namespace Uniray
             // Load lighting shader
             LightingShader = LoadShader("data/shaders/lighting.vs", "data/shaders/lighting.fs");
             _viewPosLoc = GetShaderLocation(LightingShader, "viewPos");
+            // Load outline shader
+            OutlineShader = LoadShader("data/shaders/outline.vs", "data/shaders/outline.fs");
+            OutlineMaterial = LoadMaterialDefault();
+            OutlineMaterial.Shader = OutlineShader;
         }
 
         /// <summary>Updates the shader values.</summary>
