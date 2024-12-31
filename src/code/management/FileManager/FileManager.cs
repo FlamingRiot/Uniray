@@ -110,7 +110,7 @@ namespace Uniray
 
             // DON'T YOU DARE TOUCH THE CODE BELOW YOU PIECE OF SHIT!!!
             RaylibComplements.FirstLoopEntry = true;
-            if (RaylibComplements.IsMouseButtonDoubleClicked(MouseButton.Left, "Program.cs"))
+            if (RaylibComplements.IsMouseButtonDoubleClicked(MouseButton.Left))
             {
                 RaylibComplements.LastTimeButtonPressed = 0.0;
             }
@@ -296,7 +296,7 @@ namespace Uniray
             }
 
             // Folder entering action
-            if (RaylibComplements.IsMouseButtonDoubleClicked(MouseButton.Left, "FileManager"))
+            if (RaylibComplements.IsMouseButtonDoubleClicked(MouseButton.Left))
             {
                 if (Hover(x, y, HardRessource.Textures["model_file"].Width, HardRessource.Textures["model_file"].Height))
                 {

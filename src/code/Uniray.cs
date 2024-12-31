@@ -517,17 +517,11 @@ namespace Uniray
             UData.GameSimulation = null;
         }
 
-        /// <summary>Runs the current project's game.</summary>
+        /// <summary>Runs the current project's simulation.</summary>
         public static void RunGameSimulation()
         {
             // Draw scene game objects
-            foreach (UModel model in CurrentScene.GameObjects.Where(x => x is UModel))
-            {
-                for (int j = 0; j < model.MeshCount; j++)
-                {
-                    DrawMesh(model.Meshes[j], model.Materials[j], model.Transform);
-                }
-            }
+            CurrentScene.GameObjects.ForEach(go => go.Draw());
         }
     }
 }
@@ -541,8 +535,10 @@ namespace Raylib_cs.Complements
         public static double LastTimeButtonPressed;
         public static bool FirstLoopEntry = true;
 
-        // Fonction pour détecter un double-clic
-        public static bool IsMouseButtonDoubleClicked(MouseButton button, string source)
+        /// <summary>Checks if a mouse button has been double clicked.</summary>
+        /// <param name="button">Mouse button to check.</param>
+        /// <returns></returns>
+        public static bool IsMouseButtonDoubleClicked(MouseButton button)
         {
             double currentFrame = GetTime();
 
