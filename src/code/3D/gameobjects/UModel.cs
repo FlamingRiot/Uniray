@@ -152,8 +152,9 @@ namespace Uniray
         {
             for (int j = 0; j < MeshCount; j++)
             {
-                Raylib.DrawMesh(Meshes[j], Materials[j], Transform);
+                Raylib.DrawMesh(Meshes[j], Materials[j + 1], Transform);
             }
+            //Raylib.DrawModel(Uniray.Ressource.GetModel(ModelID), Vector3.Zero, 1, Color.White);
         }
 
         /// <summary>Draws the model's outline to the screen.</summary>
@@ -219,7 +220,7 @@ namespace Uniray
         /// <summary>Loads personal materials (used for applying different shaders and effects).</summary>
         internal void LoadMaterials()
         {
-            int materialCount = Uniray.Ressource.GetModel(ModelID).MeshCount;
+            int materialCount = Uniray.Ressource.GetModel(ModelID).MaterialCount;
             Materials = new Material[materialCount];
             Material* materials = Uniray.Ressource.GetModel(ModelID).Materials;
             for (int i = 0; i < materialCount; i++) Materials[i] = materials[i];
