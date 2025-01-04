@@ -2,6 +2,7 @@
 using static Raylib_cs.Raylib;
 using static Raylib_cs.Raymath;
 using System.Numerics;
+using RayGUI_cs;
 namespace Uniray
 {
     /// <summary>Represents an instance of <see cref="Conceptor3D"/>.</summary>
@@ -172,6 +173,14 @@ namespace Uniray
             }
             // Keep the old one 
             return index1;
+        }
+
+        /// <summary>Checks if mouse is over the 3D conceptor window.</summary>
+        /// <returns><see langword="true"/> if mouse over. <see langword="false"/> otherwise.</returns>
+        public static bool Hover()
+        {
+            return RayGUI.Hover(Uniray.UI.Components["gameManager"].X + Uniray.UI.Components["gameManager"].Width +
+                    10, 0, Program.Width - Uniray.UI.Components["gameManager"].Width - 20, Program.Height - Uniray.UI.Components["fileManager"].Height - 20);
         }
     }
 }

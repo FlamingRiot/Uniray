@@ -110,17 +110,19 @@ namespace Uniray
                 // Manage environment updating
                 // -----------------------------------------------------------
 
-                if (Hover(Uniray.UI.Components["gameManager"].X + Uniray.UI.Components["gameManager"].Width + 
-                    10, 0, Width - Uniray.UI.Components["gameManager"].Width - 20, Height - Uniray.UI.Components["fileManager"].Height - 20))
+                if (IsMouseButtonReleased(MouseButton.Middle))
                 {
-                    if (IsMouseButtonReleased(MouseButton.Middle))
+                    if (Conceptor3D.Hover())
                     {
                         motion.Mouse = motion.FakePosition;
                         motion.MouseOrigin = Vector2.Zero;
                     }
-                    if (IsMouseButtonDown(MouseButton.Middle))
-                    {
+                }
+                if (IsMouseButtonDown(MouseButton.Middle))
+                {
 
+                    if (Conceptor3D.Hover())
+                    {
                         if (IsKeyDown(KeyboardKey.LeftShift))
                         {
                             Vector3 movX = GetCameraRight(ref camera) * GetMouseDelta().X * (motion.Distance / 200);
@@ -138,7 +140,10 @@ namespace Uniray
                             motion.FakePosition = MoveCamera(motion.Distance, ref camera, camera.Target, motion.YOffset, false, motion.Mouse, motion.MouseOrigin);
                         }
                     }
-                    else
+                }
+                else
+                {
+                    if (Conceptor3D.Hover())
                     {
                         // Manage zoom
                         float mov = GetMouseWheelMove();
@@ -150,8 +155,8 @@ namespace Uniray
 
                         MoveCamera(motion.Distance, ref camera, camera.Target, motion.YOffset, true, motion.Mouse, motion.MouseOrigin);
                     }
-                    Conceptor3D.EnvCamera = camera;
                 }
+                Conceptor3D.EnvCamera = camera;
                 // -----------------------------------------------------------
                 // Manage application overall rendering
                 // -----------------------------------------------------------
