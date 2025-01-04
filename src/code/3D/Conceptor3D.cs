@@ -79,6 +79,16 @@ namespace Uniray
             if (IsKeyDown(KeyboardKey.Z)) go.Yaw += mouse.X;
         }
 
+        /// <summary>Rotate a camera object.</summary>
+        /// <param name="cam">Camera object to rotate.</param>
+        public static void RotateCamera(UCamera cam)
+        {
+            // Rotate the camera according the yaw and pitch angles
+            Vector2 mouse = GetMouseDelta();
+            if (IsKeyDown(KeyboardKey.X)) cam.Pitch += mouse.Y;
+            if (IsKeyDown(KeyboardKey.Z)) cam.Yaw += mouse.X;
+        }
+
         /// <summary>Checks whether a collision between the mouse and a <see cref="GameObject3D"/> occurs or not.</summary>
         /// <param name="go"><see cref="GameObject3D"/> to use.</param>
         /// <returns><see langword="true"/> if a collision occurs. <see langword="false"/> otherwise.</returns>
@@ -98,10 +108,7 @@ namespace Uniray
                             }
                             break;
                         case UCamera camera:
-                            unsafe
-                            {
-                                _mouseRayCollision = GetRayCollisionMesh(_mouseRay, HardRessource.Models["camera"].Meshes[0], camera.Transform);
-                            }
+                            _mouseRayCollision = GetRayCollisionSphere(_mouseRay, camera.Position, 0.5f);
                             break;
                         case UShape shape:
                             _mouseRayCollision = GetRayCollisionMesh(_mouseRay, shape.Mesh, shape.Transform);

@@ -6,7 +6,6 @@ namespace Uniray
     internal static class HardRessource
     {
         public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
-        public static Dictionary<string, Model> Models = new Dictionary<string, Model>();
         public static Dictionary<string, Material> Materials = new Dictionary<string, Material>();
         public static Dictionary<ShapeType, Mesh> ShapeMeshes = new Dictionary<ShapeType, Mesh>();
 
@@ -17,12 +16,8 @@ namespace Uniray
             {
                 { "file", LoadTexture("data/img/file.png")},
                 { "model_file", LoadTexture("data/img/model_file.png")},
-                { "folder", LoadTexture("data/img/folder.png")}
-            };
-            // Load static models
-            Models = new Dictionary<string, Model>()
-            {
-                { "camera", LoadModel("data/camera.m3d")}
+                { "folder", LoadTexture("data/img/folder.png")},
+                { "camera", LoadTexture("data/img/camera.png")}
             };
 
             // Load UShape Meshes
@@ -50,7 +45,6 @@ namespace Uniray
         {
             ShapeMeshes.ToList().ForEach(x => UnloadMesh(x.Value)); // Unload Shape Meshes
             Textures.ToList().ForEach(x => UnloadTexture(x.Value)); // Unload textures
-            Models.ToList().ForEach(x => UnloadModel(x.Value)); // Unload models
             Materials.ToList().ForEach(x => UnloadMaterial(x.Value)); // Unload materials
         }
     }

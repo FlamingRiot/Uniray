@@ -4,20 +4,19 @@ using System.Numerics;
 namespace Uniray
 {
     /// <summary>Represents an instance of <see cref="UCamera"/>.</summary>
-    public class UCamera : GameObject3D, IRotation
+    public class UCamera : GameObject3D
     {
         // -----------------------------------------------------------
         // Private attributes
         // -----------------------------------------------------------
         private float _pitch;
         private float _yaw;
-        private float _roll;
 
         /// <summary>Default <see cref="Camera3D"/> configuration.</summary>
         public static readonly Camera3D DefaultCamera = new Camera3D()
         {
             Position = Vector3.UnitY,
-            Target = new Vector3(0, 1, 1),
+            Target = new Vector3(0, 0, 1),
             Up = Vector3.UnitY,
             Projection = CameraProjection.Perspective,
             FovY = 90
@@ -42,7 +41,10 @@ namespace Uniray
             } 
             set 
             { 
+                Vector3 delta = value - Camera.Position;
                 Camera.Position = value;
+                Camera.Target += delta;
+
                 X = value.X;
                 Y = value.Y;
                 Z = value.Z;
@@ -56,7 +58,7 @@ namespace Uniray
             get { return _pitch; }
             set
             {
-                ComponentField.SetProperty(ClampAngle(value), ref _pitch, nameof(Pitch));
+                ComponentField.SetProperty(Raymath.Clamp(ClampAngle(value), 90, 270), ref _pitch, nameof(Pitch));
                 UpdateRotation();
             }
         }
@@ -68,17 +70,6 @@ namespace Uniray
             set
             {
                 ComponentField.SetProperty(ClampAngle(value), ref _yaw, nameof(Yaw));
-                UpdateRotation();
-            }
-        }
-        /// <summary>Z Axis rotation.</summary>
-        [ComponentField(Group = "Rotation")]
-        public float Roll
-        {
-            get { return _roll; }
-            set
-            {
-                ComponentField.SetProperty(ClampAngle(value), ref _roll, nameof(Roll));
                 UpdateRotation();
             }
         }
@@ -97,26 +88,26 @@ namespace Uniray
         /// <summary>Draws the camera object to the screen.</summary>
         public unsafe override void Draw()
         {
-            Raylib.DrawMesh(HardRessource.Models["camera"].Meshes[0], HardRessource.Materials["camera"], Transform);
+            Raylib.DrawBillboard(Conceptor3D.EnvCamera, HardRessource.Textures["camera"], Camera.Position, 1, Color.White);
         }
 
         /// <summary>Draws the camera's outline to the screen.</summary>
         public unsafe override void DrawOutline()
         {
             Rlgl.SetCullFace(Rlgl.ZERO);
-            Raylib.DrawMesh(HardRessource.Models["camera"].Meshes[0], HardRessource.Materials["camera"], Transform);
+            //Raylib.DrawBil
             Rlgl.SetCullFace(Rlgl.ONE);
         }
 
         /// <summary>Updates the rotation of the camera model.</summary>
         private void UpdateRotation()
         {
-            Matrix4x4 rm = Raymath.MatrixRotateXYZ(new Vector3(_pitch / Raylib.RAD2DEG, _yaw / Raylib.RAD2DEG, _roll / Raylib.RAD2DEG));
-            Matrix4x4 pm = Raymath.MatrixTranslate(X, Y, Z);
-            // Multiply matrices
-            Transform = pm * rm;
-        }
+            // Update camera target
+            Vector3 vertical = Raymath.Vector3RotateByAxisAngle(DefaultCamera.Target, Vector3.UnitX, _pitch / Raylib.RAD2DEG);
+            Vector3 horizontal = Raymath.Vector3RotateByAxisAngle(DefaultCamera.Target, Vector3.UnitY, _yaw / Raylib.RAD2DEG) * (1.01f - Math.Abs(vertical.Y));
+            Camera.Target = Camera.Position + new Vector3(horizontal.X, vertical.Y, horizontal.Z);
 
+        }
         /// <summary>Returns informations about the current instance.</summary>
         /// <returns>Informations as a <see langword="string"/>.</returns>
         public override string ToString()

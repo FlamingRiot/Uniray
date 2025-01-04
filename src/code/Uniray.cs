@@ -201,6 +201,7 @@ namespace Uniray
                 else if (IsKeyDown(KeyboardKey.R))
                 {
                     Selection.Where(x => x is IRotation).ToList().ForEach(go => Conceptor3D.RotateObject((IRotation)go));
+                    Selection.Where(x => x is UCamera).ToList().ForEach(cam => Conceptor3D.RotateCamera((UCamera)cam));
                     HideCursor();
                 }
                 else ShowCursor();
@@ -521,7 +522,7 @@ namespace Uniray
         public static void RunGameSimulation()
         {
             // Draw scene game objects
-            CurrentScene.GameObjects.ForEach(go => go.Draw());
+            CurrentScene.GameObjects.Where(go => go is not UCamera).ToList().ForEach(go => go.Draw());
         }
     }
 }
