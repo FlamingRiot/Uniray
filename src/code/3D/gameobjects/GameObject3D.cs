@@ -52,13 +52,13 @@ namespace Uniray
         abstract public Vector3 Position { get; set; }
         /// <summary>X Position of the object.</summary>
         [ComponentField(Group = "Position")]
-        public float X { get { return Transform.M14; } set { ComponentField.SetProperty(value, ref Transform.M14, nameof(X)); } }
+        public virtual float X { get { return Transform.M14; } set { ComponentField.SetProperty(value, ref Transform.M14, nameof(X)); } }
         /// <summary>X Position of the object.</summary>
         [ComponentField(Group = "Position")]
-        public float Y { get { return Transform.M24; } set { ComponentField.SetProperty(value, ref Transform.M24, nameof(Y)); } }
+        public virtual float Y { get { return Transform.M24; } set { ComponentField.SetProperty(value, ref Transform.M24, nameof(Y)); } }
         /// <summary>X Position of the object.</summary>
         [ComponentField(Group = "Position")]
-        public float Z { get { return Transform.M34; } set { ComponentField.SetProperty(value, ref Transform.M34, nameof(Z)); } }
+        public virtual float Z { get { return Transform.M34; } set { ComponentField.SetProperty(value, ref Transform.M34, nameof(Z)); } }
 
         /// <summary>Creates an instance of <see cref="GameObject3D"/>.</summary>
         public GameObject3D() 

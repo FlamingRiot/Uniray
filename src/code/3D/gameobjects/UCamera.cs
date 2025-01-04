@@ -32,6 +32,16 @@ namespace Uniray
         // Public properties
         // -----------------------------------------------------------
 
+        /// <summary>X Position of the object.</summary>
+        [ComponentField(Group = "Position")]
+        public override float X { get { return Transform.M14; } set { ComponentField.SetProperty(value, ref Transform.M14, nameof(X)); Camera.Position.X = value; } }
+        /// <summary>X Position of the object.</summary>
+        [ComponentField(Group = "Position")]
+        public override float Y { get { return Transform.M24; } set { ComponentField.SetProperty(value, ref Transform.M24, nameof(Y)); Camera.Position.Y = value; } }
+        /// <summary>X Position of the object.</summary>
+        [ComponentField(Group = "Position")]
+        public override float Z { get { return Transform.M34; } set { ComponentField.SetProperty(value, ref Transform.M34, nameof(Z)); Camera.Position.Z = value; } }
+
         /// <summary>3-Dimensional position of the camera.</summary>
         public override Vector3 Position 
         { 
