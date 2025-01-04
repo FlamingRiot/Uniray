@@ -154,7 +154,6 @@ namespace Uniray
             {
                 Raylib.DrawMesh(Meshes[j], Materials[j + 1], Transform);
             }
-            //Raylib.DrawModel(Uniray.Ressource.GetModel(ModelID), Vector3.Zero, 1, Color.White);
         }
 
         /// <summary>Draws the model's outline to the screen.</summary>

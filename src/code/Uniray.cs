@@ -97,9 +97,6 @@ namespace Uniray
             // 3D graphics rendering
             // -----------------------------------------------------------
 
-            // Define a mouse ray for collision check
-            Conceptor3D.UpdateMouseRay();
-
             // Render the outlined selected GameObjects and deactivate the Raylib culling to make it possible
             EnableBackfaceCulling();
             if (Selection.Count == 1) Selection.First().DrawOutline();

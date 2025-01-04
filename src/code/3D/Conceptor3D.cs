@@ -39,6 +39,7 @@ namespace Uniray
         {
             mouse = GetMousePosition();
             _mouseRay = GetMouseRay(mouse, EnvCamera);
+            _mouseRayCollision.Hit = false;
         }
 
         /// <summary>Translates a position according to the user's inputs.</summary>
@@ -96,6 +97,9 @@ namespace Uniray
         {
             if (IsMouseButtonPressed(MouseButton.Left))
             {
+                // Define a mouse ray for collision check
+                UpdateMouseRay();
+
                 if (mouse.X > Uniray.UI.Components["gameManager"].X + Uniray.UI.Components["gameManager"].Width && mouse.Y < Uniray.UI.Components["fileManager"].Y - 10)
                 {
                     // Type cast
