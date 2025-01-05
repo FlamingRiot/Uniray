@@ -15,6 +15,9 @@ namespace Uniray
         /// <summary>Absolute path to the project.</summary>
         public string ProjectFile;
 
+        /// <summary>The scene to display when simulating the game.</summary>
+        public string LaunchScene;
+
         /// <summary>Returns the folder of the project.</summary>
         public string ProjectFolder 
         { 
@@ -47,6 +50,7 @@ namespace Uniray
             // Init cryptography keys
             _encryptionKey = aesKey;
             _symmetricalVector = aesIv;
+            LaunchScene = scenes.First().Name; // Define launch scene
         }
 
         /// <summary>Gets the scenes at a specified location.</summary>

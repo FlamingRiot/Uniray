@@ -12,6 +12,8 @@ using Uniray.DatFiles;
 using static Uniray.UData;
 using Uniray;
 using System.Reflection;
+using System.IO;
+using System.Xml.Linq;
 
 namespace Uniray
 {
@@ -42,7 +44,7 @@ namespace Uniray
         public static readonly Color TOOLBAR_COLOR = new(27, 27, 27, 255);
 
         /// <summary>Instance containing the ressources of the loaded project.</summary>
-        public static Ressource Ressource = new Ressource();
+        public static Resource Ressource = new Resource();
 
         /// <summary>Global UI of the application.</summary>
         public static UI UI = new UI();
@@ -328,6 +330,7 @@ namespace Uniray
                 string _projectName = reader.ReadString();
                 byte[] _aesKey = reader.ReadBytes(DatEncoder.AES_KEY_LENGTH);
                 byte[] _aesIv = reader.ReadBytes(DatEncoder.AES_IV_LENGTH);
+                string _launchScene = reader.ReadString();
 
                 // Set Project info in application
                 string? directory = Path.GetDirectoryName(path);
@@ -348,6 +351,7 @@ namespace Uniray
 
                 // Load scenes along with their game objects
                 CurrentProject = new Project(_projectName, path, LoadProjectScenes(directory, _aesKey, _aesIv), _aesKey, _aesIv);
+                CurrentProject.LaunchScene = _launchScene;
                 CurrentScene = CurrentProject.GetScene(0); // Set default scene
                 ((Label)UI.Components["projectNameLabel"]).Text = "Uniray - " + _projectName;
 
@@ -368,6 +372,13 @@ namespace Uniray
                 {
                     DatEncoder.EncodeScene(scene); // Encode project scenes
                 }
+
+                FileStream stream = new FileStream(CurrentProject.ProjectFile, FileMode.Create);
+                using BinaryWriter writer = new BinaryWriter(stream);
+                writer.Write(CurrentProject.Name); // Write project name
+                writer.Write(CurrentProject.EncryptionKey); // Write project key
+                writer.Write(CurrentProject.SymmetricalVector); // Write project symmetrical vector
+                writer.Write(CurrentProject.LaunchScene); // Write default launch scene
 
                 TraceLog(TraceLogLevel.Info, "Project was saved successfully !");
             }
@@ -411,6 +422,7 @@ namespace Uniray
                 writer.Write(name); // Write project name
                 writer.Write(_aesKey); // Write project key
                 writer.Write(_aesIv); // Write project symmetrical vector
+                writer.Write("PLACEHOLDER"); // Write default launch scene
 
                 // Set file manager output to new project directory
                 ((Container)UI.Components["fileManager"]).OutputFilePath = path + "/assets/models/";
@@ -423,7 +435,7 @@ namespace Uniray
                 List<Scene> scenes = new() { defaultScene };
                 CurrentProject = new Project(name, path + "/" + name + ".uproj", scenes, _aesKey, _aesIv); // Create project
 
-                Ressource = new Ressource(); // Init ressource lists
+                Ressource = new Resource(); // Init ressource lists
                 CurrentScene = CurrentProject.GetScene(0); // Set current scene to default
                 DatEncoder.EncodeScene(CurrentScene); // Encode newly created scene to .DAT files
 
@@ -432,6 +444,18 @@ namespace Uniray
             catch
             {
                 ErrorHandler.Send(new Error(1, "Project " + name + " could not be created"));
+            }
+        }
+
+        public static void PublishProject()
+        {
+            if (CurrentProject is not null)
+            {
+
+            }
+            else
+            {
+                ErrorHandler.Send(new Error(4, "No project loaded, unable to publish"));
             }
         }
 
@@ -459,7 +483,7 @@ namespace Uniray
             return scenes;
         }
 
-        /// <summary>Resized the UI of the application.</summary>
+        /// <summary>Resizes the UI of the application.</summary>
         public static void Resize()
         {
             Program.Width = GetScreenWidth();

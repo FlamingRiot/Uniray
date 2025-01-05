@@ -298,7 +298,7 @@ namespace Uniray
                 Uniray.SaveProject();
 
                 // Unload all used ressources
-                Uniray.Ressource.UnloadRessources();
+                Uniray.Ressource.UnloadResources();
                 // Unload materials
                 foreach (GameObject3D go in UData.CurrentScene.GameObjects)
                 {

@@ -2,21 +2,25 @@
 
 namespace Uniray
 {
-    public unsafe class Ressource
+    /// <summary>Represents an instance of <see cref="Resource"/>.</summary>
+    public unsafe class Resource
     {
-        /// <summary>
-        /// Dictionary containing the currently loaded textures
-        /// </summary>
+        // -----------------------------------------------------------
+        // Private lists
+        // -----------------------------------------------------------
+
+        /// <summary>Dictionary containing the currently loaded textures</summary>
         private Dictionary<string, Texture2D> _textures;
-        /// <summary>
-        /// Dictionary containing the currently loaded sounds
-        /// </summary>
+        /// <summary>Dictionary containing the currently loaded sounds</summary>
         private Dictionary<string, Sound> _sounds;
-        /// <summary>
-        /// Dictionary containing the currently loaded models
-        /// </summary>
+        /// <summary>Dictionary containing the currently loaded models</summary>
         private Dictionary<string, Model> _models;
-        public Ressource(List<UStorage> _textures, List<UStorage> _sounds, List<UStorage> _models)
+
+        /// <summary>Creates and loads an instance of <see cref="Resource"/>.</summary>
+        /// <param name="_textures">Textures file tree.</param>
+        /// <param name="_sounds">Sounds file tree.</param>
+        /// <param name="_models">Models file tree.</param>
+        public Resource(List<UStorage> _textures, List<UStorage> _sounds, List<UStorage> _models)
         {
             this._textures = new Dictionary<string, Texture2D>();
             this._sounds = new Dictionary<string, Sound>();
@@ -30,19 +34,16 @@ namespace Uniray
             LoadModels(_models);
         }
 
-        /// <summary>
-        /// Empty lists constructor
-        /// </summary>
-        public Ressource()
+        /// <summary>Loads an emtpty instance of <see cref="Resource"/>.</summary>
+        public Resource()
         {
             this._textures = new Dictionary<string, Texture2D>();
             this._sounds = new Dictionary<string, Sound>();
             this._models = new Dictionary<string, Model>();
         }
-        /// <summary>
-        /// Load textures from the whole architecture
-        /// </summary>
-        /// <param name="textures">List of the top directory's storage units</param>
+
+        /// <summary>Loads textures from the given file tree.</summary>
+        /// <param name="textures">File tree.</param>
         private void LoadTextures(List<UStorage> textures)
         {
             // Load textures from the whole architecture
@@ -52,10 +53,9 @@ namespace Uniray
                 else LoadTextures(((UFolder)textures[i]).Files);
             }
         }
-        /// <summary>
-        /// Load models from the whole architecture
-        /// </summary>
-        /// <param name="textures">List of the top directory's storage units</param>
+
+        /// <summary>Loads models from the given file tree.</summary>
+        /// <param name="models">File tree.</param>
         private void LoadModels(List<UStorage> models)
         {
             // Load sounds from the whole architecture
@@ -75,11 +75,10 @@ namespace Uniray
                 else LoadModels(((UFolder)models[i]).Files);
             }
         }
-        /// <summary>
-        /// Load sounds from the whole architecture
-        /// </summary>
-        /// <param name="sounds">List of the top directory's storage units</param>
-        private void LoadSounds(List<UStorage> sounds) 
+
+        /// <summary>Loads sounds from the given file tree.</summary>
+        /// <param name="sounds">File tree.</param>
+        private void LoadSounds(List<UStorage> sounds)
         {
             // Load sounds from the whole architecture
             for (int i = 0; i < sounds.Count; i++)
@@ -88,10 +87,9 @@ namespace Uniray
                 else LoadSounds(((UFolder)sounds[i]).Files);
             }
         }
-        /// <summary>
-        /// Unload all the loaded ressources in RAM
-        /// </summary>
-        public void UnloadRessources()
+
+        /// <summary>Unloads the resources from the GPU/VRAM.</summary>
+        public void UnloadResources()
         {
             foreach (Model m in this._models.Values)
             {
@@ -106,6 +104,7 @@ namespace Uniray
                 Raylib.UnloadSound(s);
             }
         }
+
         public Texture2D GetTexture(string index)
         {
             return this._textures[index];
@@ -120,7 +119,7 @@ namespace Uniray
         }
         public int GetTextureCount()
         {
-            return this._textures.Count;    
+            return this._textures.Count;
         }
         public int GetSoundCount()
         {
@@ -132,7 +131,6 @@ namespace Uniray
         }
         public void AddTexture(Texture2D texture, string key)
         {
-            if (key == "Image_0") { }
             _textures.Add(key, texture);
         }
         public void AddModel(Model model, string key)
@@ -151,28 +149,25 @@ namespace Uniray
         {
             return _models.ContainsKey(key);
         }
-        /// <summary>
-        /// Remove texture from the list and unload from the RAM
-        /// </summary>
-        /// <param name="key">Key</param>
+
+        /// <summary>Deletes a <see cref="Texture2D"/> from the resources.</summary>
+        /// <param name="key">Texture key.</param>
         public void DeleteTexture(string key)
         {
             Raylib.UnloadTexture(_textures[key]);
             _textures.Remove(key);
         }
-        /// <summary>
-        /// Remove model from the list and unload from the RAM
-        /// </summary>
-        /// <param name="key">Key</param>
+
+        /// <summary>Deletes a <see cref="Model"/> from the resources.</summary>
+        /// <param name="key">Model key.</param>
         public void DeleteModel(string key)
         {
             Raylib.UnloadModel(_models[key]);
             _models.Remove(key);
         }
-        /// <summary>
-        /// Remove sound from the list and unload from the RAM
-        /// </summary>
-        /// <param name="key">Key</param>
+
+        /// <summary>Deletes a <see cref="Sound"/> from the given resources.</summary>
+        /// <param name="key">Sound key.</param>
         public void DeleteSound(string key)
         {
             Raylib.UnloadSound(_sounds[key]);
@@ -183,7 +178,7 @@ namespace Uniray
         /// <returns>Informations as a <see langword="string"/>.</returns>
         public override string ToString()
         {
-            return "Les ressources contiennent :\n" + GetTextureCount() + " textures\n" + GetSoundCount() + " sons\n" + GetModelCount() + " modèles";
+            return "Resources hold :\n" + GetTextureCount() + " textures\n" + GetSoundCount() + " sounds\n" + GetModelCount() + " models";
         }
     }
 }

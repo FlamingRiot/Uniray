@@ -572,7 +572,7 @@ namespace Uniray
                     }
                     UnloadDirectoryFiles(pathList);
                 }
-                Uniray.Ressource = new Ressource(
+                Uniray.Ressource = new Resource(
                     TextureFolder.Files,
                     SoundFolder.Files,
                     ModelFolder.Files
