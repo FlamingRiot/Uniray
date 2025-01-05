@@ -210,7 +210,7 @@ namespace Uniray
             fileDD.SetButtonEvent(0, NewProject);
             fileDD.SetButtonEvent(1, OpenProject);
             fileDD.SetButtonEvent(2, Uniray.SaveProject);
-            fileDD.SetButtonEvent(3, Project.Build);
+            fileDD.SetButtonEvent(3, Uniray.PublishProject);
 
             // Add DropDown
             List<string> addDDS = new List<string>()

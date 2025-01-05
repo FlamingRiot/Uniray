@@ -6,7 +6,6 @@ namespace Uniray
     internal static class HardRessource
     {
         public static Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
-        public static Dictionary<string, Material> Materials = new Dictionary<string, Material>();
         public static Dictionary<ShapeType, Mesh> ShapeMeshes = new Dictionary<ShapeType, Mesh>();
 
         public static void Init()
@@ -31,13 +30,6 @@ namespace Uniray
                 { ShapeType.HemiSphere, GenMeshHemiSphere(0.5f, 15, 15) },
                 { ShapeType.Knot, GenMeshKnot(0.5f, 1, 20, 20) }
             };
-
-            // Load static materials
-            Materials = new Dictionary<string, Material>();
-            // Camera material
-            Material camMat = LoadMaterialDefault();
-            SetMaterialTexture(ref camMat, MaterialMapIndex.Albedo, LoadTexture("data/cameraTex.png"));
-            Materials.Add("camera", camMat);
         }
 
         /// <summary>Unloads Hard Resources from RAM/VRAM</summary>
@@ -45,7 +37,6 @@ namespace Uniray
         {
             ShapeMeshes.ToList().ForEach(x => UnloadMesh(x.Value)); // Unload Shape Meshes
             Textures.ToList().ForEach(x => UnloadTexture(x.Value)); // Unload textures
-            Materials.ToList().ForEach(x => UnloadMaterial(x.Value)); // Unload materials
         }
     }
 }
