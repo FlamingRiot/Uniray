@@ -34,7 +34,8 @@ namespace Uniray
 
     /// <summary>Reprsents an instance of <see cref="GameObject3D"/>.</summary>
     public abstract class GameObject3D : IDrawable
-    { 
+    {
+        private string _scene;
         // -----------------------------------------------------------
         // Public attributes
         // -----------------------------------------------------------
@@ -59,11 +60,14 @@ namespace Uniray
         /// <summary>X Position of the object.</summary>
         [ComponentField(Group = "Position")]
         public virtual float Z { get { return Transform.M34; } set { ComponentField.SetProperty(value, ref Transform.M34, nameof(Z)); } }
+        /// <summary>Scene containing this game object.</summary>
+        public string Scene { get { return _scene; } set { _scene = value; } }
 
         /// <summary>Creates an instance of <see cref="GameObject3D"/>.</summary>
         public GameObject3D() 
         {
             Name = "";
+            _scene = "";
             Transform = Matrix4x4.Identity; // Get identity (default) matrix
         }
 
@@ -73,6 +77,7 @@ namespace Uniray
         public GameObject3D(string name, Vector3 position)
         {
             Name = name;
+            _scene = UData.CurrentScene.Name;
             Transform = Matrix4x4.Identity; // Get identity (default) matrix
             Position = position;
         }
@@ -84,6 +89,7 @@ namespace Uniray
         public GameObject3D(string name, Vector3 position, Behavior? behavior)
         {
             Name = name;
+            _scene = UData.CurrentScene.Name;
             Transform = Matrix4x4.Identity; // Get identity (default) matrix
             Position = position;
             Behavior = behavior;

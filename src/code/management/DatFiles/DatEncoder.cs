@@ -234,7 +234,7 @@ namespace Uniray.DatFiles
                 switch (go)
                 {
                     case UModel model: // JSON 0
-                        json[0] += "{" + "X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
+                        json[0] += "{" + "Scene: \"" + model.Scene + "\",X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
                         ",Pitch: " + model.Pitch + ",Roll: " + model.Roll + ",Width: " + model.Width + ",Height: " + model.Height
                         + ",Depth: " + model.Depth + ",ModelID: \"" + model.ModelID + "\", Transform:";
                         json[0] += JsonConvert.SerializeObject(model.Transform);
