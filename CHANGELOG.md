@@ -1,5 +1,16 @@
 ## Uniray Changelog
 
+# [2.0.1-alpha]
+
+- Added a custom toolbar
+- Added a default gridded ground to the scenes
+- Added Shape Game Objects
+- Added scale attributes on some Game Objects
+- Improved UI Components
+- Linked Camera Objects' target to their rotation angle
+- Fixed bugs
+- Optimized time-consumming if statements
+
 # [2.0.0-alpha]
 
 - Added external scene data encryption
@@ -29,3 +40,4 @@
 [1.0.0-alpha]: https://git.s2.rpn.ch/ComtesseE1/uniray/-/tags/1.0.0-alpha
 [1.0.1-alpha]: https://git.s2.rpn.ch/ComtesseE1/uniray/-/tags/1.0.1-alpha
 [2.0.0-alpha]: https://git.s2.rpn.ch/ComtesseE1/uniray/-/tags/2.0.0-alpha
+[2.0.1-alpha]: https://git.s2.rpn.ch/ComtesseE1/uniray/-/tags/2.0.1-alpha
