@@ -14,6 +14,7 @@ using Uniray;
 using System.Reflection;
 using System.IO;
 using System.Xml.Linq;
+using Uniray.PakFiles;
 
 namespace Uniray
 {
@@ -447,10 +448,29 @@ namespace Uniray
             }
         }
 
+        /// <summary>Builds the project to run outside of Uniray.</summary>
         public static void PublishProject()
         {
             if (CurrentProject is not null)
             {
+                string command = $"/C cd \"{CurrentProject.ProjectFolder}\" && dotnet publish -c Release -r win-x64 --self-contained -o publish uniray_Project.csproj";
+                System.Diagnostics.Process.Start("CMD.exe", command); // Publish dotnet project
+                while (!Directory.Exists($"{CurrentProject.ProjectFolder}/publish")) { } // Wait till publish completes
+                // Create configuration file
+                FileStream stream = new FileStream($"{CurrentProject.ProjectFolder}/publish/project.conf", FileMode.Create);
+                using BinaryWriter writer = new BinaryWriter(stream);
+                writer.Write(CurrentProject.Name); // Write project name
+                writer.Write(CurrentProject.EncryptionKey); // Write project key
+                writer.Write(CurrentProject.SymmetricalVector); // Write project symmetrical vector
+                writer.Write(CurrentScene.Name); // Write default launch scene
+                // Copy raylib dlls
+                File.Copy("data/libraries/Raylib/raylib.dll", $"{CurrentProject.ProjectFolder}/publish/raylib.dll");
+                File.Copy("data/libraries/Raylib/Raylib-cs.dll", $"{CurrentProject.ProjectFolder}/publish/Raylib-cs.dll");
+                // Create resource files
+                Directory.CreateDirectory($"{CurrentProject.ProjectFolder}/publish/res");
+                PakArchive.CreatePakFile(FileManager.ModelFolder, $"{CurrentProject.ProjectFolder}/publish/res/MODELS.pak");
+                PakArchive.CreatePakFile(FileManager.TextureFolder, $"{CurrentProject.ProjectFolder}/publish/res/TEXTURES.pak");
+                PakArchive.CreatePakFile(FileManager.SoundFolder, $"{CurrentProject.ProjectFolder}/publish/res/SOUNDS.pak");
 
             }
             else
