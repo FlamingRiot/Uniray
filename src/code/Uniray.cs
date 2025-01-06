@@ -453,6 +453,7 @@ namespace Uniray
         {
             if (CurrentProject is not null)
             {
+                
                 string command = $"/C cd \"{CurrentProject.ProjectFolder}\" && dotnet publish -c Release -r win-x64 --self-contained -o publish uniray_Project.csproj";
                 System.Diagnostics.Process.Start("CMD.exe", command); // Publish dotnet project
                 while (!Directory.Exists($"{CurrentProject.ProjectFolder}/publish")) { } // Wait till publish completes
@@ -464,14 +465,13 @@ namespace Uniray
                 writer.Write(CurrentProject.SymmetricalVector); // Write project symmetrical vector
                 writer.Write(CurrentScene.Name); // Write default launch scene
                 // Copy raylib dlls
-                File.Copy("data/libraries/Raylib/raylib.dll", $"{CurrentProject.ProjectFolder}/publish/raylib.dll");
-                File.Copy("data/libraries/Raylib/Raylib-cs.dll", $"{CurrentProject.ProjectFolder}/publish/Raylib-cs.dll");
+                File.Copy("data/libraries/Raylib/raylib.dll", $"{CurrentProject.ProjectFolder}/publish/raylib.dll", true);
+                File.Copy("data/libraries/Raylib/Raylib-cs.dll", $"{CurrentProject.ProjectFolder}/publish/Raylib-cs.dll", true);
                 // Create resource files
                 Directory.CreateDirectory($"{CurrentProject.ProjectFolder}/publish/res");
                 PakArchive.CreatePakFile(FileManager.ModelFolder, $"{CurrentProject.ProjectFolder}/publish/res/MODELS.pak");
                 PakArchive.CreatePakFile(FileManager.TextureFolder, $"{CurrentProject.ProjectFolder}/publish/res/TEXTURES.pak");
                 PakArchive.CreatePakFile(FileManager.SoundFolder, $"{CurrentProject.ProjectFolder}/publish/res/SOUNDS.pak");
-
             }
             else
             {
