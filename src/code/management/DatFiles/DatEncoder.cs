@@ -129,15 +129,15 @@ namespace Uniray.DatFiles
                 {
                     case MODELS_SECTION:
                         List<UModel>? models = JsonConvert.DeserializeObject<List<UModel>>(text);
-                        if (models is not null) objects.AddRange(models);
+                        if (models is not null && models.Count != 0) objects.AddRange(models);
                         break;
                     case CAMERAS_SECTION:
                         List<UCamera>? cameras = JsonConvert.DeserializeObject<List<UCamera>>(text);
-                        if (cameras is not null) objects.AddRange(cameras);
+                        if (cameras is not null && cameras.Count != 0) objects.AddRange(cameras);
                         break;
                     case SHAPES_SECTION:
                         List<UShape>? shapes = JsonConvert.DeserializeObject<List<UShape>>(text);
-                        if (shapes is not null) objects.AddRange(shapes);
+                        if (shapes is not null && shapes.Count != 0) objects.AddRange(shapes);
                         break;
                 }
             }
