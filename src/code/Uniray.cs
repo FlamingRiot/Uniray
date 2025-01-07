@@ -562,6 +562,8 @@ namespace Uniray
         /// <summary>Runs the current project's simulation.</summary>
         public static void RunGameSimulation()
         {
+            // Draw default terrain
+            Conceptor3D.DrawGrid();
             // Draw scene game objects
             CurrentScene.GameObjects.Where(go => go is not UCamera).ToList().ForEach(go => go.Draw());
         }
