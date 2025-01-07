@@ -137,7 +137,12 @@ namespace Uniray.DatFiles
                         break;
                     case SHAPES_SECTION:
                         List<UShape>? shapes = JsonConvert.DeserializeObject<List<UShape>>(text);
-                        if (shapes is not null && shapes.Count != 0) objects.AddRange(shapes);
+                        if (shapes is not null && shapes.Count != 0)
+                        {
+                            // Update shapes mesh reference
+                            shapes.ForEach(x => x.UpdateMesh());
+                            objects.AddRange(shapes);
+                        }
                         break;
                 }
             }

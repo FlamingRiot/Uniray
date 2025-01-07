@@ -166,6 +166,12 @@ namespace Uniray
             return (UShape)MemberwiseClone();
         }
 
+        /// <summary>Updates the mesh used for rendering using the current type.</summary>
+        internal void UpdateMesh()
+        {
+            Mesh = HardRessource.ShapeMeshes[Type];
+        }
+
         /// <summary>Updates the entire transform matrix of the object.</summary>
         private void UpdateTransform()
         {
