@@ -23,6 +23,9 @@ namespace Uniray
         /// <summary>Cubemap texture of the skybox object.</summary>
         public Material CubemapMaterial;
 
+        /// <summary>Defines the direction the skybox is facing.</summary>
+        public EnvDirection Direction;
+
         /// <summary>Creates an empty <see cref="Skybox"/> instance.</summary>
         public Skybox() { }
     }

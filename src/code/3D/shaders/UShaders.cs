@@ -64,8 +64,9 @@ namespace Uniray
         /// <param name="panorama">HDR Texture to use./param>
         /// <param name="size">FrameBuffer size.</param>
         /// <param name="format">Format of the cubemap.</param>
+        /// <paramref name="facing"/>Defines the orientation of the skybox cubemap.</param>
         /// <returns>The loaded cubemap.</returns>
-        public Texture2D GenTexureCubemap(Texture2D panorama, int size, PixelFormat format)
+        public Texture2D GenTexureCubemap(Texture2D panorama, int size, PixelFormat format, EnvDirection facing)
         {
             Texture2D cubemap;
 

@@ -601,6 +601,7 @@ namespace Raylib_cs.Complements
         public static Skybox LoadSkybox(string path, EnvDirection facing)
         {
             Skybox skybox = new Skybox();
+            skybox.Direction = facing;
             skybox.CubemapMaterial = LoadMaterialDefault();
             skybox.CubemapMaterial.Shader = Uniray.Uniray.Shaders.SkyboxShader;
 
@@ -627,7 +628,7 @@ namespace Raylib_cs.Complements
         /// <param name="texture">Texture to apply. (NON-CUBEMAP)</param>
         public static void SetSkyboxTexture(Skybox skybox, Texture2D texture)
         {
-            Texture2D cubemap = Uniray.Uniray.Shaders.GenTexureCubemap(texture, 256, PixelFormat.UncompressedR8G8B8A8);
+            Texture2D cubemap = Uniray.Uniray.Shaders.GenTexureCubemap(texture, 256, PixelFormat.UncompressedR8G8B8A8, skybox.Direction);
             SetMaterialTexture(ref skybox.CubemapMaterial, MaterialMapIndex.Cubemap, cubemap);
         }
 
