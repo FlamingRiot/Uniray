@@ -605,8 +605,7 @@ namespace Raylib_cs.Complements
             skybox.CubemapMaterial.Shader = Uniray.Uniray.Shaders.SkyboxShader;
 
             Texture2D panorama = LoadTexture(path);
-            Texture2D cubemap = Uniray.Uniray.Shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
-            SetSkyboxCubemap(skybox, cubemap);
+            SetSkyboxTexture(skybox, panorama);
             UnloadTexture(panorama);
 
             return skybox;
@@ -625,10 +624,11 @@ namespace Raylib_cs.Complements
 
         /// <summary>Modifies a skybox object's cubemap texture.</summary>
         /// <param name="skybox">Skybox to modify</param>
-        /// <param name="texture">Texture to apply.</param>
-        public static void SetSkyboxCubemap(Skybox skybox, Texture2D texture)
+        /// <param name="texture">Texture to apply. (NON-CUBEMAP)</param>
+        public static void SetSkyboxTexture(Skybox skybox, Texture2D texture)
         {
-            SetMaterialTexture(ref skybox.CubemapMaterial, MaterialMapIndex.Cubemap, texture);
+            Texture2D cubemap = Uniray.Uniray.Shaders.GenTexureCubemap(texture, 256, PixelFormat.UncompressedR8G8B8A8);
+            SetMaterialTexture(ref skybox.CubemapMaterial, MaterialMapIndex.Cubemap, cubemap);
         }
 
         /// <summary>Unloads a <see cref="UModel"/>'s ressources from the vRAM.</summary>
