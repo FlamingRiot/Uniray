@@ -15,6 +15,7 @@ using System.Reflection;
 using System.IO;
 using System.Xml.Linq;
 using Uniray.PakFiles;
+using Raylib_cs.Complements;
 
 namespace Uniray
 {
@@ -63,14 +64,6 @@ namespace Uniray
         /// <summary>Initializes the <see cref="Uniray"/> engine.</summary>
         public static void Init()
         {
-            // Intitialize the Uniray shaders
-            Shaders = new UShaders();
-            Texture2D panorama = LoadTexture("data/shaders/skyboxes/industrial.hdr");
-            Texture2D cubemap = Shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
-            Shaders.SetCubemap(cubemap);
-            // Unload useless texture
-            UnloadTexture(panorama);
-
             // Load hard ressources
             HardRessource.Init();
 
@@ -78,7 +71,7 @@ namespace Uniray
             Conceptor3D.Init();
 
             // Intitialize the default scene and the render camera for Uniray
-            CurrentScene = new Scene("", new List<GameObject3D>());
+            CurrentScene = new Scene("", new List<GameObject3D>(), Skybox.DEFAULT_CUBEMAP_TEXTURE);
 
             // Create the render texture for preview of a camera's POV
             _cameraView = LoadRenderTexture(Program.Width / 2, Program.Height / 2);
@@ -102,7 +95,10 @@ namespace Uniray
 
             // Render the outlined selected GameObjects and deactivate the Raylib culling to make it possible
             EnableBackfaceCulling();
-            if (Selection.Count == 1) Selection.First().DrawOutline();
+            if (Selection.Count == 1)
+            {
+                Selection.First().DrawOutline();
+            }
             DisableBackfaceCulling();
 
             // Draw 3-Dimensional models of the current scene and check for a hypothetical new selected object
@@ -221,11 +217,7 @@ namespace Uniray
                 BeginMode3D(cam.Camera);
 
                 // Draw the external skybox 
-                DisableBackfaceCulling();
-                DisableDepthMask();
-                DrawMesh(Program.Skybox, Shaders.SkyboxMaterial, MatrixIdentity());
-                EnableBackfaceCulling();
-                EnableDepthMask();
+                RaylibComplements.DrawSkybox(CurrentScene.Skybox);
 
                 Shaders.Update(cam.Camera.Position);
 
@@ -432,7 +424,7 @@ namespace Uniray
 
                 // Create new empty scene (except camera)
                 UCamera ucamera = new UCamera("Default camera", UCamera.DefaultCamera);
-                Scene defaultScene = new Scene("PLACEHOLDER", new List<GameObject3D> { ucamera });
+                Scene defaultScene = new Scene("PLACEHOLDER", new List<GameObject3D> { ucamera }, Skybox.DEFAULT_CUBEMAP_TEXTURE);
                 List<Scene> scenes = new() { defaultScene };
                 CurrentProject = new Project(name, path + "/" + name + ".uproj", scenes, _aesKey, _aesIv); // Create project
 
@@ -600,6 +592,43 @@ namespace Raylib_cs.Complements
                 return false;
             }
             return false;
+        }
+
+        /// <summary>Loads a skybox object and configures its attributes.</summary>
+        /// <param name="path">Path to .hdr skybox texture.</param>
+        /// <param name="facing">Direction the skybox is facing (North by default).</param>
+        /// <returns>The configured skybox object.</returns>
+        public static Skybox LoadSkybox(string path, EnvDirection facing)
+        {
+            Skybox skybox = new Skybox();
+            skybox.CubemapMaterial = LoadMaterialDefault();
+            skybox.CubemapMaterial.Shader = Uniray.Uniray.Shaders.SkyboxShader;
+
+            Texture2D panorama = LoadTexture(path);
+            Texture2D cubemap = Uniray.Uniray.Shaders.GenTexureCubemap(panorama, 256, PixelFormat.UncompressedR8G8B8A8);
+            SetSkyboxCubemap(skybox, cubemap);
+            UnloadTexture(panorama);
+
+            return skybox;
+        }
+
+        /// <summary>Draws a skybox object to the screen.</summary>
+        /// <param name="skybox">Skybox object to display.</param>
+        public static void DrawSkybox(Skybox skybox)
+        {
+            DisableBackfaceCulling();
+            DisableDepthMask();
+            DrawMesh(Skybox.Mesh, skybox.CubemapMaterial, MatrixIdentity());
+            EnableBackfaceCulling();
+            EnableDepthMask();
+        }
+
+        /// <summary>Modifies a skybox object's cubemap texture.</summary>
+        /// <param name="skybox">Skybox to modify</param>
+        /// <param name="texture">Texture to apply.</param>
+        public static void SetSkyboxCubemap(Skybox skybox, Texture2D texture)
+        {
+            SetMaterialTexture(ref skybox.CubemapMaterial, MaterialMapIndex.Cubemap, texture);
         }
 
         /// <summary>Unloads a <see cref="UModel"/>'s ressources from the vRAM.</summary>

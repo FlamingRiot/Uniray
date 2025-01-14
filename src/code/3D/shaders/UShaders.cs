@@ -18,7 +18,6 @@ namespace Uniray
         // -----------------------------------------------------------
         // Shader associated materials
         // -----------------------------------------------------------
-        public Material SkyboxMaterial;
         public Material OutlineMaterial;
 
         // -----------------------------------------------------------
@@ -34,8 +33,6 @@ namespace Uniray
             SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "environmentMap"), (int)MaterialMapIndex.Cubemap, ShaderUniformDataType.Int);
             SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "doGamma"), 1, ShaderUniformDataType.Int);
             SetShaderValue(SkyboxShader, GetShaderLocation(SkyboxShader, "vflipped"), 1, ShaderUniformDataType.Int);
-            SkyboxMaterial = LoadMaterialDefault();
-            SkyboxMaterial.Shader = SkyboxShader;
             // Cubemap shader
             CubemapShader = LoadShader("data/shaders/cubemap.vs", "data/shaders/cubemap.fs");
             SetShaderValue(CubemapShader, GetShaderLocation(CubemapShader, "equirectangularMap"), 0, ShaderUniformDataType.Int);
@@ -61,9 +58,6 @@ namespace Uniray
             // Unload shaders
             UnloadShader(SkyboxShader);
             UnloadShader(CubemapShader);
-
-            // Unload materials
-            UnloadMaterial(SkyboxMaterial);
         }
 
         /// <summary>Generate skybox cubemap using the loading shader.</summary>
@@ -147,13 +141,6 @@ namespace Uniray
             cubemap.Format = format;
 
             return cubemap;
-        }
-
-        /// <summary>Sets the cubemap texture.</summary>
-        /// <param name="tex">¨Texture to set.</param>
-        public void SetCubemap(Texture2D tex)
-        {
-            SetMaterialTexture(ref SkyboxMaterial, MaterialMapIndex.Cubemap, tex);
         }
     }
 }

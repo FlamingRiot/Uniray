@@ -149,7 +149,7 @@ namespace Uniray.DatFiles
             // Reset entries list
             _entries.Clear();
             // Create scene
-            return new Scene("PLACEHOLDER", objects);
+            return new Scene("PLACEHOLDER", objects, Skybox.DEFAULT_CUBEMAP_TEXTURE);
         }
 
         /// <summary>Encrypts data with the AES algorithm.</summary>

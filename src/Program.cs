@@ -171,7 +171,7 @@ namespace Uniray
                     ClearBackground(Uniray.APPLICATION_COLOR);
                     BeginMode3D(UData.CurrentScene.Camera.Camera);
                     Conceptor3D.DrawGrid();
-                    DrawSkybox();
+                    RaylibComplements.DrawSkybox(UData.CurrentScene.Skybox);
                     Uniray.RunGameSimulation();
                     EndMode3D();
                     EndTextureMode();
@@ -179,7 +179,7 @@ namespace Uniray
                 else
                 {
                     BeginMode3D(camera);
-                    DrawSkybox();
+                    RaylibComplements.DrawSkybox(UData.CurrentScene.Skybox);
                     Conceptor3D.DrawGrid();
                     Uniray.DrawScene();
                     EndMode3D();
@@ -275,17 +275,6 @@ namespace Uniray
             }
         }
         
-        /// <summary>Draws a skybox into a 3D context.</summary>
-        static void DrawSkybox()
-        {
-            // Draw the external skybox 
-            Rlgl.DisableBackfaceCulling();
-            Rlgl.DisableDepthMask();
-            DrawMesh(Skybox, Uniray.Shaders.SkyboxMaterial, Raymath.MatrixIdentity());
-            Rlgl.EnableBackfaceCulling();
-            Rlgl.EnableDepthMask();
-        }
-
         /// <summary>Closes the Uniray and unloads its data from RAM/VRAM.</summary>
         public static void CloseUniray()
         {
