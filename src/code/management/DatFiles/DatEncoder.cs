@@ -65,7 +65,8 @@ namespace Uniray.DatFiles
                     _offset += data.Length;
                 }
                 // Write entries table
-                int tableOffset = _offset;
+                //int tableOffset = writer.BaseStream.;
+                int tableOffset = (int)writer.BaseStream.Length;
                 foreach (DatFileEntry entry in _entries)
                 {
                     writer.Write(entry.Name);
