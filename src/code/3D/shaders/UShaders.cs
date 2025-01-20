@@ -133,7 +133,7 @@ namespace Uniray
 
             Rlgl.UnloadFramebuffer(fbo);
 
-            Rlgl.Viewport(0, 0, Rlgl.GetFramebufferWidth(), Rlgl.GetFramebufferHeight());
+            Rlgl.Viewport(0, 0, Program.Width, Program.Height);
             Rlgl.EnableBackfaceCulling();
 
             cubemap.Width = size;
