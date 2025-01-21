@@ -36,6 +36,7 @@ namespace Uniray.DatFiles
                 writer.Write(scene.GameObjects.Count); // Object count placeholder (Int-32)
                 writer.Write(_offset); // Table placeholder (Int-32)
                 writer.Write(scene.Skybox.KeyID);
+                
                 // Move writer after placeholder
                 _offset += (int)writer.BaseStream.Length; // Int-32 + Int-32 = 8 bytes
                 // Encode and write JSON data       

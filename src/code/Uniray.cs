@@ -470,6 +470,9 @@ namespace Uniray
                 File.Copy("data/shaders/cubemap.fs", $"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/builtin/cubemap.fs", true);
                 File.Copy("data/shaders/skybox.vs", $"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/builtin/skybox.vs", true);
                 File.Copy("data/shaders/skybox.fs", $"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/builtin/skybox.fs", true);
+                File.Copy("data/shaders/lighting.vs", $"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/builtin/lighting.vs", true);
+                File.Copy("data/shaders/lighting.fs", $"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/builtin/lighting.fs", true);
+                File.Copy("data/img/grid_ground.png", $"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/grid_ground.png", true);
                 // Create resource files
                 Directory.CreateDirectory($"{CurrentProject.ProjectFolder}/publish/res");
                 // Model encoding
