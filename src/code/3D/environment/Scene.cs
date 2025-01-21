@@ -7,7 +7,7 @@ namespace Uniray
     /// <summary>Represents an instance of Uniray <see cref="Scene"/>.</summary>
     public class Scene
     {
-        internal string SkyboxPath;
+        internal string SkyboxID;
 
         /// <summary>Name of the scene.</summary>
         public string Name;
@@ -27,25 +27,25 @@ namespace Uniray
             GameObjects = new List<GameObject3D>();
             Camera = new UCamera();
             Name = "";
-            SkyboxPath = "";
+            SkyboxID = "";
         }
 
         /// <summary>Creates an instance of Uniray <see cref="Scene"/>.</summary>
         /// <param name="gameObjects">Scene game objects.</param>
-        public Scene(string name, List<GameObject3D> gameObjects, string skyboxPath)
+        public Scene(string name, List<GameObject3D> gameObjects, string skyboxKey)
         {
             GameObjects = gameObjects;
             if (gameObjects.Count != 0) Camera = (UCamera)gameObjects.Where(x => x is UCamera).ToList().First();
             else Camera = new UCamera();
             Name = name;
-            SkyboxPath = skyboxPath;
-            if (skyboxPath == Skybox.DEFAULT_CUBEMAP_TEXTURE) LoadSkybox(); // Load if default passed (simplicity.)
+            SkyboxID = skyboxKey;
+            if (Skybox.DEFAULT_CUBEMAP_TEXTURE.Contains(skyboxKey)) LoadSkybox(); // Load if default passed (simplicity.)
         }
 
         /// <summary>Loads the skybox object of the scene.</summary>
         public void LoadSkybox()
         {
-            Skybox = RaylibComplements.LoadSkybox(SkyboxPath, EnvDirection.North);
+            if (Skybox.DEFAULT_CUBEMAP_TEXTURE.Contains(SkyboxID)) Skybox = RaylibComplements.LoadSkybox(Skybox.DEFAULT_CUBEMAP_TEXTURE, EnvDirection.North);
         }
 
         /// <summary>Returns informations about the current instance.</summary>

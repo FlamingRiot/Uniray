@@ -35,8 +35,9 @@ namespace Uniray.DatFiles
                 // Write placeholder data to the beginning of the file
                 writer.Write(scene.GameObjects.Count); // Object count placeholder (Int-32)
                 writer.Write(_offset); // Table placeholder (Int-32)
+                writer.Write(scene.Skybox.KeyID);
                 // Move writer after placeholder
-                _offset += 8; // Int-32 + Int-32 = 8 bytes
+                _offset += (int)writer.BaseStream.Length; // Int-32 + Int-32 = 8 bytes
                 // Encode and write JSON data       
                 for (int i = 0; i < jsons.Length; i++)
                 {
@@ -104,6 +105,7 @@ namespace Uniray.DatFiles
             // Read file header data
             int _entryCount = reader.ReadInt32(); // Read object count
             int _tableOffset = reader.ReadInt32(); // Read entry table offset
+            string skyboxId = reader.ReadString(); // Read skybox resource id
             // Move to table offset
             datFile.Seek(_tableOffset, SeekOrigin.Begin);
             // Loop over different file entries
@@ -150,7 +152,7 @@ namespace Uniray.DatFiles
             // Reset entries list
             _entries.Clear();
             // Create scene
-            return new Scene("PLACEHOLDER", objects, Skybox.DEFAULT_CUBEMAP_TEXTURE);
+            return new Scene("PLACEHOLDER", objects, skyboxId);
         }
 
         /// <summary>Encrypts data with the AES algorithm.</summary>

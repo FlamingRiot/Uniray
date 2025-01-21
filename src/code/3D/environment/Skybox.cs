@@ -17,6 +17,13 @@ namespace Uniray
     {
         public const string DEFAULT_CUBEMAP_TEXTURE = "data/shaders/skyboxes/default.hdr";
 
+        public string KeyID { get
+            {
+                string rep = DEFAULT_CUBEMAP_TEXTURE.Replace('\\', '/');
+                return rep.Split('/').Last().Split('.')[0];
+            } 
+        }
+
         /// <summary>Defines the default mesh used for skybox rendering.</summary>
         public static readonly Mesh Mesh = GenMeshCube(1, 1, 1);
 

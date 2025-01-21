@@ -348,7 +348,7 @@ namespace Uniray
                 CurrentScene = CurrentProject.GetScene(0); // Set default scene
                 ((Label)UI.Components["projectNameLabel"]).Text = "Uniray - " + _projectName;
 
-                TraceLog(TraceLogLevel.Info, "Project has been loaded successfully !");
+                UDebugger.Send($"Project {CurrentProject.Name} has been loaded successfully", ConsoleColor.Green);
             }
             catch
             {
@@ -373,7 +373,7 @@ namespace Uniray
                 writer.Write(CurrentProject.SymmetricalVector); // Write project symmetrical vector
                 writer.Write(CurrentProject.LaunchScene); // Write default launch scene
 
-                TraceLog(TraceLogLevel.Info, "Project was saved successfully !");
+                UDebugger.Send($"Project {CurrentProject.Name} has been saved successfully", ConsoleColor.Green);
             }
             else
             {
@@ -432,7 +432,7 @@ namespace Uniray
                 CurrentScene = CurrentProject.GetScene(0); // Set current scene to default
                 DatEncoder.EncodeScene(CurrentScene); // Encode newly created scene to .DAT files
 
-                TraceLog(TraceLogLevel.Info, "Project \"" + name + "\" has been created");
+                UDebugger.Send($"Project ${name} has been created", ConsoleColor.Green);
             }
             catch
             {
@@ -608,6 +608,8 @@ namespace Raylib_cs.Complements
             Texture2D panorama = LoadTexture(path);
             SetSkyboxTexture(skybox, panorama);
             UnloadTexture(panorama);
+
+            UDebugger.Send($"Skybox at {path} has been loaded successfully", ConsoleColor.Green);
 
             return skybox;
         }
