@@ -5,6 +5,7 @@ using System.Text;
 using static Raylib_cs.Raylib;
 using Raylib_cs.Complements;
 using System.Numerics;
+using System.IO;
 
 namespace Uniray
 {
@@ -128,6 +129,7 @@ namespace Uniray
                     {
                         case UFile file:
                             file.Rename(box.Text);
+                            if (file.Extension == "cs") UpdateScriptName(file.Path, file.Name);
                             break;
                         case UFolder folder:
                             folder.Rename(box.Text);
@@ -142,21 +144,40 @@ namespace Uniray
             }
 
             // Creates folder action
-            if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift) && IsKeyPressed(KeyboardKey.N))
+            if (RaylibComplements.IsControlShiftDown())
             {
-                UFolder folder = new UFolder(CurrentFolder.Path + "/New", new List<UStorage>());
-                folder.UpstreamFolder = CurrentFolder;
-                CurrentFolder.Files.Add(folder);
-                Directory.CreateDirectory(CurrentFolder.Path + "/New");
+                if (IsKeyPressed(KeyboardKey.N))
+                {
+                    UFolder folder = new UFolder(CurrentFolder.Path + "/New", new List<UStorage>());
+                    folder.UpstreamFolder = CurrentFolder;
+                    CurrentFolder.Files.Add(folder);
+                    Directory.CreateDirectory(CurrentFolder.Path + "/New");
 
-                // Set clicked item to new folder
-                ClickedUnits.Clear();
-                ClickedUnits.Add(folder);
+                    // Set clicked item to new folder
+                    ClickedUnits.Clear();
+                    ClickedUnits.Add(folder);
 
-                // Add rename box
-                InjectRenameBox(folder);
+                    // Add rename box
+                    InjectRenameBox(folder);
+                }
+                if (IsKeyPressed(KeyboardKey.B))
+                {
+                    string filePath = $"{CurrentFolder.Path}/NewScript.cs";
+                    File.Copy("data/script.cs", filePath);
+                    UFile file = new UFile(filePath);
+                    CurrentFolder.AddFile(file);
+
+                    // Prepare file
+                    UpdateScriptName(filePath, "NewScript");
+
+                    // Set clicked item to new file
+                    ClickedUnits.Clear();
+                    ClickedUnits.Add(file);
+
+                    // Add rename box
+                    InjectRenameBox(file);
+                }
             }
-
             // Draw selected item
             Vector2 mouse = GetMousePosition();
             if (UData.SelectedFiles.Count != 0 && !Hover((int)staticSelectedPos.X, (int)staticSelectedPos.Y, 65, 65)) 
@@ -217,6 +238,9 @@ namespace Uniray
                         Rectangle destRectangle = new Rectangle(x, y, 65, 65);
 
                         DrawTexturePro(previewTexture, srcRectangle, destRectangle, Vector2.Zero, 0, new Color(255, 255, 255, alpha));
+                        break;
+                    case "cs":
+                        DrawTexture(HardRessource.Textures["cs_script"], x, y, new Color(255, 255, 255, alpha));
                         break;
                 }
                 // Draw label
@@ -656,6 +680,34 @@ namespace Uniray
                 Uniray.UI.Components.Add("rename_box", box);
             }
             UData.CurrentRenaming = unit;
+        }
+
+        /// <summary>Injects a new file into a folder.</summary>
+        /// <param name="path">Path to the file to be created.</param>
+        private static void InjectNewFile(string path)
+        {
+            File.Create(path);
+            UFile file = new UFile(path);
+            CurrentFolder.AddFile(file);
+
+            // Set clicked item to new file
+            ClickedUnits.Clear();
+            ClickedUnits.Add(file);
+
+            // Add rename box
+            InjectRenameBox(file);
+        }
+        
+        /// <summary>Updates a script's name and modifies the dependencies.</summary>
+        /// <param name="path">Path to the file</param>
+        /// <param name="name">Name to replace.</param>
+        private static void UpdateScriptName(string path, string name)
+        {
+            string text = File.ReadAllText(path);
+            text = text.Replace("###", name);
+            text = text.Replace("/*", "");
+            text = text.Replace("*/", "");
+            File.WriteAllText(path, text);
         }
 
         /// <summary>Deletes a <see cref="UStorage"/> instance, along with its dependencies.</summary>

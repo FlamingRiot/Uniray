@@ -16,7 +16,8 @@ namespace Uniray
                 { "file", LoadTexture("data/img/file.png")},
                 { "model_file", LoadTexture("data/img/model_file.png")},
                 { "folder", LoadTexture("data/img/folder.png")},
-                { "camera", LoadTexture("data/img/camera.png")}
+                { "camera", LoadTexture("data/img/camera.png")},
+                { "cs_script", LoadTexture("data/img/cs_script.png")},
             };
 
             // Load UShape Meshes

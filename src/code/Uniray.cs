@@ -614,6 +614,14 @@ namespace Raylib_cs.Complements
             return false;
         }
 
+        /// <summary>Checks if control and shift are simultaneously pressed.</summary>
+        /// <returns>Yea. You get it.</returns>
+        public static bool IsControlShiftDown()
+        {
+            if (IsKeyDown(KeyboardKey.LeftControl) && IsKeyDown(KeyboardKey.LeftShift)) return true;
+            return false;
+        }
+
         /// <summary>Loads a skybox object and configures its attributes.</summary>
         /// <param name="path">Path to .hdr skybox texture.</param>
         /// <param name="facing">Direction the skybox is facing (North by default).</param>
