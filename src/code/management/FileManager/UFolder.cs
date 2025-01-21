@@ -35,7 +35,7 @@ namespace Uniray
 
         /// <summary>Deletes a file from the folder.</summary>
         /// <param name="file">File to delete.</param>
-        public void DeleteFile(UStorage file)
+        public void RemoveFile(UStorage file)
         {
             Files.Remove(file);
         }

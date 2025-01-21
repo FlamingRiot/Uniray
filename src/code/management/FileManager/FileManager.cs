@@ -362,22 +362,6 @@ namespace Uniray
                             }
                         }
                     }
-                    // Check if component field
-                    /*Component box = Uniray.UI.Components["textureTextbox"];
-                    if (Hover(box.X, box.Y, box.Width, box.Height))
-                    {
-                        if (UData.GameSimulation is null)
-                        {
-                            // Check if texture
-                            if (UData.SelectedFiles[0].Path.Split('.').Last() == "png")
-                            {
-                                if (UData.Selection.Count == 1 && UData.Selection.First() is UModel)
-                                {
-                                    ((UModel)UData.Selection.First()).SetTexture(UData.SelectedFiles[0].Name, 0); // INDEX 0 IS A PLACEHOLDER
-                                }
-                            }
-                        }
-                    }*/
                     // Check if over folder
                     foreach (UFolder folder in CurrentFolder.Files.Where(x => x is UFolder))
                     {
@@ -401,7 +385,7 @@ namespace Uniray
                                     {
                                         // Move virtually
                                         folder.AddFile(unit);
-                                        CurrentFolder.DeleteFile(unit);
+                                        CurrentFolder.RemoveFile(unit);
                                         // Move effectively
                                         File.Move(unit.Path, folder.Path + '/' + ((UFile)unit).FullName);
                                         unit.Path = folder.Path + '/' + ((UFile)unit).FullName;
@@ -414,7 +398,7 @@ namespace Uniray
                                     {
                                         // Move virtually
                                         folder.AddFile(unit);
-                                        CurrentFolder.DeleteFile(unit);
+                                        CurrentFolder.RemoveFile(unit);
                                         // Move effectively
                                         Directory.Move(unit.Path, folder.Path + '/' + unit.Name);
                                         unit.Path = folder.Path + '/' + unit.Name;

@@ -463,8 +463,14 @@ namespace Uniray
                 File.Copy("data/libraries/Raylib/Raylib-cs.dll", $"{CurrentProject.ProjectFolder}/publish/Raylib-cs.dll", true);
                 // Create resource files
                 Directory.CreateDirectory($"{CurrentProject.ProjectFolder}/publish/res");
+                // Model encoding
                 PakArchive.CreatePakFile(FileManager.ModelFolder, $"{CurrentProject.ProjectFolder}/publish/res/MODELS.pak");
+                // Texture encoding
+                UFile defSkyboxTex = new UFile(Skybox.DEFAULT_CUBEMAP_TEXTURE);
+                FileManager.TextureFolder.AddFile(defSkyboxTex);
                 PakArchive.CreatePakFile(FileManager.TextureFolder, $"{CurrentProject.ProjectFolder}/publish/res/TEXTURES.pak");
+                FileManager.TextureFolder.RemoveFile(defSkyboxTex);
+                // Sound encoding
                 PakArchive.CreatePakFile(FileManager.SoundFolder, $"{CurrentProject.ProjectFolder}/publish/res/SOUNDS.pak");
             }
             else
