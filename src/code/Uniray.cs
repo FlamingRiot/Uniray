@@ -447,8 +447,11 @@ namespace Uniray
         {
             if (CurrentProject is not null)
             {
-                
+#if DEBUG
+                string command = $"/C cd \"{CurrentProject.ProjectFolder}\" && dotnet publish -c Debug -r win-x64 --self-contained -o publish uniray_Project.csproj";
+#else
                 string command = $"/C cd \"{CurrentProject.ProjectFolder}\" && dotnet publish -c Release -r win-x64 --self-contained -o publish uniray_Project.csproj";
+#endif
                 System.Diagnostics.Process.Start("CMD.exe", command); // Publish dotnet project
                 while (!Directory.Exists($"{CurrentProject.ProjectFolder}/publish")) { } // Wait till publish completes
                 // Create configuration file

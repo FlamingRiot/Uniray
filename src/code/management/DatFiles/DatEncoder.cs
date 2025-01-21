@@ -125,7 +125,7 @@ namespace Uniray.DatFiles
                 datFile.Seek(entry.Index, SeekOrigin.Begin);
                 // Read encrypted data from the file
                 byte[] encryptedData = new byte[entry.Size];
-                datFile.Read(encryptedData, 0, encryptedData.Length);
+                datFile.ReadExactly(encryptedData);
                 // Decrypt data
                 string text = Decrypt(encryptedData, key, iv);
                 switch (entry.Name)

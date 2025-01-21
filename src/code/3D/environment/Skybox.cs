@@ -15,7 +15,7 @@ namespace Uniray
     /// <summary>Represents a <see cref="Skybox"/> world object.</summary>
     public struct Skybox
     {
-        public const string DEFAULT_CUBEMAP_TEXTURE = "data/shaders/skyboxes/default.hdr";
+        public const string DEFAULT_CUBEMAP_TEXTURE = "data/shaders/skyboxes/industrial.hdr";
 
         public string KeyID { get
             {
