@@ -461,6 +461,12 @@ namespace Uniray
                 // Copy raylib dlls
                 File.Copy("data/libraries/Raylib/raylib.dll", $"{CurrentProject.ProjectFolder}/publish/raylib.dll", true);
                 File.Copy("data/libraries/Raylib/Raylib-cs.dll", $"{CurrentProject.ProjectFolder}/publish/Raylib-cs.dll", true);
+                // Copy built-in shaders
+                Directory.CreateDirectory($"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/builtin");
+                File.Copy("data/shaders/cubemap.vs", $"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/builtin/cubemap.vs", true);
+                File.Copy("data/shaders/cubemap.fs", $"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/builtin/cubemap.fs", true);
+                File.Copy("data/shaders/skybox.vs", $"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/builtin/skybox.vs", true);
+                File.Copy("data/shaders/skybox.fs", $"{CurrentProject.ProjectFolder}/publish/res/shaderpacks/builtin/skybox.fs", true);
                 // Create resource files
                 Directory.CreateDirectory($"{CurrentProject.ProjectFolder}/publish/res");
                 // Model encoding
