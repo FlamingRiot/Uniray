@@ -71,7 +71,9 @@ namespace Uniray
             Conceptor3D.Init();
 
             // Intitialize the default scene and the render camera for Uniray
-            CurrentScene = new Scene("", new List<GameObject3D>(), Skybox.DEFAULT_CUBEMAP_TEXTURE);
+            string rep = Skybox.DEFAULT_CUBEMAP_TEXTURE.Replace('\\', '/');
+            string skyboxId = rep.Split('/').Last().Split('.')[0];
+            CurrentScene = new Scene("", new List<GameObject3D>(), skyboxId);
 
             // Create the render texture for preview of a camera's POV
             _cameraView = LoadRenderTexture(Program.Width / 2, Program.Height / 2);
@@ -432,7 +434,7 @@ namespace Uniray
                 CurrentScene = CurrentProject.GetScene(0); // Set current scene to default
                 DatEncoder.EncodeScene(CurrentScene); // Encode newly created scene to .DAT files
 
-                UDebugger.Send($"Project ${name} has been created", ConsoleColor.Green);
+                UDebugger.Send($"Project {name} has been created", ConsoleColor.Green);
             }
             catch
             {
@@ -600,18 +602,47 @@ namespace Raylib_cs.Complements
         /// <returns>The configured skybox object.</returns>
         public static Skybox LoadSkybox(string path, EnvDirection facing)
         {
-            Skybox skybox = new Skybox();
-            skybox.Direction = facing;
-            skybox.CubemapMaterial = LoadMaterialDefault();
-            skybox.CubemapMaterial.Shader = Uniray.Uniray.Shaders.SkyboxShader;
+            // Check for loaded skybox
+            string rep = path.Replace('\\', '/');
+            string id = rep.Split('/').Last().Split('.')[0];
+            if (id == CurrentScene.SkyboxID) return CurrentScene.Skybox;
+            else
+            {
+                Skybox skybox = new Skybox();
+                skybox.Direction = facing;
+                skybox.CubemapMaterial = LoadMaterialDefault();
+                skybox.CubemapMaterial.Shader = Uniray.Uniray.Shaders.SkyboxShader;
 
-            Texture2D panorama = LoadTexture(path);
-            SetSkyboxTexture(skybox, panorama);
-            UnloadTexture(panorama);
+                Texture2D panorama = LoadTexture(path);
+                SetSkyboxTexture(skybox, panorama);
+                UnloadTexture(panorama);
 
-            UDebugger.Send($"Skybox at {path} has been loaded successfully", ConsoleColor.Green);
+                UDebugger.Send($"Skybox at {path} has been loaded successfully", ConsoleColor.Green);
 
-            return skybox;
+                return skybox;
+            }
+        }
+
+        /// <summary>Loads a skybox object from a texture and configures its attributes.</summary>
+        /// <param name="panorama">Panorama texture to use.</param>
+        /// <param name="facing">Direction the skybox is facing (North by default).</param>
+        /// <returns>The configured skybox object.</returns>
+        public static Skybox LoadSkybox(Texture2D panorama, string id, EnvDirection facing)
+        {
+            // Check for loaded skybox
+            if (id == CurrentScene.SkyboxID) return CurrentScene.Skybox; 
+            else
+            {
+                Skybox skybox = new Skybox();
+                skybox.Direction = facing;
+                skybox.CubemapMaterial = LoadMaterialDefault();
+                skybox.CubemapMaterial.Shader = Uniray.Uniray.Shaders.SkyboxShader;
+
+                SetSkyboxTexture(skybox, panorama);
+
+                UDebugger.Send($"Custom skybox has been loaded successfully");
+                return skybox;
+            }
         }
 
         /// <summary>Draws a skybox object to the screen.</summary>

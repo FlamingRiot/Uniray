@@ -39,13 +39,14 @@ namespace Uniray
             else Camera = new UCamera();
             Name = name;
             SkyboxID = skyboxKey;
-            if (Skybox.DEFAULT_CUBEMAP_TEXTURE.Contains(skyboxKey)) LoadSkybox(); // Load if default passed (simplicity.)
+            LoadSkybox();
         }
 
         /// <summary>Loads the skybox object of the scene.</summary>
         public void LoadSkybox()
         {
             if (Skybox.DEFAULT_CUBEMAP_TEXTURE.Contains(SkyboxID)) Skybox = RaylibComplements.LoadSkybox(Skybox.DEFAULT_CUBEMAP_TEXTURE, EnvDirection.North);
+            else Skybox = RaylibComplements.LoadSkybox(Uniray.Ressource.GetTexture(SkyboxID), SkyboxID, EnvDirection.North);
         }
 
         /// <summary>Returns informations about the current instance.</summary>
