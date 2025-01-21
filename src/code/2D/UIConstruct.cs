@@ -14,7 +14,7 @@ namespace Uniray
         public const string COMPONENT_GROUP_IDENTIFIER = $"{COMPONENT_IDENTIFIER}Group";
 
         /// <summary>The list of every components in the UI</summary>
-        public Dictionary<string, Component> Components;
+        public OrderedDictionary<string, Component> Components;
 
         /// <summary>The list of every modal in the UI</summary>
         public Dictionary<string, Modal> Modals;
@@ -30,7 +30,7 @@ namespace Uniray
         public UI()
         {
             // Instanciate the components dictionary
-            Components = new Dictionary<string, Component>();
+            Components = new OrderedDictionary<string, Component>();
             // Instanciate the modals dictionary
             Modals = new Dictionary<string, Modal>();
 
