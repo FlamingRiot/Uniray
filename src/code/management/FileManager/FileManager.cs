@@ -162,20 +162,24 @@ namespace Uniray
                 }
                 if (IsKeyPressed(KeyboardKey.B))
                 {
-                    string filePath = $"{CurrentFolder.Path}/NewScript.cs";
-                    File.Copy("data/script.cs", filePath);
-                    UFile file = new UFile(filePath);
-                    CurrentFolder.AddFile(file);
+                    // Prevent from creating scripts other than in scripts section
+                    if (((Container)Uniray.UI.Components["fileManager"]).ExtensionFile == "cs")
+                    {
+                        string filePath = $"{CurrentFolder.Path}/NewScript.cs";
+                        File.Copy("data/script.cs", filePath);
+                        UFile file = new UFile(filePath);
+                        CurrentFolder.AddFile(file);
 
-                    // Prepare file
-                    UpdateScriptName(filePath, "NewScript");
+                        // Prepare file
+                        UpdateScriptName(filePath, "NewScript");
 
-                    // Set clicked item to new file
-                    ClickedUnits.Clear();
-                    ClickedUnits.Add(file);
+                        // Set clicked item to new file
+                        ClickedUnits.Clear();
+                        ClickedUnits.Add(file);
 
-                    // Add rename box
-                    InjectRenameBox(file);
+                        // Add rename box
+                        InjectRenameBox(file);
+                    }
                 }
             }
             // Draw selected item
