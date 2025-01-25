@@ -8,8 +8,8 @@ class Program
         string appName = "Uniray";
         string fileExtension = ".uproj";
         string appPath = Directory.GetCurrentDirectory(); // Get current directory
-        appPath = appPath.Replace($"uniray\\ext\\RegistryKey", $"uniray\\src").Replace("net8.0", "net7.0") + $"\\Uniray.exe"; // Get path to .exe
-        string commandDir = appPath.Split("\\bin\\Debug\\net7.0").First(); // Get directory to application source
+        appPath = appPath.Replace($"uniray\\ext\\RegistryKey", $"uniray\\src").Replace("net8.0", "net9.0") + $"\\Uniray.exe"; // Get path to .exe
+        string commandDir = appPath.Split("\\bin\\Debug\\net9.0").First(); // Get directory to application source
         string iconPath = commandDir + "\\data\\logo.ico"; // Get application icon
         // Build application 
         string command = $"/C cd \"{commandDir}\" && dotnet build";
