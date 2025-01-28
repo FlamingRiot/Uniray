@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Raylib_cs;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -243,7 +244,7 @@ namespace Uniray.DatFiles
                 switch (go)
                 {
                     case UModel model: // JSON 0
-                        json[0] += "{" + "Scene: \"" + model.Scene + "\",X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
+                        json[0] += "{" + "Scene: \"" + model.Scene + "\",Name: \"" + model.Name + "\",X: " + model.X + ",Y: " + model.Y + ",Z: " + model.Z + ",Yaw: " + model.Yaw +
                         ",Pitch: " + model.Pitch + ",Roll: " + model.Roll + ",Width: " + model.Width + ",Height: " + model.Height
                         + ",Depth: " + model.Depth + ",ModelID: \"" + model.ModelID + "\", Transform:";
                         json[0] += JsonConvert.SerializeObject(model.Transform);
@@ -254,7 +255,7 @@ namespace Uniray.DatFiles
                         json[1] += ",";
                         break;
                     case UShape shape: // JSON 2
-                        json[2] += "{" + "X: " + shape.X + ",Y: " + shape.Y + ",Z: " + shape.Z + ",Yaw: " + shape.Yaw +
+                        json[2] += "{" + "Name: \"" + shape.Name + "\",X: " + shape.X + ",Y: " + shape.Y + ",Z: " + shape.Z + ",Yaw: " + shape.Yaw +
                         ",Pitch: " + shape.Pitch + ",Roll: " + shape.Roll + ",Width: " + shape.Width + ",Height: " + shape.Height
                         + ",Depth: " + shape.Depth + ",Type: \"" + shape.Type + "\", Transform:";
                         json[2] += JsonConvert.SerializeObject(shape.Transform);

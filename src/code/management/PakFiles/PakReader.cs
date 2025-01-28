@@ -64,7 +64,7 @@ namespace Uniray.PakFiles
                 pakFile.Seek(entry.Index, SeekOrigin.Begin);
                 // Read compressed data from pak file
                 byte[] compressedBuffer = new byte[entry.CompressedSize];
-                pakFile.Read(compressedBuffer, 0, compressedBuffer.Length);
+                pakFile.ReadExactly(compressedBuffer);
                 // Decompress data
                 byte[] buffer = PakArchive.Decompress(compressedBuffer);
                 // Return loaded data

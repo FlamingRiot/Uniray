@@ -42,7 +42,7 @@ namespace Uniray
         /// <summary>Transformative matrix of the object.</summary>
         public Matrix4x4 Transform;
         /// <summary>Name of the object.</summary>
-        public string Name;
+        private string _name;
         /// <summary>Behvior of the object.</summary>
         public Behavior? Behavior;
 
@@ -60,13 +60,16 @@ namespace Uniray
         /// <summary>X Position of the object.</summary>
         [ComponentField(Group = "Position")]
         public virtual float Z { get { return Transform.M34; } set { ComponentField.SetProperty(value, ref Transform.M34, nameof(Z)); } }
+        /// <summary>X Position of the object.</summary>
+        [ComponentField(Group = "General")]
+        public string Name { get { return _name; } set { ComponentField.SetProperty(value, ref _name, nameof(Name)); } }
         /// <summary>Scene containing this game object.</summary>
         public string Scene { get { return _scene; } set { _scene = value; } }
 
         /// <summary>Creates an instance of <see cref="GameObject3D"/>.</summary>
         public GameObject3D() 
         {
-            Name = "";
+            _name = "";
             _scene = "";
             Transform = Matrix4x4.Identity; // Get identity (default) matrix
         }
@@ -76,7 +79,7 @@ namespace Uniray
         /// <param name="position">Object position</param>
         public GameObject3D(string name, Vector3 position)
         {
-            Name = name;
+            _name = name;
             _scene = UData.CurrentScene.Name;
             Transform = Matrix4x4.Identity; // Get identity (default) matrix
             Position = position;
@@ -88,7 +91,7 @@ namespace Uniray
         /// <param name="behaviour">Object behaviour script</param>
         public GameObject3D(string name, Vector3 position, Behavior? behavior)
         {
-            Name = name;
+            _name = name;
             _scene = UData.CurrentScene.Name;
             Transform = Matrix4x4.Identity; // Get identity (default) matrix
             Position = position;
