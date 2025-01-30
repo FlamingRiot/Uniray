@@ -17,7 +17,7 @@ uniform mat4 matProjection;
 void main()
 {
     // Expanding on vertex position (from model space)
-    vec4 worldPos = matModel * vec4(vertexPosition + normalize(vertexNormal) * 0.0025, 1.0);
+    vec4 worldPos = matModel * vec4(vertexPosition + normalize(vertexNormal) * 0.05, 1.0);
 
 
     // Calculate final vertex position
