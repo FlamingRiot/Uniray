@@ -83,7 +83,9 @@ namespace Uniray
             // Set default asset folder
             FileManager.CurrentFolder = FileManager.ModelFolder;
 
-            //ComponentFieldValidator.Validate<UCamera>();
+            ComponentFieldValidator.Validate<UCamera>();
+            ComponentFieldValidator.Validate<UModel>();
+            ComponentFieldValidator.Validate<UShape>();
         }
 
         /// <summary>Draws the currently displayed <see cref="Scene"/>.</summary>
@@ -374,6 +376,11 @@ namespace Uniray
                 writer.Write(CurrentProject.LaunchScene); // Write default launch scene
 
                 UDebugger.Send($"Project {CurrentProject.Name} has been saved successfully", ConsoleColor.Green);
+
+                //FileStream cryptoStream = new FileStream(CurrentProject.ProjectFolder + "/crypto.env", FileMode.Create);
+                //using BinaryWriter cryptoWriter = new BinaryWriter(cryptoStream);
+                //cryptoWriter.Write(CurrentProject.EncryptionKey);
+                //cryptoWriter.Write(CurrentProject.SymmetricalVector);
             }
             else
             {

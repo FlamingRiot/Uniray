@@ -389,6 +389,8 @@ namespace Uniray
                                 }
                             }
                         }
+                        // Clear selection
+                        ClickedUnits.Clear();
                     }
                     // Check if over folder
                     foreach (UFolder folder in CurrentFolder.Files.Where(x => x is UFolder))
@@ -418,6 +420,7 @@ namespace Uniray
                                         File.Move(unit.Path, folder.Path + '/' + ((UFile)unit).FullName);
                                         unit.Path = folder.Path + '/' + ((UFile)unit).FullName;
                                     }
+                                    ClickedUnits.Clear();
                                 }
                                 else if (unit is UFolder)
                                 {
@@ -433,7 +436,6 @@ namespace Uniray
                                     }
                                 }
                             }
-
                             break;
                         }
                     }
