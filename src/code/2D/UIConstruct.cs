@@ -221,7 +221,8 @@ namespace Uniray
                 "Cone",
                 "Hemisphere",
                 "Torus",
-                "Knot"
+                "Knot",
+                "Hollow Cylinder"
             };
             addDD = new DropDown(165, 30, 140, addDDS);
             addDD.BackgroundColor = Uniray.SPECIAL_COLOR;
@@ -232,6 +233,7 @@ namespace Uniray
             addDD.SetButtonEvent(4, AddHemisphere);
             addDD.SetButtonEvent(5, AddTorus);
             addDD.SetButtonEvent(6, AddKnot);
+            addDD.SetButtonEvent(7, AddHollowCylinder);
         }
 
         /// <summary>Draws the full 2D UI of the application.</summary>

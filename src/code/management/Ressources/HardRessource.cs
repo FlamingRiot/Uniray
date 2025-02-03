@@ -29,7 +29,8 @@ namespace Uniray
                 { ShapeType.Cone, GenMeshCone(0.5f, 1, 20) },
                 { ShapeType.Torus, GenMeshTorus(0.5f, 1, 20, 20) },
                 { ShapeType.HemiSphere, GenMeshHemiSphere(0.5f, 15, 15) },
-                { ShapeType.Knot, GenMeshKnot(0.5f, 1, 20, 20) }
+                { ShapeType.Knot, GenMeshKnot(0.5f, 1, 20, 20) },
+                { ShapeType.HollowCylinder, GenMeshTorus(0.5f, 1, 4, 20) },
             };
         }
 

@@ -156,5 +156,9 @@ namespace Uniray
         {
             UData.CurrentScene.GameObjects.Add(new UShape("Knot", Vector3.UnitY, ShapeType.Knot));
         }
+        private void AddHollowCylinder()
+        {
+            UData.CurrentScene.GameObjects.Add(new UShape("Hollow Cylinder", Vector3.UnitY, ShapeType.HollowCylinder));
+        }
     }
 }

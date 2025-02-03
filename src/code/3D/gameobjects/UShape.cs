@@ -12,7 +12,8 @@ namespace Uniray
         Cone,
         HemiSphere,
         Knot,
-        Torus
+        Torus,
+        HollowCylinder
     }
 
     /// <summary>Represents a <see cref="UShape"/> game object.</summary>
