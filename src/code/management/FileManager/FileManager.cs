@@ -6,6 +6,7 @@ using static Raylib_cs.Raylib;
 using Raylib_cs.Complements;
 using System.Numerics;
 using System.IO;
+using System.Diagnostics;
 
 namespace Uniray
 {
@@ -337,6 +338,24 @@ namespace Uniray
                         // Reset selected item
                         UData.SelectedFiles.Clear();
                         ClickedUnits.Clear();
+                    }
+                    if (unit is UFile file)
+                    {
+                        switch (file.Extension)
+                        {
+                            case "cs":
+                                // try launching vs 2022
+                                try
+                                {
+                                    string command = $"/C code {file.Path}";
+                                    Process.Start("cmd", command);
+                                }
+                                catch (Exception e)
+                                {
+                                    UDebugger.Send(e.Message, ConsoleColor.Red);
+                                }
+                                break;
+                        }
                     }
                 }
                 else if (Hover(x + 10, y + HardRessource.Textures["model_file"].Height + 20, _labelWidth, _labelHeight))
@@ -711,6 +730,7 @@ namespace Uniray
         {
             string text = File.ReadAllText(path);
             text = text.Replace("###", name);
+            text = text.Replace("NewScript", name);
             text = text.Replace("/*", "");
             text = text.Replace("*/", "");
             File.WriteAllText(path, text);

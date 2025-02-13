@@ -68,6 +68,9 @@ namespace Uniray
             // Change CultureInfo
             ChangeCultureInfo();
 
+            // Load internal data
+            InternalData.LookUp();
+
             // Init the GUI library with the two main colors of the application
             InitGUI(Uniray.APPLICATION_COLOR, Uniray.FOCUS_COLOR, LoadFont("data/font/Ubuntu-Regular.ttf"));
             SetDefaultFontSize(15);
