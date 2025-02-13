@@ -19,6 +19,8 @@ namespace Uniray
     /// <summary>Represents an instance of the running program.</summary>
     public class Program
     {
+        public const string VERSION = "2.0.1-alpha";
+
         internal static int Width;
         internal static int Height;
         private static int MaxWidth;
@@ -41,6 +43,8 @@ namespace Uniray
             InitWindow(SPLASH_SIZE, SPLASH_SIZE, "Uniray - New Project");
             SetWindowState(ConfigFlags.ResizableWindow);
             SetWindowState(ConfigFlags.UndecoratedWindow);
+
+            UDebugger.Send($"Version {VERSION}");
 
             // Set window icon
             Image icon = LoadImage("data/img/logo.png");
@@ -91,7 +95,7 @@ namespace Uniray
 
             // Disable exit key
             SetExitKey(KeyboardKey.Null);
-#if !DEBUG
+#if DEBUG
             SetTargetFPS(60);
 #endif
             while (!WindowShouldClose())

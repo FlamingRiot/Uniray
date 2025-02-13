@@ -17,7 +17,7 @@
         {
             Console.ForegroundColor = color;
             Console.WriteLine($"UNIRAY: {msg}");
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Gray;
         }
     }
 }

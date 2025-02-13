@@ -38,11 +38,6 @@ namespace Uniray
             // Get properties using ComponentField attribute
             PropertyInfo[] props = type.GetProperties().Where(prop => prop.IsDefined(typeof(ComponentField), false)).ToArray();
             // Check if implements SetProperty<T> in setter
-
-            for (int i = 0; i < props.Length; i++) 
-            {
-                UDebugger.Send($"Property {props[i].Name} from {type.Name} respects [ComponentField] conventions", ConsoleColor.Green);
-            }
         }
     }
 }

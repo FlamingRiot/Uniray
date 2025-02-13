@@ -41,10 +41,8 @@ namespace Uniray
         // -----------------------------------------------------------
         /// <summary>Transformative matrix of the object.</summary>
         public Matrix4x4 Transform;
-        /// <summary>Name of the object.</summary>
         private string _name;
-        /// <summary>Behvior of the object.</summary>
-        public Behavior? Behavior;
+        private Behavior? Behavior;
 
         // -----------------------------------------------------------
         // Public properties
@@ -60,7 +58,7 @@ namespace Uniray
         /// <summary>X Position of the object.</summary>
         [ComponentField(Group = "Position")]
         public virtual float Z { get { return Transform.M34; } set { ComponentField.SetProperty(value, ref Transform.M34, nameof(Z)); } }
-        /// <summary>X Position of the object.</summary>
+        /// <summary>Name of the object.</summary>
         [ComponentField(Group = "General")]
         public string Name { get { return _name; } set { ComponentField.SetProperty(value, ref _name, nameof(Name)); } }
         /// <summary>Scene containing this game object.</summary>
